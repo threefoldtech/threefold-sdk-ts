@@ -19,7 +19,7 @@
           type="warning"
           variant="tonal"
           class="mb-4"
-          v-if="failedToListGws.length && gatewayTab === 0 && !loadingGateways"
+          v-if="errorMessage && gatewayTab === 0 && !loadingGateways"
         >
           Failed to list {{ failedToListGws.length }} domains.
           <template #append>
@@ -266,6 +266,7 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
+    const errorMessage = ref("");
 
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
     const tableHeaders = ref([
@@ -330,8 +331,12 @@ export default {
         });
         gateways.value = gws;
         failedToListGws.value = failedToList;
+        if (failedToListGws.value.length) {
+          errorMessage.value = `Failed to list ${failedToListGws.value.length} domains`;
+        }
       } catch (error) {
-        layout.value.setStatus("failed", normalizeError(error, "Failed to list this deployment's domains."));
+        errorMessage.value = "Failed to list this deployment's domains";
+        layout.value.setStatus("failed", normalizeError(error, errorMessage.value));
       } finally {
         loadingGateways.value = false;
       }
@@ -509,6 +514,7 @@ export default {
       isWireGuard,
       availableK8SNodesNames,
       selectedK8SNodeName,
+      errorMessage,
     };
   },
 };
