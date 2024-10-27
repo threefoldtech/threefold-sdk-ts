@@ -30,7 +30,6 @@ const API_PREFIX = "/api/v1/";
  * @method getToken - Fetches the token from the KYC service.
  */
 export class KYC {
-  private keyring: Keyring;
   private keypair: KeyringPair;
   public address: string;
   /**
@@ -76,7 +75,7 @@ export class KYC {
    *
    */
   private async prepareHeaders(): Promise<Record<string, string>> {
-    await this.setupKeyring();
+    if (!this.keypair) await this.setupKeyring();
     const timestamp = Date.now();
     const challenge = stringToHex(`${this.apiDomain}:${timestamp}`);
     const signedChallenge = this.keypair.sign(bytesFromHex(challenge));
@@ -140,9 +139,14 @@ export class KYC {
    * @throws {KycErrors.TFGridKycError | KycBaseError} If there is an issue with fetching the status data.
    */
   async status(): Promise<KycStatus> {
-    const headers = await this.prepareHeaders();
     try {
-      const res = await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "status"), "", headers);
+      if (!this.keypair) await this.setupKeyring();
+      const res = await send(
+        "GET",
+        urlJoin("https://", this.apiDomain, API_PREFIX, "status", `?client_id=${this.address}`),
+        "",
+        { "Content-Type": "application/json" },
+      );
       if (!res.result.status)
         throw new KycErrors.KycInvalidResponseError(
           "Failed to get status due to: Response does not contain status field",
