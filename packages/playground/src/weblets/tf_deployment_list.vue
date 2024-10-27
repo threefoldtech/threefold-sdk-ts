@@ -512,29 +512,29 @@ async function onDelete(k8s = false) {
       }
     });
 
-    await Promise.all(
-      allSelectedItems.map(async item => {
-        try {
-          if (projectNameLower === ProjectName.Domains.toLowerCase()) {
-            await deleteGatewayDeployment(
-              updateGrid(grid, { projectName: projectNameLower }),
-              item[0].workloads[0].name as string,
-            );
-          } else {
-            await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-              deploymentName: item.deploymentName,
-              name: k8s ? item.deploymentName : item.name,
-              projectName: item.projectName,
-              ip: item.interfaces?.[0]?.ip,
-              k8s,
-            });
-          }
-        } catch (e: any) {
-          createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
-          console.error("Error while deleting deployment", e.message);
+    await allSelectedItems.reduce(async (acc, item) => {
+      await acc;
+      try {
+        if (projectNameLower === ProjectName.Domains.toLowerCase()) {
+          await deleteGatewayDeployment(
+            updateGrid(grid, { projectName: projectNameLower }),
+            item[0].workloads[0].name as string,
+          );
+        } else {
+          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+            deploymentName: item.deploymentName,
+            name: k8s ? item.deploymentName : item.name,
+            projectName: item.projectName,
+            ip: item.interfaces?.[0]?.ip,
+            k8s,
+          });
         }
-      }),
-    );
+      } catch (e: any) {
+        createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
+        console.error("Error while deleting deployment", e.message);
+      }
+    }, Promise.resolve());
+
     table.value?.loadDeployments();
   } catch (e) {
     createCustomToast((e as Error).message, ToastType.danger);
