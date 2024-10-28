@@ -66,6 +66,7 @@ export default {
     };
 
     const handleReceiveMessage = (event: MessageEvent) => {
+      window.removeEventListener("message", handleReceiveMessage, false);
       handleUpdateDialog(false); // close the dialog
       if (!event.data.status) console.error("Can't check the verification status", event.data);
       const status = (event.data.status as string).toLowerCase();

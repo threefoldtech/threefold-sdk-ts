@@ -24,7 +24,7 @@ class TwinDeploymentHandler {
     this.deploymentFactory = new DeploymentFactory(this.config);
     this.rmb = new RMB(config.rmbClient);
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
-    this.kyc = new KYC(this.config.kycURL, this.tfclient.mnemonic, this.tfclient.keypairType);
+    this.kyc = new KYC(this.config.kycURL, this.config.mnemonic, this.config.keypairType);
   }
 
   async createNameContract(name: string) {
