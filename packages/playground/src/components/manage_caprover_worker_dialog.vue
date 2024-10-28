@@ -7,6 +7,7 @@
     @deploy="deploy"
     @delete="onDelete"
     @back="updateCaprover"
+    @click:outside="updateCaprover"
   >
     <template #title>Manage Caprover({{ $props.master.name }}) Workers</template>
 
@@ -150,6 +151,11 @@ async function deploy(layout: any) {
     leader.deploymentName = leader.name;
     caproverData.value = leader;
     deployedDialog.value = true;
+    workers.forEach((worker: any) => {
+      if (!worker.projectName) worker.projectName = props.projectName;
+      if (!worker.deploymentName) worker.deploymentName = leader.name;
+    });
+    emits("update:caprover", leader);
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
   } catch (e) {
     layout.setStatus("failed", normalizeError(e, "Failed to deploy a caprover worker."));
