@@ -153,7 +153,7 @@ class MachinesModel {
 }
 
 class AddMachineModel extends MachineModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) deployment_name: string;
   @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
@@ -167,7 +167,7 @@ class MachinesGetModel extends BaseGetDeleteModel {}
 class MachinesDeleteModel extends BaseGetDeleteModel {}
 
 class KubernetesNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(1024) memory: number; // in MB
@@ -187,7 +187,7 @@ class KubernetesNodeModel {
 }
 
 class K8SModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() secret: string;
   @Expose() @Type(() => NetworkModel) @ValidateNested() network: NetworkModel;
   @Expose() @Type(() => KubernetesNodeModel) @ValidateNested({ each: true }) masters: KubernetesNodeModel[];
@@ -202,13 +202,13 @@ class K8SGetModel extends BaseGetDeleteModel {}
 class K8SDeleteModel extends BaseGetDeleteModel {}
 
 class AddWorkerModel extends KubernetesNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) deployment_name: string;
   @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
 class DeleteWorkerModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
 }
 
 class ZDBModel {
