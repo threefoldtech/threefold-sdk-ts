@@ -106,10 +106,10 @@ export class KYC {
     const errorMessage = formatErrorMessage(messagePrefix, error);
     switch (true) {
       case status === HttpStatusCode.BadRequest:
-        return new KycErrors.BadRequest(errorMessage);
+        return new KycErrors.BadRequest(`${errorMessage}. Please contact support.`);
 
       case status === HttpStatusCode.Unauthorized:
-        return new KycErrors.Unauthorized(errorMessage);
+        return new KycErrors.Unauthorized(`${errorMessage}. Please contact support.`);
 
       case status === HttpStatusCode.NotFound:
         return new KycErrors.Unverified(errorMessage);
@@ -171,7 +171,7 @@ export class KYC {
   async getToken(): Promise<string> {
     try {
       const headers = await this.prepareHeaders();
-      const res = (await axios.post(urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", headers)).data;
+      const res = (await axios.post(urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", { headers })).data;
       if (!res.result.authToken)
         throw new KycErrors.InvalidResponse("Failed to get token due to: Response does not contain authToken field");
       return res.result.authToken;
