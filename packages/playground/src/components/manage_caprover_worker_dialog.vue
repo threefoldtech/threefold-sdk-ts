@@ -7,6 +7,7 @@
     @deploy="deploy"
     @delete="onDelete"
     @back="updateCaprover"
+    @click:outside="updateCaprover"
   >
     <template #title>Manage Caprover({{ $props.master.name }}) Workers</template>
 
@@ -144,9 +145,17 @@ async function deploy(layout: any) {
       }),
     });
 
-    const leader = setCaproverWorkers(vms, props.projectName);
+    const [leader, ...workers] = vms;
+    leader.workers = workers;
+    leader.projectName = props.projectName;
+    leader.deploymentName = leader.name;
     caproverData.value = leader;
     deployedDialog.value = true;
+    workers.forEach((worker: any) => {
+      if (!worker.projectName) worker.projectName = props.projectName;
+      if (!worker.deploymentName) worker.deploymentName = leader.name;
+    });
+    emits("update:caprover", leader);
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
   } catch (e) {
     layout.setStatus("failed", normalizeError(e, "Failed to deploy a caprover worker."));
@@ -179,8 +188,6 @@ async function onDelete(cb: (workers: any[]) => void) {
 
 <script lang="ts">
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-
-import { setCaproverWorkers } from "@/utils/deploy_helpers";
 
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";

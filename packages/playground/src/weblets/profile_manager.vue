@@ -82,6 +82,7 @@
         :tabs="getTabs()"
         v-model="activeTab"
         :disabled="creatingAccount || activatingAccount || activating"
+        ref="tabsRef"
         @tab:change="
           () => {
             clearError();
@@ -524,6 +525,19 @@ watch(
   },
   { deep: false },
 );
+const tabsRef = ref();
+
+function handleTabs() {
+  const tabs = tabsRef.value?.$el;
+  if (!tabs) return;
+  if (!isStoredCredentials()) return;
+
+  const activeClass = "v-slide-group-item--active";
+  const tabsButtons = tabs.nextSibling.querySelectorAll("button");
+  const ButtonsList: HTMLElement[] = Array.from(tabsButtons);
+  const activeButtonIndex = ButtonsList.findIndex(sibling => sibling.classList.contains(activeClass));
+  activeTab.value = activeButtonIndex;
+}
 
 async function mounted() {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
@@ -562,6 +576,7 @@ function isStoredCredentials() {
 }
 
 function getTabs() {
+  handleTabs();
   let tabs = [];
   if (isStoredCredentials()) {
     tabs = [
@@ -629,10 +644,6 @@ watch(
     confirmPassword.value && confirmPasswordInput.value?.validate();
   },
   { immediate: true },
-);
-watch(
-  () => [online, props.modelValue],
-  ([newOnline, newModelValue], [oldOnline, oldModelValue]) => {},
 );
 
 function logout() {

@@ -20,17 +20,23 @@
       <input-validator
         :value="$props.modelValue.username"
         :rules="[
-          validators.required('Email is required.'),
-          validators.isEmail('Please provide a valid email address.'),
-          v => {
-            return isDiscourse ? undefined : validators.isEmail('Please provide a valid email address.')(v);
+          validators.required('Email or Username is required.'),
+          validators.minLength('Username must be at least 2 characters.', 2),
+          validators.maxLength('Email or Username cannot exceed 50 characters.', 50),
+          (v: string) => {
+            return (
+              validators.isEmail('Please provide a valid email address.')(v) &&
+              (validators.IsAlphanumericExpectDashAndUnderscore(
+                'Username should consist of letters, numbers, dashs and underscores only.' 
+              )(v))
+            );
           },
         ]"
         #="{ props }"
       >
-        <input-tooltip :tooltip="isDiscourse ? 'SMTP admin email, Username or API key.' : 'SMTP admin email'">
+        <input-tooltip tooltip="SMTP admin email, Username or API key.">
           <v-text-field
-            label="Admin Email"
+            label="Admin Email or Username"
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
             v-bind="props"
@@ -46,7 +52,7 @@
           :rules="[
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
-            validators.maxLength('Password cannot exceed 50 characters.', 50),
+            validators.maxLength('Password cannot exceed 69 characters.', 69),
             validators.pattern('Password should not contain whitespaces.', {
               pattern: /^[^\s]+$/,
             }),
@@ -139,7 +145,6 @@ defineProps<{
   tls?: boolean;
   email?: boolean;
   persistent?: boolean;
-  isDiscourse?: boolean;
 }>();
 </script>
 
