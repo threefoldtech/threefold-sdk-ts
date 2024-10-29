@@ -525,7 +525,7 @@ async function onDelete(k8s = false) {
             deploymentName: item.deploymentName,
             name: k8s ? item.deploymentName : item.name,
             projectName: item.projectName,
-            ip: item.interfaces?.[0]?.ip,
+            ip: getDeploymentIps(item),
             k8s,
           });
         }
@@ -565,6 +565,28 @@ function openDialog(project: string, item?: any): void {
 
 function clickOpenDialog(_: MouseEvent, { item }: any) {
   return openDialog(tabs[activeTab.value].value, item);
+}
+/**
+ * Collect the deployment interfaces ips
+ * @param item deployment data
+ * @returns {string[]} list of strings
+ */
+function getDeploymentIps(item: any): string[] {
+  const ips = [];
+  // wg ip
+  if (item.interfaces) {
+    for (const iface of item.interfaces) {
+      if (iface.ip) ips.push(iface.ip);
+    }
+  }
+  // public ip, ipv6
+  if (item.publicIP) {
+    if (item.publicIP.ip) ips.push(item.publicIP.ip.split("/")[0]);
+    if (item.publicIP.ip6) ips.push(item.publicIP.ip6.split("/")[0]);
+  }
+  if (item.planetary) ips.push(item.planetary);
+  if (item.myceliumIP) ips.push(item.myceliumIP);
+  return ips;
 }
 
 /* List Manager */
