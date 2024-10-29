@@ -15,13 +15,7 @@
       >
         <span>Filters</span>
         <VSpacer />
-        <VBtn
-          variant="outlined"
-          :disabled="loading || !valid || empty"
-          @click.stop="clear"
-          text="Clear"
-          density="compact"
-        />
+        <VBtn variant="outlined" :disabled="loading || empty" @click.stop="clear" text="Clear" density="compact" />
         <VBtn
           variant="outlined"
           color="secondary"
