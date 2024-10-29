@@ -59,7 +59,7 @@ import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
 export default {
   name: "CreateFarm",
-  setup() {
+  setup(_, context) {
     const showDialogue = ref(false);
     const isCreating = ref(false);
     const gridStore = useGrid();
@@ -73,6 +73,7 @@ export default {
         createCustomToast("Farm created successfully.", ToastType.success);
         showDialogue.value = false;
         farmName.value = "";
+        context.emit("farm-created");
         notifyDelaying();
       } catch (error) {
         console.log(error);

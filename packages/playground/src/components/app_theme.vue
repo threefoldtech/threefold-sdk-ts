@@ -21,7 +21,11 @@ const theme = useTheme();
 const light = ref(false);
 
 watch(light, light => (theme.global.name.value = light ? "light" : "dark"));
-watch(theme.global.name, theme => localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme));
+watch(theme.global.name, theme => {
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme);
+  light.value = theme === "light";
+});
+
 onMounted(() => {
   const theme = localStorage.getItem(LocalStorageSettingsKey.THEME_KEY);
   light.value = theme === "light";

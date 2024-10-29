@@ -410,19 +410,9 @@
         <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <template v-if="hasWorkers">
-          <v-alert type="warning">Please note that: This deployment contains workers workloads.</v-alert>
-        </template>
-        <template v-for="item in selectedItems" :key="item.name">
-          <template v-if="item.workers">
-            <v-chip class="ma-3" v-for="worker in item.workers" :key="worker.name">
-              {{ worker.name }}
-            </v-chip>
-          </template>
-          <v-chip class="ma-3">
-            {{ item.name }}
-          </v-chip>
-        </template>
+        <v-chip class="ma-1" v-for="item in selectedItems" :key="item.name">
+          {{ item.name }}
+        </v-chip>
         <v-divider />
       </v-card-text>
       <v-card-actions class="justify-end my-1 mr-2">
@@ -434,7 +424,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
+import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 
 import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -486,7 +476,6 @@ const deletingDialog = ref(false);
 const table = ref() as Ref<{ loadDeployments(): void }>;
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-const hasWorkers = computed(() => selectedItems.value.map(item => item.workers && item.workers.length).some(i => i));
 
 const _idx = tabs.findIndex(t => t.value === props.projectName);
 const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
@@ -495,39 +484,29 @@ watch(activeTab, () => (selectedItems.value = []));
 async function onDelete(k8s = false) {
   deletingDialog.value = false;
   deleting.value = true;
-
   try {
-    const projectNameLower = props.projectName?.toLowerCase();
-    const allSelectedItems = [...selectedItems.value];
-    selectedItems.value.forEach(item => {
-      if (item.projectName.toLowerCase().includes(ProjectName.Caprover.toLowerCase()) && item.workers) {
-        allSelectedItems.push(...item.workers);
-      }
-    });
-
-    await Promise.all(
-      allSelectedItems.map(async item => {
-        try {
-          if (projectNameLower === ProjectName.Domains.toLowerCase()) {
-            await deleteGatewayDeployment(
-              updateGrid(grid, { projectName: projectNameLower }),
-              item[0].workloads[0].name as string,
-            );
-          } else {
-            await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-              deploymentName: item.deploymentName,
-              name: k8s ? item.deploymentName : item.name,
-              projectName: item.projectName,
-              ip: getDeploymentIps(item),
-              k8s,
-            });
-          }
-        } catch (e: any) {
-          createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
-          console.error("Error while deleting deployment", e.message);
+    for (const item of selectedItems.value) {
+      try {
+        if (props.projectName?.toLowerCase() === ProjectName.Domains.toLowerCase()) {
+          await deleteGatewayDeployment(
+            updateGrid(grid, { projectName: props.projectName.toLocaleLowerCase() }),
+            item[0].workloads[0].name as string,
+          );
+        } else {
+          await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+            deploymentName: item.deploymentName,
+            name: k8s ? item.deploymentName : item.name,
+            projectName: item.projectName,
+            ip: item.interfaces?.[0]?.ip,
+            k8s,
+          });
         }
-      }),
-    );
+      } catch (e: any) {
+        createCustomToast(`Failed to delete deployment with name: ${item.name}`, ToastType.danger);
+        console.log("Error while deleting deployment", e.message);
+        continue;
+      }
+    }
     table.value?.loadDeployments();
   } catch (e) {
     createCustomToast((e as Error).message, ToastType.danger);
@@ -544,11 +523,6 @@ function openDialog(project: string, item?: any): void {
     : project === ProjectName.Kubernetes
     ? "k8s"
     : (project.toLowerCase() as any);
-
-  if (item && item.projectName && item.projectName.includes(ProjectName.Caprover.toLocaleLowerCase())) {
-    item = [item, ...item.workers];
-  }
-
   layout.value.openDialog(item, deploymentListEnvironments[key]);
 }
 

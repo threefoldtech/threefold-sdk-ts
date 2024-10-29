@@ -5,14 +5,14 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm class="mt-4" @farm-created="farmsReload = true" />
-    <UserFarms ref="userFarms" :reloadFarms="farmsReload" />
+    <CreateFarm class="mt-4" @farm-created="handleFarmCreated" />
+    <UserFarms :ref="el => (userFarms = el)" :reloadFarms="farmsReload" />
     <UserNodes />
   </div>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import CreateFarm from "./components/create_farm.vue";
 import UserFarms from "./components/user_farms.vue";
@@ -26,9 +26,20 @@ export default {
   },
   setup() {
     const farmsReload = ref<boolean>(false);
-
+    const userFarms = ref();
+    function handleFarmCreated() {
+      farmsReload.value = !farmsReload.value;
+    }
+    watch(
+      () => farmsReload.value,
+      () => {
+        userFarms.value.reloadFarms = farmsReload.value;
+      },
+    );
     return {
       farmsReload,
+      handleFarmCreated,
+      userFarms,
     };
   },
 };
