@@ -86,7 +86,6 @@
             placeholder="email@example.com"
             v-model="$props.modelValue.email"
             v-bind="props"
-            autofocus
           />
         </input-tooltip>
       </input-validator>
