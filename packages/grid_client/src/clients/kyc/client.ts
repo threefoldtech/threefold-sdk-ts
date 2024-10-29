@@ -102,19 +102,24 @@ export class KYC {
   private throwKycError(error: Error, messagePrefix: string) {
     if (!(error instanceof AxiosError)) return new KycBaseError(error.message);
     const { response, status } = error as AxiosError;
-    const errorMessage = formatErrorMessage(messagePrefix, error);
     if (response?.data) error.message = (response?.data as { error: string })?.error || error.message;
+    const errorMessage = formatErrorMessage(messagePrefix, error);
     switch (true) {
       case status === HttpStatusCode.BadRequest:
-        return new KycErrors.BadRequest(formatErrorMessage(`Bad Request: ${messagePrefix}`, error));
+        return new KycErrors.BadRequest(errorMessage);
+
       case status === HttpStatusCode.Unauthorized:
-        return new KycErrors.Unauthorized(formatErrorMessage(`Unauthorized: ${messagePrefix}.`, error));
+        return new KycErrors.Unauthorized(errorMessage);
+
       case status === HttpStatusCode.NotFound:
         return new KycErrors.Unverified(errorMessage);
+
       case status === HttpStatusCode.TooManyRequests:
         return new KycErrors.RateLimit(errorMessage);
+
       case status === HttpStatusCode.Conflict:
         return new KycErrors.AlreadyVerified(errorMessage);
+
       case status === HttpStatusCode.PaymentRequired:
         return new InsufficientBalanceError(errorMessage);
     }
@@ -131,7 +136,7 @@ export class KYC {
       const headers = await this.prepareHeaders();
       return await axios.get(urlJoin("https://", this.apiDomain, API_PREFIX, "data"), { headers });
     } catch (error) {
-      throw this.throwKycError(error, "Failed to get authentication data from KYC service");
+      throw this.throwKycError(error, "Failed to get authentication data from KYC service.");
     }
   }
 
@@ -154,7 +159,7 @@ export class KYC {
       return res.result.status;
     } catch (error) {
       if (error instanceof AxiosError && error.status === HttpStatusCode.NotFound) return KycStatus.unverified;
-      throw this.throwKycError(error, "Failed to get authentication status from KYC service");
+      throw this.throwKycError(error, "Failed to get authentication status from KYC service.");
     }
   }
   /**
@@ -171,7 +176,7 @@ export class KYC {
         throw new KycErrors.InvalidResponse("Failed to get token due to: Response does not contain authToken field");
       return res.result.authToken;
     } catch (error) {
-      throw this.throwKycError(error, "Failed to get auth token from KYC service");
+      throw this.throwKycError(error, "Failed to get auth token from KYC service.");
     }
   }
 }
