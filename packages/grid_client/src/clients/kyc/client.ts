@@ -1,12 +1,12 @@
 import { Keyring } from "@polkadot/keyring";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { InsufficientBalanceError, KycBaseError, KycErrors, RequestError, ValidationError } from "@threefold/types";
-import { HttpStatusCode } from "axios";
+import { InsufficientBalanceError, KycBaseError, KycErrors, ValidationError } from "@threefold/types";
+import axios, { AxiosError, HttpStatusCode } from "axios";
 import { Buffer } from "buffer";
 import urlJoin from "url-join";
 
-import { bytesFromHex, formatErrorMessage, KeypairType, send, stringToHex } from "../..";
+import { bytesFromHex, formatErrorMessage, KeypairType, stringToHex } from "../..";
 import { KycHeaders, KycStatus, VerificationDataResponse } from "./types";
 const API_PREFIX = "/api/v1/";
 /**
@@ -99,16 +99,24 @@ export class KYC {
    * @throws {KycErrors.KycInvalidSignatureError} If the error message indicates a malformed or bad signature.
    * @returns {undefined} If the error message does not match any known error patterns.
    */
-  private ThrowHeadersRelatedError(errorMessage: string) {
+  private throwKycError(error: Error, messagePrefix: string) {
+    if (!(error instanceof AxiosError)) return new KycBaseError(error.message);
+    const { response, status } = error as AxiosError;
+    const errorMessage = formatErrorMessage(messagePrefix, error);
+    if (response?.data) error.message = (response?.data as { error: string })?.error || error.message;
     switch (true) {
-      case errorMessage.includes("malformed address"):
-        throw new KycErrors.KycInvalidAddressError(errorMessage);
-      case errorMessage.includes("malformed challenge") || errorMessage.includes("bad challenge"):
-        throw new KycErrors.KycInvalidChallengeError(errorMessage);
-      case errorMessage.includes("malformed signature") || errorMessage.includes("bad signature"):
-        throw new KycErrors.KycInvalidSignatureError(errorMessage);
-      default:
-        return undefined;
+      case status === HttpStatusCode.BadRequest:
+        return new KycErrors.BadRequest(formatErrorMessage(`Bad Request: ${messagePrefix}`, error));
+      case status === HttpStatusCode.Unauthorized:
+        return new KycErrors.Unauthorized(formatErrorMessage(`Unauthorized: ${messagePrefix}.`, error));
+      case status === HttpStatusCode.NotFound:
+        return new KycErrors.Unverified(errorMessage);
+      case status === HttpStatusCode.TooManyRequests:
+        return new KycErrors.RateLimit(errorMessage);
+      case status === HttpStatusCode.Conflict:
+        return new KycErrors.AlreadyVerified(errorMessage);
+      case status === HttpStatusCode.PaymentRequired:
+        return new InsufficientBalanceError(errorMessage);
     }
   }
 
@@ -121,14 +129,9 @@ export class KYC {
   async data(): Promise<VerificationDataResponse> {
     try {
       const headers = await this.prepareHeaders();
-      return await send("GET", urlJoin("https://", this.apiDomain, API_PREFIX, "data"), "", headers);
+      return await axios.get(urlJoin("https://", this.apiDomain, API_PREFIX, "data"), { headers });
     } catch (error) {
-      const messagePrefix = "Failed to get authentication data from KYC service";
-      const errorMessage = formatErrorMessage(messagePrefix, error);
-      const statusCode = (error as RequestError).statusCode;
-      this.ThrowHeadersRelatedError(errorMessage);
-      if (statusCode === 404) throw new KycErrors.KycUnverifiedError(errorMessage);
-      throw new KycBaseError(errorMessage);
+      throw this.throwKycError(error, "Failed to get authentication data from KYC service");
     }
   }
 
@@ -141,23 +144,17 @@ export class KYC {
   async status(): Promise<KycStatus> {
     try {
       if (!this.keypair) await this.setupKeyring();
-      const res = await send(
-        "GET",
-        urlJoin("https://", this.apiDomain, API_PREFIX, "status", `?client_id=${this.address}`),
-        "",
-        { "Content-Type": "application/json" },
-      );
+      const res = (
+        await axios.get(urlJoin("https://", this.apiDomain, API_PREFIX, "status"), {
+          params: { client_id: this.address },
+        })
+      ).data;
       if (!res.result.status)
-        throw new KycErrors.KycInvalidResponseError(
-          "Failed to get status due to: Response does not contain status field",
-        );
+        throw new KycErrors.InvalidResponse("Failed to get status due to: Response does not contain status field");
       return res.result.status;
     } catch (error) {
-      if (error instanceof RequestError && error.statusCode === HttpStatusCode.NotFound) return KycStatus.unverified;
-      const messagePrefix = "Failed to get authentication status from KYC service";
-      const errorMessage = formatErrorMessage(messagePrefix, error);
-      this.ThrowHeadersRelatedError(errorMessage);
-      throw new KycBaseError(errorMessage);
+      if (error instanceof AxiosError && error.status === HttpStatusCode.NotFound) return KycStatus.unverified;
+      throw this.throwKycError(error, "Failed to get authentication status from KYC service");
     }
   }
   /**
@@ -169,27 +166,12 @@ export class KYC {
   async getToken(): Promise<string> {
     try {
       const headers = await this.prepareHeaders();
-      const res = await send("POST", urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", headers);
+      const res = (await axios.post(urlJoin("https://", this.apiDomain, API_PREFIX, "token"), "", headers)).data;
       if (!res.result.authToken)
-        throw new KycErrors.KycInvalidResponseError(
-          "Failed to get token due to: Response does not contain authToken field",
-        );
+        throw new KycErrors.InvalidResponse("Failed to get token due to: Response does not contain authToken field");
       return res.result.authToken;
     } catch (error) {
-      const messagePrefix = "Failed to get auth token from KYC service";
-      const errorMessage = formatErrorMessage(messagePrefix, error);
-      const statusCode = (error as RequestError).statusCode;
-      this.ThrowHeadersRelatedError(errorMessage);
-      switch (true) {
-        case statusCode === HttpStatusCode.TooManyRequests:
-          throw new KycErrors.KycRateLimitError(errorMessage);
-        case errorMessage.includes("already verified"):
-          throw new KycErrors.KycAlreadyVerifiedError(errorMessage);
-        case errorMessage.includes("balance"):
-          throw new InsufficientBalanceError(errorMessage);
-        default:
-          throw new KycBaseError(errorMessage);
-      }
+      throw this.throwKycError(error, "Failed to get auth token from KYC service");
     }
   }
 }

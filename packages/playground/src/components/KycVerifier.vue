@@ -22,7 +22,6 @@ import { onMounted, ref } from "vue";
 
 import { useKYC } from "@/stores/kyc";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { handleKYCError } from "@/utils/helpers";
 
 export default {
   name: "KycVerifier",
@@ -51,15 +50,13 @@ export default {
         token.value = await kyc.client.getToken();
       } catch (e) {
         handleUpdateDialog(false);
-        if (e instanceof KycErrors.KycAlreadyVerifiedError) {
+        if (e instanceof KycErrors.AlreadyVerified) {
           kyc.updateStatus();
           createCustomToast("Already verified", ToastType.info);
           return;
         }
-        const message = "Failed to get authentication token";
-        handleKYCError(message, e as Error);
-        createCustomToast(handleKYCError(message, e as Error), ToastType.danger);
-        console.error(message, e);
+        createCustomToast((e as KycErrors.TFGridKycError).message, ToastType.danger);
+        console.error(e);
       } finally {
         emit("loaded");
       }
