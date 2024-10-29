@@ -46,13 +46,19 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'"> Go to Proposal </v-btn>
+              <div class="d-flex justify-between">
+                <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'" class="mx-3">
+                  Go to Proposal
+                </v-btn>
+                <v-btn @click="shareProposal(proposal.hash)">Share</v-btn>
+              </div>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
             <v-card-text class="pb-0">
               <v-row class="my-1 mb-3">
                 <p class="font-weight-bold mr-3">Description:</p>
+
                 <span> {{ proposal.description }}</span>
               </v-row>
               <v-row v-if="expired(proposal.end)" class="my-1">
@@ -339,6 +345,10 @@ onMounted(async () => {
     loadingProposals.value = false;
   }
 });
+function shareProposal(hash: string) {
+  const link = `${window.location.href}/${hash}`;
+  console.log(link);
+}
 function expired(proposalEnd: moment.Moment) {
   return proposalEnd.isAfter(Date.now());
 }
