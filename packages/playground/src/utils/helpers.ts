@@ -1,4 +1,4 @@
-import { InsufficientBalanceError, KycErrors } from "@threefold/types";
+import { InsufficientBalanceError } from "@threefold/types";
 
 import type { NodeGPUCardType } from "../utils/filter_nodes";
 
@@ -99,26 +99,4 @@ export function markAsFromAnotherClient(deployment: any): any {
     });
   }
   return deployment;
-}
-
-export function handleKYCError(message: string, error: Error): string {
-  if (error instanceof KycErrors.TFGridKycError) {
-    switch (true) {
-      case error instanceof KycErrors.KycInvalidAddressError:
-        return `${message}: Invalid address, please contact support`;
-      case error instanceof KycErrors.KycInvalidChallengeError:
-        return `${message}: Invalid challenge, please contact support`;
-      case error instanceof KycErrors.KycInvalidSignatureError:
-        return `${message}: Invalid signature, please contact support`;
-      case error instanceof InsufficientBalanceError:
-        return `${message}: Insufficient balance, please fund your wallet`;
-      case error instanceof KycErrors.KycUnverifiedError:
-        return `${message}: KYC is not verified`;
-      case error instanceof KycErrors.KycInvalidResponseError:
-        return `${message}: Invalid response, please contact support`;
-      case error instanceof KycErrors.KycRateLimitError:
-        return `${message}: Rate limit exceeded, please try again later`;
-    }
-  }
-  return `${message}`;
 }

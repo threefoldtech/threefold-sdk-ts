@@ -16,7 +16,7 @@ export enum Generic {
 }
 export abstract class BaseError extends Error {
   constructor(name: string, public code: number, message: string, public module: ErrorModules) {
-    super(`${name}: ${message}`);
+    super(message);
   }
 }
 

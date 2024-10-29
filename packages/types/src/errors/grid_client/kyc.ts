@@ -2,13 +2,12 @@ import { BaseError } from "../base_error";
 import { ErrorModules } from "../modules";
 
 export enum Errors {
-  UnverifiedError,
-  InvalidResponseError,
-  RateLimitError,
-  InvalidChallengeError,
-  InvalidSignatureError,
-  InvalidAddressError,
-  AlreadyVerifiedError,
+  Unverified,
+  InvalidResponse,
+  RateLimit,
+  badRequest,
+  unauthorized,
+  AlreadyVerified,
 }
 
 export class TFGridKycError extends BaseError {
@@ -17,43 +16,38 @@ export class TFGridKycError extends BaseError {
   }
 }
 
-export class KycInvalidResponseError extends TFGridKycError {
+export class InvalidResponse extends TFGridKycError {
   constructor(message: string) {
-    super("KycInvalidResponseError", Errors.InvalidResponseError, message);
+    super("InvalidResponse", Errors.InvalidResponse, message);
   }
 }
 
-export class KycUnverifiedError extends TFGridKycError {
+export class Unverified extends TFGridKycError {
   constructor(message: string) {
-    super("KycUnverifiedError", Errors.UnverifiedError, message);
+    super("Unverified", Errors.Unverified, message);
   }
 }
 
-export class KycRateLimitError extends TFGridKycError {
+export class RateLimit extends TFGridKycError {
   constructor(message: string) {
-    super("KycRateLimitError", Errors.RateLimitError, message);
+    super("RateLimit", Errors.RateLimit, message);
   }
 }
 
-export class KycInvalidAddressError extends TFGridKycError {
+export class BadRequest extends TFGridKycError {
   constructor(message: string) {
-    super("KycInvalidAddressError", Errors.InvalidAddressError, message);
+    super("BadRequest", Errors.badRequest, message);
   }
 }
 
-export class KycInvalidChallengeError extends TFGridKycError {
+export class Unauthorized extends TFGridKycError {
   constructor(message: string) {
-    super("KycInvalidChallengeError", Errors.InvalidChallengeError, message);
+    super("Unauthorized", Errors.unauthorized, message);
   }
 }
 
-export class KycInvalidSignatureError extends TFGridKycError {
+export class AlreadyVerified extends TFGridKycError {
   constructor(message: string) {
-    super("KycInvalidSignatureError", Errors.InvalidSignatureError, message);
-  }
-}
-export class KycAlreadyVerifiedError extends TFGridKycError {
-  constructor(message: string) {
-    super("KycAlreadyVerifiedError", Errors.AlreadyVerifiedError, message);
+    super("AlreadyVerified", Errors.AlreadyVerified, message);
   }
 }

@@ -2,7 +2,6 @@ import { KYC as KycClient, KycStatus } from "@threefold/grid_client";
 import { defineStore } from "pinia";
 
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { handleKYCError } from "@/utils/helpers";
 
 import type { Profile } from "./profile_manager";
 
@@ -37,8 +36,7 @@ const useKYC = defineStore("KYC-client", {
         try {
           this.status = await this.client.status();
         } catch (error) {
-          const message = "Failed to fetch KYC status";
-          createCustomToast(handleKYCError(message, error as Error), ToastType.danger);
+          createCustomToast((error as Error).message, ToastType.danger);
           console.error(error);
           this.status = null;
         }
