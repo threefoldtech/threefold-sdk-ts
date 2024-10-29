@@ -1,5 +1,7 @@
 import { NetworkModel, type ZmachineData } from "@threefold/grid_client";
 
+import { ProjectName } from "@/types";
+
 import { generateName } from "./strings";
 
 export function createNetwork(network: Network = {}): NetworkModel {
@@ -11,29 +13,46 @@ export function createNetwork(network: Network = {}): NetworkModel {
   return nw;
 }
 
-export function setCaproverWorkers(vms: ZmachineData[], projectName: string | undefined = undefined): ZmachineData {
-  let leader: any = null;
-  const workers: any[] = [];
+export const mergeCaproverDeployments = (clusters: ZmachineData[][]) => {
+  const vms: ZmachineData[] = [];
 
-  vms.forEach((vm: any) => {
-    if (vm.env["SWM_NODE_MODE"] === "leader") {
-      leader = vm;
-    } else if (vm.env["SWM_NODE_MODE"] === "worker") {
-      workers.push(vm);
+  for (const cluster of clusters) {
+    let clusterLeader = null;
+    const clusterWorkers: any[] = [];
+
+    if (!Array.isArray(cluster)) {
+      vms.push(cluster);
+      continue;
     }
 
-    if (projectName && leader) {
-      vm.projectName = projectName;
-      vm.deploymentName = leader.name;
-    }
-  });
+    for (const vm of cluster) {
+      const isCaprover = String((vm as any).projectName)
+        .toLowerCase()
+        .includes(ProjectName.Caprover.toLowerCase());
+      if (!isCaprover) {
+        if (!vms.includes(vm)) {
+          vms.push(vm);
+        }
+        continue;
+      }
 
-  if (leader) {
-    leader.workers = workers;
+      if (vm.env["SWM_NODE_MODE"] === "leader") {
+        clusterLeader = vm;
+      } else if (vm.env["SWM_NODE_MODE"] === "worker") {
+        clusterWorkers.push(vm);
+      }
+
+      if (clusterLeader) {
+        (clusterLeader as any).workers = clusterWorkers;
+        if (!vms.includes(clusterLeader)) {
+          vms.push(clusterLeader);
+        }
+      }
+    }
   }
 
-  return leader as ZmachineData;
-}
+  return vms;
+};
 
 export interface Network {
   name?: string;
