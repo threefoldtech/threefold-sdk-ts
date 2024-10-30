@@ -6,7 +6,7 @@ import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
 
-const Flist = "https://hub.grid.tf/tf-official-apps/threefoldtech-k3s-latest.flist";
+const Flist = "https://hub.grid.tf/tf-official-apps/threefolddev-k3s-v1.31.0.flist";
 
 class KubernetesHL extends HighLevelBase {
   async add_master(
@@ -115,6 +115,7 @@ class KubernetesHL extends HighLevelBase {
     solutionProviderId: number,
     zlogsOutput?: string,
     gpus: string[] = [],
+    masterFlist?: string,
   ) {
     events.emit("logs", `Creating a worker with name: ${name} on node: ${nodeId}, network: ${network.name}`);
     const machine = new VMHL(this.config);
@@ -135,7 +136,7 @@ class KubernetesHL extends HighLevelBase {
     return await machine.create(
       name,
       nodeId,
-      Flist,
+      masterFlist ? masterFlist : Flist,
       cpu,
       memory,
       rootfs_size,

@@ -55,7 +55,7 @@
       </v-dialog>
     </v-alert>
 
-    <AccessDeploymentAlert />
+    <AccessDeploymentAlert v-if="!hideSSH" />
 
     <InputTooltip
       v-if="props.projectName.toLowerCase() === 'vm'"
@@ -135,6 +135,19 @@
           </span>
         </v-chip>
       </template>
+      <template #[`item.health`]="{ item }">
+        <v-chip :color="getNodeHealthColor(item[0].workloads[0].result.state as string).color">
+          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Error" activator="parent" location="top">{{
+            item.message
+          }}</v-tooltip>
+          <v-tooltip v-if="item[0].workloads[0].result.state == NodeHealth.Paused" activator="parent" location="top"
+            >The deployment contract is in grace period</v-tooltip
+          >
+          <span class="text-uppercase">
+            {{ getNodeHealthColor(item[0].workloads[0].result.state as string).type }}
+          </span>
+        </v-chip>
+      </template>
 
       <template #no-data-text>
         <div v-if="failedDeploymentList.length > 0" class="text-center">
@@ -170,6 +183,7 @@ const props = defineProps<{
   projectName: string;
   modelValue: any[];
   deleting: boolean;
+  hideSSH?: boolean;
 }>();
 defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 
@@ -227,6 +241,7 @@ async function loadDeployments() {
     if (chunk2.count > 0 && migrateGateways) {
       await migrateModule(grid!.gateway);
     }
+
     let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
     if (showAllDeployments.value) {
       chunk3 =
@@ -243,19 +258,8 @@ async function loadDeployments() {
 
     const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
     failedDeployments.value = vms.failedDeployments;
-
     count.value = vms.count;
-    items.value = vms.items
-      .map((vm: any) => {
-        if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
-          const [leader, ...workers] = vm;
-          leader.workers = workers;
-          return leader;
-        }
-
-        return vm;
-      })
-      .flat();
+    items.value = mergeCaproverDeployments(vms.items);
   } catch (err) {
     errorMessage.value = `Failed to load Deployments: ${err}`;
   } finally {
@@ -278,7 +282,7 @@ const filteredHeaders = computed(() => {
       },
       {
         title: "Backends",
-        key: "0.workloads.0.data.backends",
+        key: "backends",
         value(item: any) {
           return item[0].workloads[0].data.backends.join(", ");
         },
@@ -343,6 +347,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Subsquid,
     ProjectName.Peertube,
     ProjectName.Jenkins,
+    ProjectName.Jitsi,
   ] as string[];
 
   const IPV4Solutions = [
@@ -367,6 +372,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Peertube,
     ProjectName.Jenkins,
     ProjectName.Caprover,
+    ProjectName.Jitsi,
   ] as string[];
 
   const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel, ProjectName.TFRobot] as string[];
@@ -444,6 +450,7 @@ defineExpose({ loadDeployments });
 
 <script lang="ts">
 import toHumanDate from "@/utils/date";
+import { mergeCaproverDeployments } from "@/utils/deploy_helpers";
 
 import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";

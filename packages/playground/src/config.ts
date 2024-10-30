@@ -10,30 +10,21 @@ import {
 import { marked } from "marked";
 import { type App, type Component, defineAsyncComponent } from "vue";
 
-import CopyInputWrapper from "./components/copy_input_wrapper.vue";
-import Filters from "./components/filter.vue";
-import FormValidator from "./components/form_validator.vue";
-import InputTooltip from "./components/input_tooltip.vue";
-import InputValidator from "./components/input_validator.vue";
-import TfSelectCountry from "./components/node_selector/select_location_internals/TfSelectCountry.vue";
-import TfSelectRegion from "./components/node_selector/select_location_internals/TfSelectRegion.vue";
-import PasswordInputWrapper from "./components/password_input_wrapper.vue";
-import ViewLayout from "./components/view_layout.vue";
 import * as validators from "./utils/validators";
 
 const GLOBAL_COMPONENTS: { [key: string]: Component } = {
-  PasswordInputWrapper,
+  PasswordInputWrapper: defineAsyncComponent(() => import("./components/password_input_wrapper.vue")),
   WebletLayout: defineAsyncComponent(() => import("./components/weblet_layout.vue")),
-  CopyInputWrapper,
+  CopyInputWrapper: defineAsyncComponent(() => import("./components/copy_input_wrapper.vue")),
   DTabs: defineAsyncComponent(() => import("./components/dynamic_tabs.vue")),
-  InputValidator,
-  FormValidator,
-  ViewLayout,
-  InputTooltip,
-  Filters,
+  InputValidator: defineAsyncComponent(() => import("./components/input_validator.vue")),
+  FormValidator: defineAsyncComponent(() => import("./components/form_validator.vue")),
+  ViewLayout: defineAsyncComponent(() => import("./components/view_layout.vue")),
+  InputTooltip: defineAsyncComponent(() => import("./components/input_tooltip.vue")),
+  Filters: defineAsyncComponent(() => import("./components/filter.vue")),
   TfSelectionDetails: defineAsyncComponent(() => import("./components/node_selector/TfSelectionDetails.vue")),
-  TfSelectRegion,
-  TfSelectCountry,
+  TfSelectRegion: defineAsyncComponent(() => import("./components/node_selector/select_location_internals/TfSelectRegion.vue")), // prettier-ignore
+  TfSelectCountry: defineAsyncComponent(() => import("./components/node_selector/select_location_internals/TfSelectCountry.vue")), // prettier-ignore
 };
 
 export function defineGlobals(app: App<Element>): void {
@@ -75,6 +66,7 @@ function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
   app.config.globalProperties.MANUAL_URL = window.env.MANUAL_URL;
 }
+
 /**
  * Configures global environment variables based on available service URLs.
  *

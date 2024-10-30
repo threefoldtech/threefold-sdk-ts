@@ -49,6 +49,13 @@ export interface DaoCloseOptions {
   index: number;
 }
 
+export interface ProposalVotes {
+  ayes: AyesAndNayes[];
+  nays: AyesAndNayes[];
+  ayesProgress: number;
+  nayesProgress: number;
+}
+
 class QueryDao {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -100,6 +107,21 @@ class QueryDao {
       }
     }
     return { active: activeProposals, inactive: inactiveProposals };
+  }
+  @checkConnection
+  async getVotesOfProposal(hash: string): Promise<ProposalVotes> {
+    const { ayes, nays }: DaoProposalVotes = await this.getProposalVotes(hash);
+    const ayesProgress = this.getProgress(ayes, nays, true);
+    const nayesProgress = this.getProgress(ayes, nays, false);
+
+    const proposal: ProposalVotes = {
+      ayes,
+      nays,
+      ayesProgress,
+      nayesProgress,
+    };
+
+    return proposal;
   }
   private getVotesWithWeights(votes: AyesAndNayes[]): number {
     return votes.reduce((total: number, vote: AyesAndNayes) => {

@@ -97,7 +97,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         qsfs_disks: [
           {
             qsfs_zdbs_name: qsfs_name,
@@ -123,7 +123,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: "",

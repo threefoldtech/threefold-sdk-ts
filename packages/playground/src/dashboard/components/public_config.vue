@@ -162,6 +162,7 @@
 
 <script lang="ts">
 import type { PublicConfig } from "@threefold/grid_client";
+import { ValidationError } from "@threefold/types";
 import { contains } from "cidr-tools";
 import { isEqual } from "lodash";
 import { default as PrivateIp } from "private-ip";
@@ -259,10 +260,11 @@ export default {
         getPublicConfig();
         showDialogue.value = false;
       } catch (error) {
-        createCustomToast(
-          "Failed to save the node public configuration. Please ensure that the configuration data you entered is valid.",
-          ToastType.danger,
-        );
+        let msg = "Failed to save the node public configuration";
+        if (error instanceof ValidationError && error.toString().includes("Balance is not enough"))
+          msg += " due to insufficient balance.";
+        else msg += ". Please ensure that the configuration data you entered is valid.";
+        createCustomToast(msg, ToastType.danger);
         console.error(`Failed to save config due: ${error}.`, ToastType.danger);
       } finally {
         isSaving.value = false;

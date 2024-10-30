@@ -4,17 +4,17 @@
       <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
       <v-card-title class="pa-0">Transfer TFT Across Chains</v-card-title>
     </v-card>
-    <v-card class="pa-5 white--text">
-      <v-row class="pa-5 text-center">
+    <v-card class="white--text pa-4">
+      <v-row class="text-center pt-4">
         <v-col cols="12">
           <v-text-field model-value="Stellar" label="Selected Chain" variant="outlined" readonly></v-text-field>
         </v-col>
       </v-row>
-      <v-row class="pa-4 px-8">
-        <v-btn color="secondary" @click="navigation">Learn How?</v-btn>
-        <div class="ml-auto">
+      <v-row class="max_line justify-space-between pa-sm-4">
+        <v-btn class="mb-4 mr-2" color="secondary" @click="navigation">Learn How?</v-btn>
+        <div class="mb-2">
           <v-btn color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn variant="elevated" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+          <v-btn variant="elevated" class="" @click="openDepositDialog = true">Deposit</v-btn>
         </div>
       </v-row>
     </v-card>
@@ -103,3 +103,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+@media (max-width: 425px) {
+  .max_line {
+    flex-basis: auto !important;
+    justify-content: center !important;
+  }
+}
+</style>

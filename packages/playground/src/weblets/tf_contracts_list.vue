@@ -256,7 +256,7 @@ import { useGrid } from "../stores";
 
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => balance.value?.free ?? 0);
 const isLoading = ref<boolean>(false);
 
 const profileManager = useProfileManager();
@@ -605,3 +605,11 @@ export default defineComponent({
   components: {},
 });
 </script>
+
+<style>
+@media only screen and (max-width: 600px) {
+  .v-expansion-panel-text__wrapper {
+    padding: 0px !important;
+  }
+}
+</style>

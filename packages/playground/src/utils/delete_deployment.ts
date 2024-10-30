@@ -39,6 +39,14 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
 
   /* Delete deployment */
   if (options.k8s) {
+    const { gateways } = await loadDeploymentGateways(grid, { filter: gw => true });
+    for (const gateway of gateways) {
+      try {
+        await grid.gateway.delete_name({ name: gateway.name });
+      } catch (error) {
+        console.error("Error while deleting k8s gateway.", error);
+      }
+    }
     return grid.k8s.delete({ name: options.name });
   }
 
@@ -85,6 +93,9 @@ export function solutionHasGateway(projectName: ProjectName) {
     ProjectName.Taiga,
     ProjectName.Wordpress,
     ProjectName.Nextcloud,
+    ProjectName.Gitea,
+    ProjectName.Jenkins,
+    ProjectName.Jitsi,
   ];
 
   for (const solution of solutions) {

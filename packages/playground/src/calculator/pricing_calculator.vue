@@ -25,7 +25,7 @@
             @input="priceTask.run()"
           >
             <VRow>
-              <VCol cols="6">
+              <v-col md="6" sm="12" xs="12">
                 <InputTooltip tooltip="The number of virtual cores.">
                   <VTextField
                     label="CPU (vCores)"
@@ -36,9 +36,9 @@
                     v-model="resources.cru"
                   />
                 </InputTooltip>
-              </VCol>
+              </v-col>
 
-              <VCol cols="6">
+              <v-col md="6" sm="12" xs="12">
                 <InputTooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
                   <VTextField
                     label="Memory (GB)"
@@ -49,9 +49,9 @@
                     v-model="resources.mru"
                   />
                 </InputTooltip>
-              </VCol>
+              </v-col>
 
-              <VCol cols="6">
+              <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="The SSD capacity storage.">
                   <VTextField
                     label="Disk SSD"
@@ -64,7 +64,7 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="6">
+              <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="The HDD capacity storage.">
                   <VTextField
                     label="Disk HDD"
@@ -77,7 +77,7 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="6">
+              <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="To input network bandwidth, The public IPv4 should be enabled.">
                   <VTextField
                     label="Bandwidth"
@@ -91,10 +91,11 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="6">
+              <VCol lg="6" md="6" sm="12">
                 <InputTooltip tooltip="The amount of TFT to calculate discount.">
                   <VTextField
                     label="Balance"
+                    :max="10 ** 15"
                     suffix="TFT"
                     :rules="[balanceRules]"
                     :disabled="userBalance && resources.useCurrentBalance"
@@ -104,7 +105,7 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="4">
+              <VCol lg="4" md="4" sm="12">
                 <InputTooltip
                   inline
                   tooltip=" A certified node will receive 25% more reward compared to a non-certified node."
@@ -113,7 +114,7 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="4">
+              <VCol lg="4" md="4" sm="12">
                 <InputTooltip
                   inline
                   tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet"
@@ -123,7 +124,9 @@
               </VCol>
 
               <VCol
-                cols="4"
+                lg="4"
+                md="4"
+                sm="12"
                 v-if="userBalance"
                 @vue:unmounted="
                   resources.useCurrentBalance = true;
@@ -151,7 +154,7 @@
           </VRow>
 
           <VRow class="text-center text-body-1 text-black" v-else-if="valid">
-            <VCol cols="6">
+            <VCol lg="6" md="6" sm="12">
               <div
                 class="rounded pa-4 discount border"
                 :style="{
@@ -182,7 +185,7 @@
                 </p>
               </section>
             </VCol>
-            <VCol cols="6">
+            <VCol lg="6" md="6" sm="12">
               <div
                 class="rounded pa-4 discount border"
                 :style="{
@@ -361,5 +364,11 @@ export default {
   background: white;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+@media (max-width: 425px) {
+  .v-col {
+    flex-basis: auto !important;
+  }
 }
 </style>

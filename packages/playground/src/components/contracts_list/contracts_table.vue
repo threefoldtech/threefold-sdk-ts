@@ -384,7 +384,7 @@ const selectedContracts = ref<NormalizedContract[]>([]);
 const selectedItem = ref();
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
-const freeBalance = computed(() => (balance.value?.free ?? 0) - (balance.value?.locked ?? 0));
+const freeBalance = computed(() => balance.value?.free ?? 0);
 const unlockContractLoading = ref(false);
 const unlockDialog = ref(false);
 const selectedLockedContracts = computed(() => {

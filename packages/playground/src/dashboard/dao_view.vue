@@ -137,7 +137,8 @@
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
                               <v-chip color="info">
-                                {{ proposal.threshold }} {{ proposal.threshold > 1 ? "votes" : "vote" }}
+                                {{ proposal.threshold }}
+                                {{ proposal.threshold > 1 ? "votes" : "vote" }}
                               </v-chip>
                             </v-col>
                           </v-row>
@@ -147,7 +148,8 @@
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
                               <v-chip color="info">
-                                {{ proposal.ayes.length }} {{ proposal.ayes.length > 1 ? "votes" : "vote" }}
+                                {{ proposal.ayes.length }}
+                                {{ proposal.ayes.length > 1 ? "votes" : "vote" }}
                               </v-chip>
                             </v-col>
                           </v-row>
@@ -157,7 +159,8 @@
                             </v-col>
                             <v-col class="d-flex align-center justify-end mr-2">
                               <v-chip color="info">
-                                {{ proposal.nayes.length }} {{ proposal.nayes.length > 1 ? "votes" : "vote" }}
+                                {{ proposal.nayes.length }}
+                                {{ proposal.nayes.length > 1 ? "votes" : "vote" }}
                               </v-chip>
                             </v-col>
                           </v-row>
@@ -332,7 +335,6 @@ onMounted(async () => {
     proposals.value = await grid?.dao.get();
     activeProposals.value = proposals.value.active.filter(proposal => proposal.hash);
     inactiveProposals.value = proposals.value.inactive.filter(proposal => proposal.hash);
-
     userFarms.value = await getFarms(grid, { ownedBy: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
@@ -355,7 +357,6 @@ function filteredProposals(proposals: DaoProposalDetails[] | undefined) {
 }
 async function castVote() {
   loadingVote.value = true;
-
   if (grid) {
     try {
       await grid.dao.vote({
@@ -363,6 +364,14 @@ async function castVote() {
         approve: castedVote.value,
         hash: selectedProposal.value,
       });
+      const { ayes, nays, ayesProgress, nayesProgress } = await grid.dao.getProposalVotes(selectedProposal.value);
+      const updatedProposal = proposals.value?.active.find(proposal => proposal.hash === selectedProposal.value);
+      if (updatedProposal) {
+        updatedProposal.ayes = ayes;
+        updatedProposal.nayes = nays;
+        updatedProposal.ayesProgress = ayesProgress;
+        updatedProposal.nayesProgress = nayesProgress;
+      }
       createToast("Voted for proposal!", {
         position: "top-right",
         hideProgressBar: true,

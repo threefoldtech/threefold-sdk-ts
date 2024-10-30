@@ -170,12 +170,12 @@ export async function getNodeStates(nodeId: number): Promise<NodeStats> {
  * @param {NodesExtractOptions} config - The configuration for the node request.
  * @returns {Promise<GridNode>} - A promise that resolves to an object containing the node details.
  */
-export async function getNode(nodeId: number, config: NodesExtractOptions): Promise<GridNode> {
+export async function getNode(nodeId: number, config?: NodesExtractOptions): Promise<GridNode> {
   if (typeof nodeId !== "number" || nodeId <= 0) {
     throw new Error("Invalid nodeId. Expected a positive integer.");
   }
 
-  if (typeof config !== "object" || config === null) {
+  if (config && typeof config !== "object") {
     throw new Error("Invalid config parameter. Expected an object.");
   }
 

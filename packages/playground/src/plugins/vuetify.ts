@@ -38,7 +38,7 @@ const defaults = {
     size: "small",
   },
   VDialog: {
-    width: "70%",
+    width: "min(900px, calc(100% - 50px)) ",
     attach: "#modals",
   },
 };

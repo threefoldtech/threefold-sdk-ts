@@ -9,7 +9,6 @@ export interface NodesExtractOptions {
   loadFarm?: boolean;
   loadTwin?: boolean;
   loadStats?: boolean;
-  loadGpu?: boolean;
 }
 
 export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
@@ -51,22 +50,6 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
       });
     }
 
-    if (!extraOptions.loadGpu) {
-      nodes.data = nodes.data.map(n => {
-        n.cards = [];
-        return n;
-      });
-    }
-
-    if (extraOptions.loadGpu) {
-      const nodesGpu = await Promise.all(nodes.data.map(n => this.gpuById(n.nodeId)));
-      nodes.data = nodes.data.map((n, index) => {
-        const cards = nodesGpu[index];
-        n.cards = Array.isArray(cards) ? cards : [];
-        return n;
-      });
-    }
-
     return nodes;
   }
 
@@ -92,15 +75,6 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
 
     if (extraOptions.loadStats) {
       node.stats = await this.statsById(node.nodeId);
-    }
-
-    node.cards = [];
-
-    if (extraOptions.loadGpu) {
-      const cards = await this.gpuById(node.nodeId);
-      if (Array.isArray(cards)) {
-        node.cards = cards;
-      }
     }
 
     return node;

@@ -18,7 +18,7 @@ function createMachineModel(node: number) {
     node_id: node,
     public_ip: false,
     planetary: true,
-    mycelium: false,
+    mycelium: true,
     cpu: 1,
     memory: 1024 * 2,
     rootfs_size: 0,

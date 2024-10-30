@@ -70,6 +70,10 @@ declare module "@polkadot/api-base/types/consts" {
        **/
       maxAuthorities: u32 & AugmentedConst<ApiType>;
       /**
+       * The maximum number of nominators for each validator.
+       **/
+      maxNominators: u32 & AugmentedConst<ApiType>;
+      /**
        * The maximum number of entries to keep in the set id to session index mapping.
        *
        * Since the `SetIdSession` map is only used for validating equivocations this

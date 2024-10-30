@@ -11,7 +11,7 @@
         <v-card-text>
           <v-container>
             <v-row class="py-2">
-              <v-col cols="6" class="mx-4">
+              <v-col sm="12" md="6" class="">
                 <div class="mb-2">
                   <p>
                     Deposit your TFTs to Threefold Bridge using a

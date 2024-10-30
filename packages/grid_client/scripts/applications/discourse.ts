@@ -94,7 +94,7 @@ async function main() {
         planetary: true,
         public_ip: false,
         public_ip6: false,
-        mycelium: false,
+        mycelium: true,
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,

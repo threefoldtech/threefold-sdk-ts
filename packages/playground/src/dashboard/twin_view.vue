@@ -33,14 +33,14 @@
 
       <v-card>
         <v-row>
-          <v-col xl="6" lg="7" md="12" sm="12" class="my-4">
+          <v-col lg="8" md="12" sm="12" class="my-4">
             <v-list class="custom-list" density="compact">
               <v-row class="row-style">
-                <v-col cols="1" sm="2" style="min-width: fit-content">
-                  <v-list-item> ID :</v-list-item>
+                <v-col cols="3" class="px-0">
+                  <v-list-item class="px-0"> ID :</v-list-item>
                 </v-col>
-                <v-col>
-                  <v-list-item>
+                <v-col cols="9" class="px-0">
+                  <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between">
                       {{ profileManager.profile?.twinId.toString() }}
                       <input-tooltip
@@ -54,12 +54,12 @@
                 </v-col>
               </v-row>
               <v-row class="row-style">
-                <v-col cols="1" sm="2" style="min-width: fit-content">
-                  <v-list-item> E-mail :</v-list-item>
+                <v-col cols="3" class="px-0">
+                  <v-list-item class="px-0"> E-mail :</v-list-item>
                 </v-col>
-                <v-col>
-                  <v-list-item v-if="!editEmail">
-                    <div style="display: flex; justify-content: space-between">
+                <v-col cols="9" class="px-0">
+                  <v-list-item class="px-0" v-if="!editEmail">
+                    <div class="edit_pen" style="display: flex; justify-content: space-between">
                       {{ profileManager.profile?.email }}
                       <v-icon @click="editEmail = true">mdi-pencil</v-icon>
                     </div>
@@ -104,11 +104,11 @@
                 </v-col>
               </v-row>
               <v-row class="row-style">
-                <v-col cols="1" sm="2" style="min-width: fit-content">
-                  <v-list-item> Address : </v-list-item>
+                <v-col cols="3" class="px-0">
+                  <v-list-item class="px-0"> Address : </v-list-item>
                 </v-col>
-                <v-col>
-                  <v-list-item>
+                <v-col cols="9" class="px-0">
+                  <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
                       <div class="pr-2" style="overflow: hidden; word-wrap: normal">
                         <span class="mr-2">{{ profileManager.profile?.address }}</span>
@@ -126,9 +126,9 @@
                 </v-col>
               </v-row>
               <v-row class="row-style">
-                <v-col cols="1" sm="2"> <v-list-item class="mr-auto"> Relay : </v-list-item></v-col>
-                <v-col>
-                  <v-list-item>
+                <v-col cols="3" class="px-0"> <v-list-item class="px-0"> Relay : </v-list-item></v-col>
+                <v-col cols="9" class="px-0">
+                  <v-list-item class="px-0">
                     <div style="display: flex; justify-content: space-between; align-items: center">
                       {{ profileManager.profile?.relay }}
                       <input-tooltip
@@ -144,7 +144,7 @@
 
           <v-divider vertical aria-colspan="1"></v-divider>
 
-          <v-col xl="5" lg="4" md="12" sm="12" class="my-4" v-if="profileManager.profile">
+          <v-col lg="4" md="12" sm="12" class="my-4" v-if="profileManager.profile">
             <div class="text-center my-3">
               <p>
                 Scan the QR code using
@@ -336,7 +336,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .custom-container {
   width: 80%;
 }
@@ -349,8 +349,8 @@ export default {
 
 .row-style {
   border-bottom: 0.1px solid #8a8a8a;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 6px;
+  margin-right: 6px;
 }
 
 .custom-toolbar {
@@ -362,5 +362,26 @@ export default {
 .bold-text {
   font-weight: 500;
   padding-left: 1rem;
+}
+
+@media (max-width: 425px) {
+  .v-col {
+    flex-basis: auto !important;
+  }
+}
+
+@media (max-width: 375px) {
+  .custom-list {
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 320px) {
+  .custom-list {
+    font-size: 13px !important;
+  }
+  .edit_pen {
+    display: inline-block !important;
+  }
 }
 </style>

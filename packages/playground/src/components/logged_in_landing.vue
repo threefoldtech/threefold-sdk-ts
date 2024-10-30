@@ -14,11 +14,12 @@
               backgroundPosition: 'center center',
               minHeight: '450px',
             }"
+            class="responsive-div"
           />
           <div class="d-flex flex-column justify-center">
             <v-row>
-              <v-col cols="3" v-for="s in stats" :key="s.value" class="stats px-2">
-                <v-card class="mt-10">
+              <v-col lg="3" xs="12" v-for="s in stats" :key="s.value" class="stats px-2">
+                <v-card class="mt-4">
                   <v-img
                     cover
                     width="80"
@@ -162,5 +163,19 @@ export default {
 
 .card-opacity {
   background-color: rgba(125, 227, 200, 0.12);
+}
+@media (max-width: 768px) {
+  .responsive-div {
+    min-height: 220px !important; /* Adjust height for mobile */
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .v-col {
+    flex-basis: auto !important;
+  }
+  .v-card-title {
+    white-space: normal !important;
+  }
 }
 </style>

@@ -40,6 +40,11 @@ export const deploymentListEnvironments = {
     CASPERLABS_HOSTNAME: "Casperlabs Hostname",
   },
 
+  jitsi: {
+    SSH_KEY: _ssh,
+    JITSI_HOSTNAME: "Jitsi Hostname",
+  },
+
   discourse: {
     SSH_KEY: _ssh,
     DISCOURSE_HOSTNAME: "Discourse Hostname",

@@ -41,6 +41,7 @@ export default {
       type: String as PropType<string | number | INode | undefined>,
       required: true,
     },
+    defaultValue: { type: Object as PropType<any>, default: () => undefined },
     validMessage: String,
     hint: String,
     disableValidation: Boolean,
@@ -51,6 +52,7 @@ export default {
     "update:modelValue": (valid: boolean) => valid,
     "update:status": (status: ValidatorStatus) => status,
     "update:error": (error: string | null) => true || error,
+    "update:value": (value: any) => true || value,
   },
   setup(props, { emit, expose }) {
     const { uid: _uid } = getCurrentInstance() as { uid: number };
@@ -145,6 +147,8 @@ export default {
       validate: validate as InputValidatorService["validate"],
       setStatus,
       reset() {
+        emit("update:value", props.defaultValue);
+        initializedInput.value = false;
         blured.value = false;
         setStatus(ValidatorStatus.Init);
         error.value = null;

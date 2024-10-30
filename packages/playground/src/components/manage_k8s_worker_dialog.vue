@@ -36,6 +36,9 @@
         <template #[`item.mycelium`]="{ item }">
           {{ item.myceliumIP || "-" }}
         </template>
+        <template #[`item.planetary`]="{ item }">
+          {{ item.planetary || "-" }}
+        </template>
       </ListTable>
     </template>
 

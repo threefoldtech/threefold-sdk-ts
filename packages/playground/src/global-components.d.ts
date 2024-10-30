@@ -39,6 +39,8 @@ declare global {
   interface Window {
     $$appLoader: () => Promise<void>;
     $$showMonitorError: (urls: { [key: string]: string | null }) => void;
+    $$monitorLock: Promise<void>;
+    $$releaseMonitorLock(): void;
     env: {
       GRAPHQL_STACKS: string[];
       GRIDPROXY_STACKS: string[];

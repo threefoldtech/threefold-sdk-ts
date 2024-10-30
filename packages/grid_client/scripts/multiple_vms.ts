@@ -63,7 +63,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
@@ -86,7 +86,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
@@ -108,7 +108,7 @@ async function main() {
   await getDeployment(grid3, name);
 
   // //Uncomment the line below to cancel the deployment
-  await cancel(grid3, name);
+  // await cancel(grid3, name);
 
   await grid3.disconnect();
 }

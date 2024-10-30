@@ -6,7 +6,7 @@ The target is to make a private Mesh connection between the nodes so they can re
 
 ## Configuration
 
-This configuration is set on each node using [network workload](../src/zos/znet.ts)
+This configuration is set on each node using [network workload](../../src/zos/znet.ts)
 
 - `ip_range`: an ip range to be used for this network, it needs to be private ip range, normally a /16 subnet is used (e.g. `10.20.0.0/16`)
 - `subnet`: a subnet to be used for this network, it should be a subnet of the entire network ip range, normally a /24 subnet is used for the node (e.g. `10.20.1.0/24`)

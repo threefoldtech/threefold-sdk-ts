@@ -259,7 +259,7 @@ class BaseModule {
    * @returns {Promise<Required<GqlNodeContract>[]>} - A promise that resolves to an array of contracts associated with the current module.
    */
   private async getMyContracts(fetch = false): Promise<Required<GqlNodeContract>[]> {
-    const moduleName = modulesNames[this.moduleName];
+    const moduleName = modulesNames[this.moduleName] ?? this.moduleName;
     if (fetch || !this.contracts) {
       let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,

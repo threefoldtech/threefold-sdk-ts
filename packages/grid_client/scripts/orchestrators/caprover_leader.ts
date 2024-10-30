@@ -33,6 +33,7 @@ async function main() {
     mru: 4, // GB
     sru: 10,
     farmId: 1,
+    availableFor: grid3.twinId,
   };
 
   const vms: MachinesModel = {
@@ -55,7 +56,7 @@ async function main() {
         public_ip: true,
         public_ip6: false,
         planetary: false,
-        mycelium: false,
+        mycelium: true,
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,

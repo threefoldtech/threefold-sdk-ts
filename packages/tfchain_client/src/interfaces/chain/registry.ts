@@ -84,7 +84,9 @@ import type {
   PalletSmartContractContractBill,
   PalletSmartContractContractBillingInformation,
   PalletSmartContractContractData,
+  PalletSmartContractContractIdProvides,
   PalletSmartContractContractLock,
+  PalletSmartContractContractPaymentState,
   PalletSmartContractContractResources,
   PalletSmartContractContractState,
   PalletSmartContractDiscountLevel,
@@ -263,7 +265,9 @@ declare module "@polkadot/types/types/registry" {
     PalletSmartContractContractBill: PalletSmartContractContractBill;
     PalletSmartContractContractBillingInformation: PalletSmartContractContractBillingInformation;
     PalletSmartContractContractData: PalletSmartContractContractData;
+    PalletSmartContractContractIdProvides: PalletSmartContractContractIdProvides;
     PalletSmartContractContractLock: PalletSmartContractContractLock;
+    PalletSmartContractContractPaymentState: PalletSmartContractContractPaymentState;
     PalletSmartContractContractResources: PalletSmartContractContractResources;
     PalletSmartContractContractState: PalletSmartContractContractState;
     PalletSmartContractDiscountLevel: PalletSmartContractDiscountLevel;

@@ -1,11 +1,10 @@
-import { DaoProposals } from "@threefold/tfchain_client";
+import { DaoProposals, ProposalVotes } from "@threefold/tfchain_client";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { DaoVoteModel } from "./models";
-
 class Dao {
   client: TFClient;
 
@@ -45,6 +44,18 @@ class Dao {
   @validateInput
   async vote(options: DaoVoteModel): Promise<any> {
     return (await this.client.dao.vote(options)).apply();
+  }
+
+  /**
+   * Asynchronously retrieves votes of specific proposal from the `DAO` using the `TFClient` instance.
+   *
+   * @returns {Promise<ProposalVotes>} A promise that resolves with the data retrieved from the `DAO`.
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   */
+  @expose
+  async getProposalVotes(hash: string): Promise<ProposalVotes> {
+    return await this.client.dao.getVotesOfProposal(hash);
   }
 }
 export { Dao as dao };

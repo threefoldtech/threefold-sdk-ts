@@ -1,6 +1,6 @@
 <template>
   <VContainer>
-    <VRow align="center">
+    <VRow class="mx-2" align="center">
       <span v-if="showPrice" v-text="usdPrice + ' USD'" :class="{ 'order-0': swap, 'order-2': !swap }" />
       <VTooltip :text="priceTask.error || ''" :disabled="!priceTask.error">
         <template #activator="{ props }">
@@ -24,7 +24,7 @@
             target="_blank"
             v-bind="props"
             color="anchor"
-            class="mr-4 ml-1 order-3"
+            class="mr-0 mr-md-4 ml-1 order-3"
           />
         </template>
       </VTooltip>
