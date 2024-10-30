@@ -247,8 +247,7 @@ class GridClient {
       substrate: substrateURL || `wss://tfchain.${base}/ws`,
       graphql: graphqlURL || `https://graphql.${base}/graphql`,
       activation: activationURL || `https://activation.${base}/activation/activate`,
-      //TODO handle kyc url
-      KYC: `kyc1.gent01.dev.grid.tf`,
+      KYC: `https://kyc.${base}`,
     };
 
     return urls;
