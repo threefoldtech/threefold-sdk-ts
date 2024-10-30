@@ -68,7 +68,15 @@
         :large="{ cpu: 4, memory: 16, disk: 1000 }"
         v-model="solution"
       />
-      <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
+      <Networks
+        v-model:ipv4="ipv4"
+        v-model:planetary="planetary"
+        v-model:mycelium="mycelium"
+        v-model:ipv6="ipv6"
+        v-model:wireguard="wireguard"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+        require-domain
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -133,7 +141,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const { ipv4, ipv6, mycelium, planetary } = useNetworks({ planetary: true });
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const selectionDetails = ref<SelectionDetails>();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
@@ -170,7 +178,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [
