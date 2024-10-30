@@ -89,13 +89,10 @@ export class KYC {
   }
 
   /**
-   * Throws specific KYC-related errors based on the provided error message.
-   *
-   * @param errorMessage - The error message to evaluate.
-   * @throws {KycErrors.KycInvalidAddressError} If the error message indicates a malformed address.
-   * @throws {KycErrors.KycInvalidChallengeError} If the error message indicates a malformed or bad challenge.
-   * @throws {KycErrors.KycInvalidSignatureError} If the error message indicates a malformed or bad signature.
-   * @returns {undefined} If the error message does not match any known error patterns.
+   * Throws specific KYC-related errors based on the provided error .
+   * @param {Error} error - The error to evaluate.
+   * @param {string} errorMessage - The error message to evaluate.
+   * @throws {KycErrors | KycBaseError} If the error message indicates a malformed address.
    */
   private throwKycError(error: Error, messagePrefix: string) {
     if (!(error instanceof AxiosError)) return new KycBaseError(error.message);
@@ -120,6 +117,9 @@ export class KYC {
 
       case status === HttpStatusCode.PaymentRequired:
         return new InsufficientBalanceError(errorMessage);
+
+      default:
+        return new KycBaseError(errorMessage);
     }
   }
 
@@ -142,7 +142,7 @@ export class KYC {
    * Retrieves the current verification status.
    *
    * @returns {Promise<KycStatus>} A promise that resolves to the verification status.
-   * @throws {KycErrors.TFGridKycError | KycBaseError} If there is an issue with fetching the status data.
+   * @throws {KycErrors | KycBaseError} If there is an issue with fetching the status data.
    */
   async status(): Promise<KycStatus> {
     try {

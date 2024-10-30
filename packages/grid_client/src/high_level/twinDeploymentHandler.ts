@@ -39,7 +39,7 @@ class TwinDeploymentHandler {
       const kycStatus = await this.kyc.status();
       if (kycStatus !== KycStatus.verified)
         throw new ValidationError(
-          "Your account is not verified. Please sign into Threefold Dashboard or Connect mobile app to complete your KYC verification.",
+          "Your account is not verified. Please sign into ThreeFold Dashboard or ThreeFold Connect mobile app to complete your KYC verification.",
         ); //TODO add kyc manual link
       return await this.tfclient.contracts.createName({ name });
     } catch (e) {

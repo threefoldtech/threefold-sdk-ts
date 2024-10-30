@@ -5,8 +5,8 @@ export enum Errors {
   Unverified,
   InvalidResponse,
   RateLimit,
-  badRequest,
-  unauthorized,
+  BadRequest,
+  Unauthorized,
   AlreadyVerified,
 }
 
@@ -36,13 +36,13 @@ export class RateLimit extends TFGridKycError {
 
 export class BadRequest extends TFGridKycError {
   constructor(message: string) {
-    super("BadRequest", Errors.badRequest, message);
+    super("BadRequest", Errors.BadRequest, message);
   }
 }
 
 export class Unauthorized extends TFGridKycError {
   constructor(message: string) {
-    super("Unauthorized", Errors.unauthorized, message);
+    super("Unauthorized", Errors.Unauthorized, message);
   }
 }
 
