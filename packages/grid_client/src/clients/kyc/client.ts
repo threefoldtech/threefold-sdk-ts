@@ -177,4 +177,22 @@ export class KYC {
       throw this.throwKycError(error, "Failed to get auth token from KYC service.");
     }
   }
+
+  /**
+   * Checks the health status of the KYC service.
+   *
+   * @returns {Promise<boolean>} A promise that resolves to `true` if the service is healthy, otherwise `false`.
+   *
+   * @throws Will return `false` if there is an error during the request.
+   */
+  async isHealthy(): Promise<boolean> {
+    try {
+      const res = await axios.get(urlJoin("https://", this.apiDomain, API_PREFIX, "health"));
+      const { status } = res.data;
+      if (status !== `Healthy`) return false;
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
