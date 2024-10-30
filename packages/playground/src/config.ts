@@ -97,7 +97,7 @@ export async function setGlobalEnv() {
       { URLs: SUBSTRATE_STACKS, service: new TFChainMonitor() },
       { URLs: ACTIVATION_SERVICE_STACKS, service: new ActivationMonitor() },
       { URLs: RELAY_STACKS, service: new RMBMonitor() },
-      { URLs: [KYC_URL], service: new KYCMonitor(KYC_URL) },
+      { URLs: [KYC_URL], service: new KYCMonitor() },
     ],
     silent: true,
   });
