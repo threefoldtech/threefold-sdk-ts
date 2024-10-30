@@ -158,7 +158,7 @@ export default {
         const fn = attrs["onUpdate:wireguard"];
         if (readonly && !props.wireguard && typeof fn === "function") {
           fn(true);
-        }
+        } else fn(false);
       },
       { immediate: true },
     );
