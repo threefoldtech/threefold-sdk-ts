@@ -65,6 +65,7 @@
           :ipv4="ipv4"
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
+          :has-smtp="true"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">

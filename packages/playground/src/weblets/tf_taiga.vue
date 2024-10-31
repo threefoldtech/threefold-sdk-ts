@@ -98,6 +98,7 @@
           v-model:wireguard="wireguard"
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
+          :has-smtp="smtp.enabled"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -285,24 +286,6 @@ async function deploy() {
 function updateSSHkeyEnv(selectedKeys: string) {
   selectedSSHKeys.value = selectedKeys;
 }
-
-watch(
-  () => smtp.value.enabled,
-  newValue => {
-    if (newValue) {
-      ipv4.value = true;
-    }
-  },
-);
-
-watch(
-  () => ipv4.value,
-  newValue => {
-    if (!newValue && smtp.value.enabled) {
-      smtp.value.enabled = false;
-    }
-  },
-);
 </script>
 
 <script lang="ts">

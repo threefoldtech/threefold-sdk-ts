@@ -53,6 +53,7 @@
           v-model:wireguard="wireguard"
           :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
           require-domain
+          :has-smtp="smtp.enabled"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -122,20 +123,6 @@ const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
-
-watch(
-  () => smtp.value.enabled,
-  newSMTP => {
-    ipv4.value = newSMTP;
-  },
-);
-
-watch(
-  () => ipv4.value,
-  newIPv4 => {
-    smtp.value.enabled = newIPv4;
-  },
-);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();

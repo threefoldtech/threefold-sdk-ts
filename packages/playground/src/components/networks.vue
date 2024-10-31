@@ -14,10 +14,10 @@
 
         <v-expansion-panel-text>
           <NetworkItem
-            tooltip-text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+            :tooltip-text="ipv4Tooltip"
             label="Public IPv4"
             :value="$props.ipv4"
-            :emit-function="$props.requiredIpv4 ? undefined : $attrs['onUpdate:ipv4']"
+            :emit-function="$props.hasSmtp ? undefined : $attrs['onUpdate:ipv4']"
           />
 
           <NetworkItem
@@ -100,7 +100,7 @@ export default {
     wireguard: { type: Boolean, default: () => null },
     requireDomain: { type: Boolean, default: () => false },
     hasCustomDomain: { type: Boolean, default: () => false },
-    requiredIpv4: { type: Boolean, default: () => false },
+    hasSmtp: { type: Boolean, default: () => false },
     disabled: Boolean,
   },
   setup(props, { attrs }) {
@@ -151,6 +151,11 @@ export default {
         ? "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections. Please note that this field will be read-only unless you use a custom domain with IPV4."
         : "Enabling WireGuard Access allows you to establish private, secure, and encrypted instance connections.",
     );
+    const ipv4Tooltip = computed(() =>
+      props.hasSmtp
+        ? "An Internet Protocol version 4 address that is globally unique and accessible over the internet. Please note that this field will be read-only as SMTP is enabled."
+        : "An Internet Protocol version 4 address that is globally unique and accessible over the internet.",
+    );
 
     watch(
       readonlyWireguard,
@@ -163,7 +168,7 @@ export default {
       { immediate: true },
     );
     watch(
-      () => props.requiredIpv4,
+      () => props.hasSmtp,
       required => {
         const fn = attrs["onUpdate:ipv4"];
         if (required && typeof fn === "function") {
@@ -177,6 +182,7 @@ export default {
       error,
       input,
       wireguardTooltip,
+      ipv4Tooltip,
       readonlyWireguard,
     };
   },
