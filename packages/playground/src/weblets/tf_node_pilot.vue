@@ -34,10 +34,11 @@
         :large="{ cpu: 8, memory: 32, disk: 2000 }"
         v-model="solution"
       />
+
       <Networks
         required
-        v-model:ipv4="ipv4"
-        v-model:ipv6="ipv6"
+        :ipv4="ipv4"
+        :ipv6="ipv6"
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
         v-model:wireguard="wireguard"
@@ -96,7 +97,7 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",
 };
-const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks({ ipv4: true, ipv6: true });
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = 2;
