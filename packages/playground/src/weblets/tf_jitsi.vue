@@ -36,7 +36,16 @@
         :large="{ cpu: 8, memory: 32, disk: 1000 }"
       />
 
-      <Networks v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" v-model:ipv6="ipv6" />
+      <Networks
+        required
+        v-model:ipv4="ipv4"
+        v-model:ipv6="ipv6"
+        v-model:planetary="planetary"
+        v-model:mycelium="mycelium"
+        v-model:wireguard="wireguard"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+        require-domain
+      />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -87,7 +96,7 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const profileManager = useProfileManager();
-
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const name = ref(generateName({ prefix: "jt" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
@@ -96,10 +105,6 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const mycelium = ref(true);
-const planetary = ref(false);
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
@@ -140,7 +145,7 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        addAccess: wireguard.value || selectionDetails.value!.domain!.enableSelectedDomain,
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [
@@ -201,7 +206,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

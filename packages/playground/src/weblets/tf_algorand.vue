@@ -126,11 +126,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const name = ref(generateName({ prefix: "al" }));
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
 const storage = ref() as Ref<number>;
@@ -215,7 +211,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import type { GridClient } from "@threefold/grid_client";
 
 import AlgorandCapacity from "../components/algorand_capacity.vue";
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
