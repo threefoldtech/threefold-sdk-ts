@@ -54,6 +54,19 @@ function formatErrorMessage(prefix: string, error: Error) {
   return `${prefix}\n\t ${error.message}`;
 }
 
+/**
+ * Generates a random hexadecimal seed of a specified length.
+ *
+ * This function uses the `crypto` module to generate a sequence of random bytes,
+ * which are then converted to a hexadecimal string representation. The length of
+ * the output string will be twice the specified byte length, as each byte is
+ * represented by two hexadecimal characters.
+ *
+ * @param {number} length - The number of random bytes to generate. The resulting
+ *                          hexadecimal string will be 2 * length characters long.
+ * @returns {string} A random hexadecimal string of the specified length.
+ */
+
 function generateRandomHexSeed(length: number) {
   const bytes = crypto.randomBytes(length);
   return bytes.toString("hex");
