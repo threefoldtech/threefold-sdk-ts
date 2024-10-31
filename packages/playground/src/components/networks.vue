@@ -92,7 +92,7 @@ export default {
   name: "Network",
   components: { NetworkItem },
   props: {
-    required: { type: Boolean, default: () => false },
+    required: { type: Boolean, default: () => true },
     ipv4: { type: Boolean, default: () => null },
     ipv6: { type: Boolean, default: () => null },
     planetary: { type: Boolean, default: () => null },
@@ -105,7 +105,6 @@ export default {
   setup(props, { attrs }) {
     const input = ref();
     const $el = computed(() => input.value?.$el);
-
     if (
       props.ipv4 === null &&
       props.ipv6 === null &&
