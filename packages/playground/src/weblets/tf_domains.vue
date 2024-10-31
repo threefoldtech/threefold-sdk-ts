@@ -1,7 +1,9 @@
 <template>
   <weblet-layout ref="layout">
-    
-    <template #title><span><v-icon  class="pr-3">mdi-web-box</v-icon></span>Deploy Domains Instance </template>
+    <template #title
+      ><span><v-icon class="pr-3">mdi-web-box</v-icon></span
+      >Deploy Domains Instance
+    </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>
