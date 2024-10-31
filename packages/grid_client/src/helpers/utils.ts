@@ -81,6 +81,22 @@ function convertObjectToQueryString(obj: Record<string, any>): string {
 
   return queryString;
 }
+/**
+ * Converts a string message to its hexadecimal representation.
+ * @param message - The message to convert.
+ * @returns The hexadecimal representation of the message.
+ */
+function stringToHex(message: string): string {
+  return Buffer.from(message).toString("hex");
+}
+/**
+ * Converts a hexadecimal string to a byte array.
+ * @param hex - The hexadecimal string to convert.
+ * @returns {Uint8Array} The byte array representation of the hexadecimal string.
+ */
+function bytesFromHex(hex: string): Uint8Array {
+  return new Uint8Array(Buffer.from(hex, "hex"));
+}
 
 export {
   generateString,
@@ -95,4 +111,6 @@ export {
   generateRandomHexSeed,
   zeroPadding,
   convertObjectToQueryString,
+  stringToHex,
+  bytesFromHex,
 };

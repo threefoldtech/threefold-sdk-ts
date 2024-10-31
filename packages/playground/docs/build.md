@@ -26,6 +26,7 @@ bash ../scripts/build-env.sh
   - RELAY_DOMAIN
   - BRIDGE_TFT_ADDRESS
   - STATS_URL
+  - KYC_URL
   - STELLAR_NETWORK
   - SENTRY_DSN
   - ENABLE_TELEMETRY
