@@ -107,7 +107,7 @@ export default {
       ssh: computed(() => profileManager.profile?.ssh),
       kyc: computed(() => kyc.status),
       requireSSH: computed(() => route.meta.requireSSH),
-      requireKYC: computed(() => route.meta.requireKYC || route.path.match(/\/applications\/.+$|\/orchestrators\/.+$/)),
+      requireKYC: computed(() => route.meta.requireKYC || route.path.match(/\/(applications|orchestrators)\/.+$/)),
       tick,
       viewLayoutContainer,
       DashboardRoutes,
