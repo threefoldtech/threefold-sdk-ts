@@ -67,7 +67,7 @@
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
       v-model:mycelium="$props.modelValue.mycelium"
-      v-model:wireguard="$props.modelValue.wireguard"
+      :wireguard="$props.modelValue.wireguard"
     />
 
     <RootFsSize
@@ -133,7 +133,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv6: false,
     planetary: false,
     mycelium: true,
-    wireguard: false,
+    wireguard: true,
     rootFsSize: 2,
     dedicated: false,
     certified: false,
