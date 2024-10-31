@@ -1,6 +1,6 @@
 {
   "name": "@threefold/stats",
-  "version": "2.5.0",
+  "version": "2.6.0-rc1",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,7 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false"
   },
   "dependencies": {
-    "@threefold/gridproxy_client": "2.5.0",
+    "@threefold/gridproxy_client": "2.6.0-rc1",
     "vue": "^3.3.5",
     "vuetify": "^3.3.21"
   },
