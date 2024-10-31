@@ -60,6 +60,7 @@ declare global {
       TFT_ASSET_ISSUER: string;
       MINTING_URL: string;
       STATS_URL: string;
+      KYC_URL: string;
       TIMEOUT: number;
       PAGE_SIZE: number;
       MANUAL_URL: string;

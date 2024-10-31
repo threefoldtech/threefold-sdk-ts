@@ -95,6 +95,7 @@
                 <InputTooltip tooltip="The amount of TFT to calculate discount.">
                   <VTextField
                     label="Balance"
+                    :max="10 ** 15"
                     suffix="TFT"
                     :rules="[balanceRules]"
                     :disabled="userBalance && resources.useCurrentBalance"

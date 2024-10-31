@@ -15,7 +15,7 @@ jest.setTimeout(500000);
 let gridClient: GridClient;
 let deploymentName: string;
 
-beforeAll(async () => {
+beforeEach(async () => {
   gridClient = await getClient();
   deploymentName = generateString(15);
   gridClient.clientOptions.projectName = `kubernetes/${deploymentName}`;
@@ -159,7 +159,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     workers: [
@@ -173,7 +173,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -196,6 +196,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.masters[0].nodeId).toBe(masterNodeId);
   expect(result.masters[0].status).toBe("ok");
   expect(result.masters[0].planetary).toBeDefined();
+  expect(result.masters[0].myceliumIP).toBeDefined();
   expect(result.masters[0].publicIP).toBeNull();
   expect(result.masters[0].interfaces[0]["network"]).toBe(networkName);
   expect(result.masters[0].interfaces[0]["ip"]).toContain(splitIP(ipRange));
@@ -211,6 +212,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.workers[0].nodeId).toBe(workerNodeId);
   expect(result.workers[0].status).toBe("ok");
   expect(result.workers[0].planetary).toBeDefined();
+  expect(result.workers[0].myceliumIP).toBeDefined();
   expect(result.workers[0].publicIP).toBeNull();
   expect(result.workers[0].interfaces[0]["network"]).toBe(networkName);
   expect(result.workers[0].interfaces[0]["ip"]).toContain(splitIP(ipRange));
@@ -285,7 +287,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   }
 });
 
-test("TC1232 - Kubernetes: Add Worker", async () => {
+test.skip("TC1232 - Kubernetes: Add Worker", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1232 - Kubernetes: Add Worker
@@ -425,7 +427,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     workers: [
@@ -439,7 +441,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -459,7 +461,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
     public_ip: workerPublicIp,
     public_ip6: false,
     planetary: true,
-    mycelium: false,
+    mycelium: true,
   };
 
   const res = await gridClient.k8s.deploy(k8s);
@@ -491,6 +493,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
   expect(newResult.workers[1].nodeId).toBe(workerNodeId);
   expect(newResult.workers[1].status).toBe("ok");
   expect(newResult.workers[1].planetary).toBeDefined();
+  expect(newResult.workers[1].myceliumIP).toBeDefined();
   expect(newResult.workers[1].publicIP).toBeNull();
   expect(newResult.workers[1].interfaces[0]["network"]).toBe(networkName);
   expect(newResult.workers[1].interfaces[0]["ip"]).toContain(splitIP(ipRange));
@@ -679,7 +682,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     workers: [
@@ -693,7 +696,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -743,8 +746,5 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
-
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);

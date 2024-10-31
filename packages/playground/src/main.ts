@@ -11,7 +11,6 @@ import { defineGlobals } from "./config";
 import Monitor from "./Monitor.vue";
 import router from "./router";
 import { normalizeError } from "./utils/helpers";
-
 const app = createApp(Monitor);
 
 app.config.errorHandler = error => {
@@ -43,5 +42,6 @@ app.use(createPinia());
 app.use(router);
 app.use(vuetify);
 defineGlobals(app);
+app.provide("noAppVersion", "No version to show");
 
 app.mount("#app");

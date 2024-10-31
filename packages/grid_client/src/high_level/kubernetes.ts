@@ -6,7 +6,7 @@ import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
 
-const Flist = "https://hub.grid.tf/tf-official-apps/threefoldtech-k3s-latest.flist";
+const Flist = "https://hub.grid.tf/tf-official-apps/threefolddev-k3s-v1.31.0.flist";
 
 class KubernetesHL extends HighLevelBase {
   async add_master(

@@ -22,7 +22,8 @@
             <p>
               Balance:
               <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
-                {{ normalizeBalance(balance.free + balance.reserved, true) }} TFT
+                {{ normalizeBalance(balance.free + balance.reserved, true) }}
+                TFT
               </strong>
             </p>
             <p>
@@ -81,6 +82,7 @@
         :tabs="getTabs()"
         v-model="activeTab"
         :disabled="creatingAccount || activatingAccount || activating"
+        ref="tabsRef"
         @tab:change="
           () => {
             clearError();
@@ -353,7 +355,11 @@
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
+                :label="
+                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
+                    ? 'Your Hex Seed'
+                    : 'Your Mnemonic'
+                "
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -423,6 +429,7 @@
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
+import { KYC } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
@@ -445,7 +452,6 @@ import { getCredentials, setCredentials } from "../utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
-
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
 const selectedName = ref("");
@@ -519,6 +525,19 @@ watch(
   },
   { deep: false },
 );
+const tabsRef = ref();
+
+function handleTabs() {
+  const tabs = tabsRef.value?.$el;
+  if (!tabs) return;
+  if (!isStoredCredentials()) return;
+
+  const activeClass = "v-slide-group-item--active";
+  const tabsButtons = tabs.nextSibling.querySelectorAll("button");
+  const ButtonsList: HTMLElement[] = Array.from(tabsButtons);
+  const activeButtonIndex = ButtonsList.findIndex(sibling => sibling.classList.contains(activeClass));
+  activeTab.value = activeButtonIndex;
+}
 
 async function mounted() {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
@@ -557,6 +576,7 @@ function isStoredCredentials() {
 }
 
 function getTabs() {
+  handleTabs();
   let tabs = [];
   if (isStoredCredentials()) {
     tabs = [
@@ -601,7 +621,7 @@ const confirmPasswordInput = useInputRef();
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
-
+const kyc = useKYC();
 let interval: any;
 watch(
   () => profileManager.profile,
@@ -610,7 +630,9 @@ watch(
       __loadBalance(profile);
       if (interval) clearInterval(interval);
       interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
+      kyc.init(profile, window.env.KYC_URL);
     } else {
+      kyc.clear();
       if (interval) clearInterval(interval);
       balance.value = undefined;
     }
@@ -625,14 +647,11 @@ watch(
   },
   { immediate: true },
 );
-watch(
-  () => [online, props.modelValue],
-  ([newOnline, newModelValue], [oldOnline, oldModelValue]) => {},
-);
 
 function logout() {
   sessionStorage.removeItem("password");
   profileManager.clear();
+  kyc.clear();
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
@@ -714,6 +733,7 @@ async function createNewAccount() {
 }
 
 const activatingAccount = ref(false);
+
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
@@ -722,7 +742,12 @@ async function activateAccount() {
   activatingAccount.value = true;
   activating.value = true;
   try {
-    await activateAccountAndCreateTwin(mnemonic.value);
+    const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
+      ? mnemonic.value
+      : mnemonic.value.length === 66
+      ? mnemonic.value
+      : `0x${mnemonic.value}`;
+    await activateAccountAndCreateTwin(mnemonicOrSeedValue);
     await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
@@ -794,9 +819,9 @@ async function storeAndLogin() {
     await activate(mnemonic.value, keypairType.value);
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
       openAcceptTerms.value = true;
       termsLoading.value = true;
+      isNonActiveMnemonic.value = true;
     }
     enableReload.value = false;
     return {
@@ -894,6 +919,7 @@ async function getEmail() {
 import { TwinNotExistError } from "@threefold/types";
 import { capitalize } from "vue";
 
+import { useKYC } from "@/stores/kyc";
 import SSHKeysManagement from "@/utils/ssh";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";

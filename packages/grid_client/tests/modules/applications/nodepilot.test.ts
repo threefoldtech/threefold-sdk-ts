@@ -101,8 +101,8 @@ test.skip("TC2701 - Applications: Deploy Nodepilot", async () => {
         flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
         entrypoint: "/",
         public_ip: publicIp,
-        planetary: false,
-        mycelium: false,
+        planetary: true,
+        mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
         },
@@ -140,7 +140,8 @@ test.skip("TC2701 - Applications: Deploy Nodepilot", async () => {
   expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result[0].capacity["cpu"]).toBe(cpu);
   expect(result[0].capacity["memory"]).toBe(memory * 1024);
-  expect(result[0].planetary).toBeUndefined();
+  expect(result[0].planetary).toBeDefined();
+  expect(result[0].myceliumIP).toBeDefined();
   expect(result[0].publicIP).toBeDefined();
   expect(result[0].description).toBe(description);
   expect(result[0].mounts[0]["name"]).toBe(disk1Name);

@@ -5,19 +5,18 @@
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
 
-    <CreateFarm v-model:name="name" class="mt-4" />
-    <UserFarms ref="userFarms" />
+    <CreateFarm class="mt-4" @farm-created="handleFarmCreated" />
+    <UserFarms :ref="el => (userFarms = el)" :reloadFarms="farmsReload" />
     <UserNodes />
   </div>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import CreateFarm from "./components/create_farm.vue";
 import UserFarms from "./components/user_farms.vue";
 import UserNodes from "./components/user_nodes.vue";
-
 export default {
   name: "DashboardFarms",
   components: {
@@ -26,10 +25,21 @@ export default {
     CreateFarm,
   },
   setup() {
-    const name = ref<string>("");
-
+    const farmsReload = ref<boolean>(false);
+    const userFarms = ref();
+    function handleFarmCreated() {
+      farmsReload.value = !farmsReload.value;
+    }
+    watch(
+      () => farmsReload.value,
+      () => {
+        userFarms.value.reloadFarms = farmsReload.value;
+      },
+    );
     return {
-      name,
+      farmsReload,
+      handleFarmCreated,
+      userFarms,
     };
   },
 };

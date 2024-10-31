@@ -108,7 +108,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
         entrypoint: "/sbin/zinit init",
         public_ip: publicIp,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
           CASPERLABS_HOSTNAME: domain,
@@ -148,6 +148,7 @@ test("TC2683 - Applications: Deploy Casperlabs", async () => {
   expect(result[0].capacity["cpu"]).toBe(cpu);
   expect(result[0].capacity["memory"]).toBe(memory * 1024);
   expect(result[0].planetary).toBeDefined();
+  expect(result[0].myceliumIP).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
   expect(result[0].rootfs_size).toBe(GBToBytes(rootfsSize));

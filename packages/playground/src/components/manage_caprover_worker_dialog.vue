@@ -7,6 +7,7 @@
     @deploy="deploy"
     @delete="onDelete"
     @back="updateCaprover"
+    @click:outside="updateCaprover"
   >
     <template #title>Manage Caprover({{ $props.master.name }}) Workers</template>
 
@@ -114,7 +115,7 @@ async function deploy(layout: any) {
 
     await layout.validateBalance(grid);
 
-    const vm = await addMachine(grid!, {
+    const vms = await addMachine(grid!, {
       name: worker.value.name,
       deploymentName: props.master.name,
       cpu: worker.value.solution!.cpu,
@@ -144,12 +145,17 @@ async function deploy(layout: any) {
       }),
     });
 
-    const [leader, ...workers] = vm;
+    const [leader, ...workers] = vms;
     leader.workers = workers;
     leader.projectName = props.projectName;
     leader.deploymentName = leader.name;
     caproverData.value = leader;
     deployedDialog.value = true;
+    workers.forEach((worker: any) => {
+      if (!worker.projectName) worker.projectName = props.projectName;
+      if (!worker.deploymentName) worker.deploymentName = leader.name;
+    });
+    emits("update:caprover", leader);
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
   } catch (e) {
     layout.setStatus("failed", normalizeError(e, "Failed to deploy a caprover worker."));
@@ -159,8 +165,6 @@ async function deploy(layout: any) {
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
   for (const worker of selectedWorkers.value) {
-    console.log(props.master.name, worker.name);
-
     try {
       await deleteMachine(grid!, {
         deploymentName: props.master.name,

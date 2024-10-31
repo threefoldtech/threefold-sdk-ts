@@ -1,6 +1,18 @@
 <template>
   <div>
-    <ListTable :headers="headers" :items="publicIps" :loading="loading" :deleting="isRemoving" v-model="selectedItems">
+    <ListTable
+      :headers="headers"
+      :items="publicIps"
+      :loading="loading"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
+      :deleting="isRemoving"
+      v-model="selectedItems"
+    >
       <template v-slot:top>
         <v-alert>
           <h4 class="text-center font-weight-medium">Public IPs</h4>
@@ -16,23 +28,21 @@
       <template #[`item.contractId`]="{ item }">
         {{ item.contractId ?? "-" }}
       </template>
-      <template #bottom>
-        <div v-if="publicIps.length > 0" class="d-flex align-end justify-end">
-          <v-btn
-            class="ma-3"
-            color="error"
-            prepend-icon="mdi-delete"
-            :disabled="selectedItems.length === 0 || isRemoving"
-            @click="showDialogue = true"
-          >
-            Delete
-          </v-btn>
-        </div>
-        <div v-else>
-          <p class="my-4">No IPs added on this farm.</p>
-        </div>
-      </template>
     </ListTable>
+    <div v-if="publicIps.length > 0" class="d-flex align-end justify-end">
+      <v-btn
+        class="ma-3"
+        color="error"
+        prepend-icon="mdi-delete"
+        :disabled="selectedItems.length === 0 || isRemoving"
+        @click="showDialogue = true"
+      >
+        Delete
+      </v-btn>
+    </div>
+    <div v-else>
+      <p class="my-4">No IPs added on this farm.</p>
+    </div>
     <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
       <v-card>
         <v-card-title class="text-subtitle-1">

@@ -19,8 +19,8 @@
                 :rules="[
                   validators.required('Recipient Twin ID is required'),
                   validators.isNotEmpty('Invalid Twin ID'),
-                  validators.isNumeric('Twin ID should be a number'),
-                  validators.min('Twin ID should be more than 0', 1),
+                  validators.isInt('Twin ID should be a valid integer.'),
+                  validators.min('Twin ID should be greater than zero', 1),
                   isSameTwinID,
                 ]"
                 :async-rules="[isValidTwinID]"

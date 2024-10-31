@@ -99,6 +99,7 @@ import { useAsync } from "@/hooks";
 import { downloadAsFile } from "@/utils/helpers";
 
 import LogMessage from "./LogMessage.vue";
+
 const clearDialog = ref(false);
 const VERSION = 1;
 const KEY = "TF_LOGGER_V." + VERSION;
@@ -168,7 +169,7 @@ export default {
 
     const page = ref(1);
     const loadLogs = useAsync(async () => {
-      if (connectDB.value.error) {
+      if (connectDB && connectDB.value.error) {
         return;
       }
 
@@ -228,15 +229,16 @@ export default {
           return;
         }
       }
+      if (connectDB && connectDB.value.data) {
+        const item = await logsDBClient.write({
+          type: log.type,
+          timestamp: log.timestamp,
+          message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
+        });
 
-      const item = await logsDBClient.write({
-        type: log.type,
-        timestamp: log.timestamp,
-        message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
-      });
-
-      logs.value.push(item);
-      scrollToBottom();
+        logs.value.push(item);
+        scrollToBottom();
+      }
     }
 
     let _init_scroll = false;

@@ -36,7 +36,9 @@ export function createCustomToast(
   type: ToastType,
   componentProps?: Record<string, unknown>,
 ) {
-  const theme = localStorage.getItem("APP_CURRENT_THEME") || "dark";
+  const themeElement = document.getElementById("vuetify-theme-stylesheet");
+  const theme = window.getComputedStyle(themeElement!).colorScheme;
+
   const colors = theme === "dark" ? darkModeColors : lightModeColors;
 
   const toastOptions: ToastOptions = {
@@ -61,7 +63,6 @@ export function createCustomToast(
     const leftIcons = document.getElementsByClassName("mosha__icon");
     const closeIcons = document.getElementsByClassName("mosha__toast__close-icon");
     const contents = document.getElementsByClassName("mosha__toast__content");
-
     if (leftIcons && closeIcons && contents) {
       for (let index = 0; index < leftIcons.length; index++) {
         const svgIcon = leftIcons[index].children[0];
