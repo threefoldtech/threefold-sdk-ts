@@ -21,7 +21,7 @@
           class="mb-4"
           v-if="errorMessage && gatewayTab === 0 && !loadingGateways"
         >
-          Failed to list {{ failedToListGws.length }} domains.
+          Failed to list {{ failedToListGws.length }} domain(s).
           <template #append>
             <v-btn
               icon="mdi-format-list-bulleted-square"
