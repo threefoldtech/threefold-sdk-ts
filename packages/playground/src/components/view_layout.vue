@@ -22,14 +22,14 @@
     >
       <AppInfo />
     </div>
-    <template v-if="requireKYC || requireSSH">
-      <template v-if="requireSSH && !ssh">
+    <template v-if="showSSHError || showKYCError">
+      <template v-if="showSSHError">
         <VAlert variant="tonal" type="error" class="mb-4">
           {{ title }} requires a public SSH key. You can generate or import it from the
           <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH Keys</router-link> page.
         </VAlert>
       </template>
-      <template v-if="requireKYC && kyc !== KycStatus.verified">
+      <template v-if="showKYCError">
         <VAlert variant="tonal" type="error">
           <template #prepend>
             <v-icon icon="mdi-shield-remove"></v-icon>
@@ -88,6 +88,10 @@ export default {
     const tick = ref(0);
     const kycDialog = ref(false);
     const kycDialogLoading = ref(false);
+    const requireSSH = computed(() => route.meta.requireSSH);
+    const requireKYC = computed(() => route.meta.requireKYC || route.path.match(/\/(applications|orchestrators)\/.+$/));
+    const showKYCError = computed(() => requireKYC.value && kyc.status !== KycStatus.verified);
+    const showSSHError = computed(() => requireSSH.value && !profileManager.profile?.ssh);
     function reRender(e: Event) {
       e.stopPropagation();
       tick.value++;
@@ -106,10 +110,8 @@ export default {
     return {
       title: computed(() => route.meta.title),
       hasInfo: computed(() => profileManager.profile && route.meta.info),
-      ssh: computed(() => profileManager.profile?.ssh),
-      kyc: computed(() => kyc.status),
-      requireSSH: computed(() => route.meta.requireSSH),
-      requireKYC: computed(() => route.meta.requireKYC || route.path.match(/\/applications\/.+$/)),
+      showKYCError,
+      showSSHError,
       tick,
       viewLayoutContainer,
       DashboardRoutes,
