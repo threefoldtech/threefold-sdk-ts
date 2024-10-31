@@ -155,7 +155,7 @@ export default {
       readonlyWireguard,
       readonly => {
         const fn = attrs["onUpdate:wireguard"];
-        if (readonly && !props.wireguard && typeof fn === "function") {
+        if (readonly && typeof fn === "function") {
           fn(true);
         } else if (typeof fn === "function") fn(false);
       },
