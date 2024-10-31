@@ -17,7 +17,7 @@
             tooltip-text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
             label="Public IPv4"
             :value="$props.ipv4"
-            :emit-function="$attrs['onUpdate:ipv4']"
+            :emit-function="$props.requiredIpv4 ? undefined : $attrs['onUpdate:ipv4']"
           />
 
           <NetworkItem
@@ -100,6 +100,7 @@ export default {
     wireguard: { type: Boolean, default: () => null },
     requireDomain: { type: Boolean, default: () => false },
     hasCustomDomain: { type: Boolean, default: () => false },
+    requiredIpv4: { type: Boolean, default: () => false },
     disabled: Boolean,
   },
   setup(props, { attrs }) {
@@ -156,6 +157,16 @@ export default {
       readonly => {
         const fn = attrs["onUpdate:wireguard"];
         if (readonly && typeof fn === "function") {
+          fn(true);
+        } else if (typeof fn === "function") fn(false);
+      },
+      { immediate: true },
+    );
+    watch(
+      () => props.requiredIpv4,
+      required => {
+        const fn = attrs["onUpdate:ipv4"];
+        if (required && typeof fn === "function") {
           fn(true);
         } else if (typeof fn === "function") fn(false);
       },
