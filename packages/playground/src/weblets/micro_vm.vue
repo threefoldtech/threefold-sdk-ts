@@ -233,6 +233,11 @@ const images = [
     flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
     entryPoint: "/entrypoint.sh",
   },
+  {
+    name: "BTC Node Mycelium",
+    flist: "https://hub.grid.tf/petep.3bot/btc_node-mycelium.flist",
+    entryPoint: "/sbin/zinit init",
+  },
 ];
 
 const name = ref(generateName({ prefix: "vm" }));
