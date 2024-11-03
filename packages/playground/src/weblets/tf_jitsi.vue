@@ -20,7 +20,7 @@
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 35 characters.', 35),
+          validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
