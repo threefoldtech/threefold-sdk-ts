@@ -6,3 +6,4 @@ export { GraphQLMonitor } from "./graphql";
 export { StatsMonitor } from "./stats";
 export { ActivationMonitor } from "./activations";
 export { ServiceUrlManager } from "./serviceURLManager";
+export { KYCMonitor } from "./kyc";

@@ -12,10 +12,11 @@ export enum Generic {
   TwinNotExistError,
   InsufficientBalanceError,
   DeploymentKeyDeletionError,
+  KycError,
 }
 export abstract class BaseError extends Error {
   constructor(name: string, public code: number, message: string, public module: ErrorModules) {
-    super(`${name}: ${message}`);
+    super(message);
   }
 }
 
@@ -69,5 +70,11 @@ export class InsufficientBalanceError extends BaseError {
 export class DeploymentKeyDeletionError extends BaseError {
   constructor(message: string) {
     super("DeploymentKeyDeletionError", Generic.DeploymentKeyDeletionError, message, ErrorModules.Generic);
+  }
+}
+
+export class KycBaseError extends BaseError {
+  constructor(message: string, public statusCode = -1) {
+    super("TFGridKYC", Generic.KycError, message, ErrorModules.Generic);
   }
 }

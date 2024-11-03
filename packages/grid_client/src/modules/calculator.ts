@@ -123,6 +123,22 @@ class Calculator {
   }
 
   /**
+   * Calculates the cost of a unique name per month.
+   *
+   * This function retrieves the price per hour for a unique name, and calculates the total cost in mUSD.
+   *
+   *
+   * @returns {Promise<number>} - The price in mUSD for the unique name usage per month.
+   */
+  @validateInput
+  async namePricing() {
+    const uniqueNamePricePerHour = (await this.getPrices()).uniqueName.value;
+    const priceInUSD = uniqueNamePricePerHour / 10 ** 7;
+    // return cost per month
+    return priceInUSD * 24 * 30;
+  }
+
+  /**
    * Asynchronously retrieves the TFT price from the TFChain.
    *
    * @returns {Promise<number>} A promise that resolves to the TFT price.

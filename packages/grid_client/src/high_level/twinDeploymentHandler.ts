@@ -2,7 +2,7 @@ import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
 import { TFChainError } from "@threefold/tfchain_client";
 import { BaseError, GridClientError, GridClientErrors, TimeoutError, ValidationError } from "@threefold/types";
 
-import { RMB } from "../clients";
+import { KYC, KycStatus, RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
@@ -14,6 +14,7 @@ import { DeploymentResultContracts, Operations, TwinDeployment } from "./models"
 class TwinDeploymentHandler {
   tfclient: TFClient;
   rmb: RMB;
+  kyc: KYC;
   deploymentFactory: DeploymentFactory;
   original_deployments = [];
   nodes: Nodes;
@@ -23,6 +24,7 @@ class TwinDeploymentHandler {
     this.deploymentFactory = new DeploymentFactory(this.config);
     this.rmb = new RMB(config.rmbClient);
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
+    this.kyc = new KYC(this.config.kycURL, this.config.mnemonic, this.config.keypairType);
   }
 
   async createNameContract(name: string) {
@@ -34,6 +36,11 @@ class TwinDeploymentHandler {
       }
     }
     try {
+      const kycStatus = await this.kyc.status();
+      if (kycStatus !== KycStatus.verified)
+        throw new ValidationError(
+          "Your account is not verified. Please sign into ThreeFold Dashboard or ThreeFold Connect mobile app to complete your KYC verification.",
+        ); //TODO add kyc manual link
       return await this.tfclient.contracts.createName({ name });
     } catch (e) {
       //TODO ERROR should be handled in tfchain
@@ -502,6 +509,11 @@ class TwinDeploymentHandler {
   }
 
   async handle(twinDeployments: TwinDeployment[]) {
+    const kycStatus = await this.kyc.status();
+    if (kycStatus !== KycStatus.verified)
+      throw new ValidationError(
+        "Your account is not verified. Please sign into Threefold Dashboard or Connect mobile app to complete your KYC verification.",
+      ); // TODO add KYC manual link.
     events.emit("logs", "Merging workloads");
     twinDeployments = await this.merge(twinDeployments);
     await this.validate(twinDeployments);
