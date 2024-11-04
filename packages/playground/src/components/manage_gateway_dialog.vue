@@ -331,8 +331,10 @@ export default {
         });
         gateways.value = gws;
         failedToListGws.value = failedToList;
-        if (failedToListGws.value.length) {
+        if (failedToListGws.value.length != 0) {
           errorMessage.value = `Failed to list ${failedToListGws.value.length} domains`;
+        } else {
+          errorMessage.value = "";
         }
       } catch (error) {
         errorMessage.value = "Failed to list this deployment's domains";
