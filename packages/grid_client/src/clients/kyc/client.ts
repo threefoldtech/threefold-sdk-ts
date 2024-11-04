@@ -188,7 +188,7 @@ export class KYC {
   async isHealthy(): Promise<boolean> {
     try {
       const res = await axios.get(urlJoin("https://", this.apiDomain, API_PREFIX, "health"));
-      const { status } = res.data;
+      const { status } = res.data.result;
       if (status !== `Healthy`) return false;
       return true;
     } catch (error) {
