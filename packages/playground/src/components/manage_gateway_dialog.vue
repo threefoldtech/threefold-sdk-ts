@@ -324,16 +324,19 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
+
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
           filter: gw => true,
         });
         gateways.value = gws;
-        failedToListGws.value = failedToList;
-        if (failedToListGws.value.length != 0) {
+
+        if (failedToList.length != 0) {
+          failedToListGws.value = failedToList;
           errorMessage.value = `Failed to list ${failedToListGws.value.length} domains`;
         } else {
+          failedToListGws.value = [];
           errorMessage.value = "";
         }
       } catch (error) {
