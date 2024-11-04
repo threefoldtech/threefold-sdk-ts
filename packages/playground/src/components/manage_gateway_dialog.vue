@@ -324,6 +324,8 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
+        failedToListGws.value = [];
+        errorMessage.value = "";
 
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
@@ -335,9 +337,6 @@ export default {
         if (failedToList.length != 0) {
           failedToListGws.value = failedToList;
           errorMessage.value = `Failed to list ${failedToListGws.value.length} domains`;
-        } else {
-          failedToListGws.value = [];
-          errorMessage.value = "";
         }
       } catch (error) {
         errorMessage.value = "Failed to list this deployment's domains";
