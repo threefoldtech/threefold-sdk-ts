@@ -41,7 +41,7 @@ export interface PublicConfig {
   domain: string;
 }
 
-interface NodeResources {
+export interface NodeResources {
   hru: number;
   sru: number;
   cru: number;

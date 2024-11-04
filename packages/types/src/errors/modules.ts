@@ -9,4 +9,5 @@ export enum ErrorModules {
   TFGrid = "tfgridModule",
   TFTBridge = "tfgridModule",
   TFTPrice = "tftPriceModule",
+  KYC = "tfGridKyc",
 }

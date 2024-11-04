@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/threefoldtech/playground
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.5.0"
+  tag: "2.6.0-rc2"
   
   env:
     - name: "MODE"

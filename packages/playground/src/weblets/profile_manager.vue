@@ -429,6 +429,7 @@
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
+import { KYC } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
@@ -451,7 +452,6 @@ import { getCredentials, setCredentials } from "../utils/credentials";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { readEmail, storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
-
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
 const selectedName = ref("");
@@ -621,7 +621,7 @@ const confirmPasswordInput = useInputRef();
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
-
+const kyc = useKYC();
 let interval: any;
 watch(
   () => profileManager.profile,
@@ -630,7 +630,9 @@ watch(
       __loadBalance(profile);
       if (interval) clearInterval(interval);
       interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
+      kyc.init(profile, window.env.KYC_URL);
     } else {
+      kyc.clear();
       if (interval) clearInterval(interval);
       balance.value = undefined;
     }
@@ -649,6 +651,7 @@ watch(
 function logout() {
   sessionStorage.removeItem("password");
   profileManager.clear();
+  kyc.clear();
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
@@ -916,6 +919,7 @@ async function getEmail() {
 import { TwinNotExistError } from "@threefold/types";
 import { capitalize } from "vue";
 
+import { useKYC } from "@/stores/kyc";
 import SSHKeysManagement from "@/utils/ssh";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";

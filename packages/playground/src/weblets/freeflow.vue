@@ -46,14 +46,15 @@
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
       />
 
-      <Network
+      <Networks
         required
         v-model:ipv4="ipv4"
         v-model:ipv6="ipv6"
         v-model:planetary="planetary"
         v-model:mycelium="mycelium"
         v-model:wireguard="wireguard"
-        :domain="selectionDetails?.domain"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+        require-domain
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -93,7 +94,7 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, onMounted, type Ref, ref, watch } from "vue";
+import { computed, onMounted, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
@@ -114,11 +115,7 @@ const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, wireguard, planetary, mycelium } = useNetworks();
 const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
@@ -228,7 +225,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -237,6 +234,6 @@ import { updateGrid } from "../utils/grid";
 
 export default {
   name: "TFFreeflow",
-  components: { SelectSolutionFlavor, Network, ManageSshDeployemnt },
+  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>
