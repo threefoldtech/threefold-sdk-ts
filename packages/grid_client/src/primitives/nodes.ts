@@ -333,81 +333,58 @@ class Nodes {
         throw new GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
       });
   }
-  // static getFeaturesFromFilters(options: FilterOptions = {}): string[] {
-  //   const features: string[] = [];
+  getFeaturesFromFilters(options: FilterOptions = {}): string[] {
+    const featuresSet = new Set<string>();
+    if (options.publicIPs || options.hasIPv6) {
+      featuresSet.add(WorkloadTypes.ip);
+    }
 
-  //   if (options.cru || options.mru || options.sru || options.hru ) {
-  //     features.push(WorkloadTypes.volume);
-  //     features.push(WorkloadTypes.zdb);
+    if (options.planetary) {
+      featuresSet.add(WorkloadTypes.zmachine);
+    }
 
-  //   }
+    if (options.mycelium && !options.planetary && !options.publicIPs && !options.hasIPv6) {
+      featuresSet.add(WorkloadTypes.zmachinelight);
+      featuresSet.add(WorkloadTypes.networklight);
+    } else {
+      featuresSet.add(WorkloadTypes.zmachine);
+      featuresSet.add(WorkloadTypes.network);
+    }
 
-  //   // Check for public IPs and IPv6
-  //   if (options.publicIPs || options.hasIPv6) {
-  //     features.push(WorkloadTypes.ip);
-  //     features.push(WorkloadTypes.ipv4);
-  //     features.push(WorkloadTypes.network);
-  //   }
+    // /   if (options.cru || options.mru || options.sru || options.hru ) {
+    //   //     features.push(WorkloadTypes.volume);
+    //   //     features.push(WorkloadTypes.zdb);
 
-  //   // Access nodes (IPv4 or IPv6)
-  //   // if (options.accessNodeV4) {
-  //   //   features.push("Access Node IPv4");
-  //   // }
-  //   // if (filters.accessNodeV6) {
-  //   //   features.push("Access Node IPv6");
-  //   // }
+    //   //   }
+    // if (machine.disks && machine.disks.length > 0) {
+    //   featuresSet.add(WorkloadTypes.volume);
+    //   featuresSet.add(WorkloadTypes.zmount);
+    // }
 
-  //   // Check for gateway
-  //   if (options.gateway) {
-  //     features.push(WorkloadTypes.gatewayfqdnproxy);
-  //     features.push(WorkloadTypes.gatewaynameproxy);
-  //   }
-  //   return features;
-  // }
+    // if (machine.qsfs_disks && machine.qsfs_disks.length > 0) {
+    //   featuresSet.add(WorkloadTypes.qsfs);
+    // }
 
-  // static getFeaturesFromMachine(machine: MachineModel): string[] {
-  //   const featuresSet = new Set<string>();
+    if (options.hasGPU) {
+      featuresSet.add(WorkloadTypes.zmachine);
+      featuresSet.add(WorkloadTypes.zmachinelight);
+    }
+    if (options.gateway) {
+      featuresSet.add(WorkloadTypes.gatewayfqdnproxy);
+      featuresSet.add(WorkloadTypes.gatewaynameproxy);
+    }
 
-  //   if (machine.public_ip6 || machine.public_ip) {
-  //     featuresSet.add(WorkloadTypes.ip);
-  //   }
+    // if (machine.zlogsOutput) {
+    //   featuresSet.add(WorkloadTypes.zlogs);
+    // }
 
-  //   if (machine.planetary) {
-  //     featuresSet.add(WorkloadTypes.zmachine);
-  //   }
-
-  //   if (machine.mycelium && machine.planetary && !machine.public_ip && !machine.public_ip6) {
-  //     featuresSet.add(WorkloadTypes.zmachinelight);
-  //     featuresSet.add(WorkloadTypes.networklight);
-  //   } else {
-  //     featuresSet.add(WorkloadTypes.zmachine);
-  //     featuresSet.add(WorkloadTypes.network);
-  //   }
-
-  //   if (machine.disks && machine.disks.length > 0) {
-  //     featuresSet.add(WorkloadTypes.volume);
-  //     featuresSet.add(WorkloadTypes.zmount);
-  //   }
-
-  //   if (machine.qsfs_disks && machine.qsfs_disks.length > 0) {
-  //     featuresSet.add(WorkloadTypes.qsfs);
-  //   }
-
-  //   if (machine.gpus && machine.gpus.length > 0) {
-  //     featuresSet.add(WorkloadTypes.zmachine);
-  //     featuresSet.add(WorkloadTypes.zmachinelight);
-  //   }
-
-  //   if (machine.zlogsOutput) {
-  //     featuresSet.add(WorkloadTypes.zlogs);
-  //   }
-
-  //   return Array.from(featuresSet);
-  // }
+    return Array.from(featuresSet);
+  }
 
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {
     let nodes: NodeInfo[] = [];
     url = url || this.proxyURL;
+    options.features = this.getFeaturesFromFilters(options);
     const query = this.getNodeUrlQuery(options);
     nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
     if (nodes.length) {
@@ -495,6 +472,7 @@ class Nodes {
       healthy: options.healthy,
       sort_by: SortBy.FreeCRU,
       sort_order: SortOrder.Desc,
+      features: options.features,
     };
 
     if (options.gateway) {

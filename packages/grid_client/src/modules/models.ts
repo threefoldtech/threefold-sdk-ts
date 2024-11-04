@@ -635,6 +635,9 @@ class FilterOptions {
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
   @Expose() @IsOptional() @IsString() region?: string;
   @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
+  @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
+  @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
+  @Expose() @IsOptional() @IsString() features?: string[];
 }
 
 enum CertificationType {

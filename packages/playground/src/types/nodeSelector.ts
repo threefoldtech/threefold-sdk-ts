@@ -23,6 +23,8 @@ export interface SelectionDetailsFilters {
   certified?: boolean;
   dedicated?: boolean;
   exclusiveFor?: string;
+  planetary?: boolean;
+  mycelium?: boolean;
 }
 
 export interface NumericValidator {

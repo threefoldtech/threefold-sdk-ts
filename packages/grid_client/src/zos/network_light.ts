@@ -12,7 +12,7 @@ class Mycelium {
 @ValidateMembers()
 class NetworkLight extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() subnet: string;
-  @Expose() @IsOptional() @Type(() => Mycelium) @ValidateNested() mycelium: Mycelium;
+  @Expose() @IsOptional() @Type(() => Mycelium) @ValidateNested() mycelium?: Mycelium;
 
   challenge(): string {
     let out = "";
