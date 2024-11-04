@@ -51,6 +51,9 @@
         solutionDisk: $props.modelValue.solution?.disk,
         memory: $props.modelValue.solution?.memory,
         rootFilesystemSize,
+        planetary: $props.modelValue.planetary,
+        mycelium: $props.modelValue.mycelium,
+        wireguard: $props.modelValue.wireguard,
       }"
       v-model="$props.modelValue.selectionDetails"
     />

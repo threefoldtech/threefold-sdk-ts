@@ -72,6 +72,9 @@
             ssdDisks: disks.map(disk => disk.size),
             memory: solution?.memory,
             rootFilesystemSize: solution?.disk,
+            planetary,
+            mycelium,
+            wireguard,
           }"
           v-model="selectionDetails"
         />

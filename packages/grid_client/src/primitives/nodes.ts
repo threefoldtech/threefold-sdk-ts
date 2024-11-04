@@ -335,17 +335,21 @@ class Nodes {
       });
   }
   getFeaturesFromFilters(options: FilterOptions = {}): string[] {
-    console.log("features: ", options);
     const featuresSet = new Set<string>();
     if (options.publicIPs || options.hasIPv6) {
       featuresSet.add(WorkloadTypes.ip);
+      featuresSet.add(WorkloadTypes.zmachine);
     }
 
     if (options.planetary) {
       featuresSet.add(WorkloadTypes.zmachine);
     }
+    if (options.wireguard) {
+      featuresSet.add(WorkloadTypes.network);
+      featuresSet.add(WorkloadTypes.zmachine);
+    }
 
-    if (options.mycelium && !options.planetary && !options.publicIPs && !options.hasIPv6) {
+    if (options.mycelium && !options.planetary && !options.publicIPs && !options.hasIPv6 && !options.wireguard) {
       featuresSet.add(WorkloadTypes.zmachinelight);
       featuresSet.add(WorkloadTypes.networklight);
     } else {

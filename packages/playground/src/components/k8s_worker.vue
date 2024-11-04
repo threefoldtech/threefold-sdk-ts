@@ -104,6 +104,9 @@
         ssdDisks: [$props.modelValue.diskSize],
         memory: $props.modelValue.memory,
         rootFilesystemSize: $props.modelValue.rootFsSize,
+        planetary: $props.modelValue.planetary,
+        mycelium: $props.modelValue.mycelium,
+        wireguard: $props.modelValue.wireguard,
       }"
       v-model="$props.modelValue.selectionDetails"
     />

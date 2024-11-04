@@ -104,6 +104,9 @@
           ssdDisks: [10],
           memory: solution?.memory,
           rootFilesystemSize,
+          planetary,
+          mycelium,
+          wireguard,
         }"
         v-model="selectionDetails"
       />
