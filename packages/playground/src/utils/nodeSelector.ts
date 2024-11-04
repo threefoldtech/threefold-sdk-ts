@@ -208,6 +208,7 @@ export function normalizeNodeFilters(
     country: options.location.country,
     gateway: options.gateway,
     healthy: true,
+    rentableOrRentedBy: filters.dedicated ? options.twinId : undefined,
   };
 }
 
