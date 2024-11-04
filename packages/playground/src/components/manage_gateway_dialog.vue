@@ -477,7 +477,7 @@ export default {
       validators.isAlphanumeric("Subdomain should consist of letters and numbers only."),
       (subdomain: string) => validators.isAlpha("Subdomain must start with an alphabet char.")(subdomain[0]),
       validators.minLength("Subdomain must be at least 4 characters.", 4),
-      (subdomain: string) => validators.maxLength("Subdomain cannot exceed 50 characters.", 50)(subdomain),
+      (subdomain: string) => validators.maxLength("Subdomain cannot exceed 35 characters.", 35)(subdomain),
     ];
 
     const portRules = [validators.required("Port is required."), validators.isPort("Please provide a valid port.")];
