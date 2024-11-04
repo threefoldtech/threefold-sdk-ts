@@ -11,8 +11,8 @@ export class KYCMonitor extends ServiceBase implements ILivenessChecker {
     try {
       const res = await fetch(urlJoin(url, "/api/v1/health"));
       if (!res?.ok) throw Error(`HTTP Response Code: ${res?.status}`);
-      const { status } = await res.json();
-      if (status !== "Healthy") throw Error(`Status: ${status}`);
+      const { result } = await res.json();
+      if (result.status !== "Healthy") throw Error(`Status: ${result.status}`);
       return { alive: true };
     } catch (error) {
       return { alive: false, error };
