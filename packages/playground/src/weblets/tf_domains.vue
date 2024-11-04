@@ -16,7 +16,7 @@
               validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
               subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
               validators.minLength('Subdomain must be at least 4 characters.', 4),
-              subdomain => validators.maxLength('Subdomain cannot exceed 15 characters.', 15)(subdomain),
+              subdomain => validators.maxLength('Subdomain cannot exceed 35 characters.', 35)(subdomain),
             ]"
             :async-rules="[validateSubdomain]"
             #="{ props }"
