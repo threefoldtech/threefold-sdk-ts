@@ -210,6 +210,7 @@ export function normalizeNodeFilters(
     healthy: true,
     planetary: filters.planetary,
     mycelium: filters.mycelium,
+    wireguard: filters.wireguard,
   };
 }
 

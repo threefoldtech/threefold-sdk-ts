@@ -63,6 +63,7 @@ interface NodeInfo {
   rentable: boolean;
   rented: boolean;
   price_usd: number;
+  features: string[];
 }
 interface PublicConfig {
   domain: string;
@@ -334,6 +335,7 @@ class Nodes {
       });
   }
   getFeaturesFromFilters(options: FilterOptions = {}): string[] {
+    console.log("features: ", options);
     const featuresSet = new Set<string>();
     if (options.publicIPs || options.hasIPv6) {
       featuresSet.add(WorkloadTypes.ip);

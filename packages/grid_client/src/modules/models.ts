@@ -637,6 +637,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
   @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
   @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
+  @Expose() @IsOptional() @IsBoolean() wireguard?: boolean;
   @Expose() @IsOptional() @IsString() features?: string[];
 }
 

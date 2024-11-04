@@ -83,6 +83,7 @@
             rootFilesystemSize,
             planetary,
             mycelium,
+            wireguard,
           }"
           v-model="selectionDetails"
         />

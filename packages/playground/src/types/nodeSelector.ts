@@ -25,6 +25,7 @@ export interface SelectionDetailsFilters {
   exclusiveFor?: string;
   planetary?: boolean;
   mycelium?: boolean;
+  wireguard?: boolean;
 }
 
 export interface NumericValidator {
