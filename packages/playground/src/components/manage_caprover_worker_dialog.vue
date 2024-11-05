@@ -147,7 +147,7 @@ async function deploy(layout: any) {
       region: worker.value.selectionDetails!.location?.region,
       planetary: true,
       publicIpv4: true,
-      mycelium: true,
+      mycelium: worker.value.mycelium,
       envs: [
         { key: "SWM_NODE_MODE", value: "worker" },
         { key: "PUBLIC_KEY", value: props.master.env.PUBLIC_KEY },
