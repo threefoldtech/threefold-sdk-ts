@@ -17,7 +17,15 @@
           { title: 'PLACEHOLDER', key: 'data-table-select' },
           { title: 'Contract ID', key: 'contractId' },
           { title: 'Name', key: 'name' },
-          { title: 'Public IPv4', key: 'publicIP.ip' },
+          {
+            title: 'Networks',
+            key: 'networks',
+            sortable: false,
+            children: [
+              { title: 'Public IPv4', key: 'publicIP.ip', sortable: false },
+              { title: 'Mycelium IP', key: 'myceliumIP', sortable: false },
+            ],
+          },
           { title: 'CPU(vCores)', key: 'capacity.cpu' },
           { title: 'Memory(MB)', key: 'capacity.memory' },
           { title: 'Disk(GB)', key: 'disk' },
@@ -29,6 +37,10 @@
       >
         <template #[`item.index`]="{ item }">
           {{ data.indexOf(item) + 1 }}
+        </template>
+
+        <template #[`item.myceliumIP`]="{ item }">
+          {{ item.myceliumIP ? item.myceliumIP : "-" }}
         </template>
 
         <template #[`item.disk`]="{ item }">
@@ -135,6 +147,7 @@ async function deploy(layout: any) {
       region: worker.value.selectionDetails!.location?.region,
       planetary: true,
       publicIpv4: true,
+      mycelium: true,
       envs: [
         { key: "SWM_NODE_MODE", value: "worker" },
         { key: "PUBLIC_KEY", value: props.master.env.PUBLIC_KEY },
