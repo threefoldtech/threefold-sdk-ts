@@ -324,14 +324,18 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
+        failedToListGws.value = [];
+        errorMessage.value = "";
+
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
           filter: gw => true,
         });
         gateways.value = gws;
-        failedToListGws.value = failedToList;
-        if (failedToListGws.value.length) {
+
+        if (failedToList.length != 0) {
+          failedToListGws.value = failedToList;
           errorMessage.value = `Failed to list ${failedToListGws.value.length} domains`;
         }
       } catch (error) {
@@ -473,7 +477,7 @@ export default {
       validators.isAlphanumeric("Subdomain should consist of letters and numbers only."),
       (subdomain: string) => validators.isAlpha("Subdomain must start with an alphabet char.")(subdomain[0]),
       validators.minLength("Subdomain must be at least 4 characters.", 4),
-      (subdomain: string) => validators.maxLength("Subdomain cannot exceed 50 characters.", 50)(subdomain),
+      (subdomain: string) => validators.maxLength("Subdomain cannot exceed 35 characters.", 35)(subdomain),
     ];
 
     const portRules = [validators.required("Port is required."), validators.isPort("Please provide a valid port.")];
