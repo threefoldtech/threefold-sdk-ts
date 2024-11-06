@@ -8,7 +8,7 @@ import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
 import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
-import { DeploymentFactory, Nodes } from "../primitives/index";
+import { DeploymentFactory, Network, Nodes } from "../primitives/index";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { DeploymentResultContracts, Operations, TwinDeployment } from "./models";
 class TwinDeploymentHandler {
@@ -147,11 +147,13 @@ class TwinDeploymentHandler {
         for (const workload of twinDeployment.deployment.workloads) {
           if (workload.type !== WorkloadTypes.network) continue;
           const contract = contracts.created.filter(c => c.contractId === twinDeployment.deployment.contract_id);
-          twinDeployment.network.save(contract[0]);
+          if (twinDeployment.network instanceof Network) {
+            twinDeployment.network.save(contract[0]);
+          }
         }
       }
       // left just to delete the old keys
-      else if (twinDeployment.operation === Operations.delete) {
+      else if (twinDeployment.operation === Operations.delete && twinDeployment.network instanceof Network) {
         await twinDeployment.network.save(undefined, twinDeployment.deployment.contract_id);
       }
     }

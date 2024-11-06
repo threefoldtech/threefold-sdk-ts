@@ -339,10 +339,12 @@ class Nodes {
     if (options.publicIPs || options.hasIPv6) {
       featuresSet.add(WorkloadTypes.ip);
       featuresSet.add(WorkloadTypes.zmachine);
+      featuresSet.add(WorkloadTypes.network);
     }
 
     if (options.planetary) {
       featuresSet.add(WorkloadTypes.zmachine);
+      featuresSet.add(WorkloadTypes.network);
     }
     if (options.wireguard) {
       featuresSet.add(WorkloadTypes.network);
@@ -352,6 +354,8 @@ class Nodes {
     if (options.mycelium && !options.planetary && !options.publicIPs && !options.hasIPv6 && !options.wireguard) {
       featuresSet.add(WorkloadTypes.zmachinelight);
       featuresSet.add(WorkloadTypes.networklight);
+      featuresSet.add(WorkloadTypes.zmachine);
+      featuresSet.add(WorkloadTypes.network);
     } else {
       featuresSet.add(WorkloadTypes.zmachine);
       featuresSet.add(WorkloadTypes.network);

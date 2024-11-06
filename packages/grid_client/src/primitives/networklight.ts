@@ -3,9 +3,7 @@ import { ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
 import { Addr } from "netaddr";
-import * as PATH from "path";
 import { default as PrivateIp } from "private-ip";
-import { default as TweetNACL } from "tweetnacl";
 
 import { RMB } from "../clients/rmb/client";
 import { TFClient } from "../clients/tf-grid/client";
@@ -19,6 +17,7 @@ import { BackendStorage } from "../storage/backend";
 import { NetworkLight } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
+import { DeploymentFactory } from "./deployment";
 import { Nodes } from "./nodes";
 
 class Node {
@@ -93,7 +92,7 @@ class ZNetworkLight {
     mycelium: boolean,
     description = "",
     subnet = "",
-    myceliumSeeds: MyceliumNetworkModel,
+    myceliumSeeds: MyceliumNetworkModel[] = [],
   ): Promise<Workload | undefined> {
     events.emit("logs", `Adding node ${nodeId} to network ${this.name}`);
     let znet_light = new NetworkLight();
@@ -105,9 +104,10 @@ class ZNetworkLight {
     znet_light["node_id"] = nodeId;
 
     if (mycelium) {
+      const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId === nodeId);
       let seed = generateRandomHexSeed(32);
-      if (myceliumSeeds?.seed) {
-        seed = myceliumSeeds.seed;
+      if (myceliumNetworkSeed?.seed) {
+        seed = myceliumNetworkSeed.seed;
         validateHexSeed(seed, 32);
       }
 
@@ -156,6 +156,79 @@ class ZNetworkLight {
       }
       throw new ValidationError(`node_id is not in the network. Please add it first.`);
     }
+  }
+  ValidateFreeSubnet(subnet): string {
+    const reservedSubnets = this.getReservedSubnets();
+    if (!reservedSubnets.includes(subnet)) {
+      this.reservedSubnets.push(subnet);
+      return subnet;
+    } else {
+      throw new ValidationError(`subnet ${subnet} is not free.`);
+    }
+  }
+
+  updateNetworkDeployments(): void {
+    for (const deployment of this.deployments) {
+      const workloads = deployment["workloads"];
+      for (const workload of workloads) {
+        if (workload["type"] !== WorkloadTypes.network) {
+          continue;
+        }
+        if (this.network.subnet === workload["data"]["subnet"]) {
+          workload["data"] = this.network;
+          break;
+        }
+      }
+      deployment["workloads"] = workloads;
+    }
+  }
+  async checkMycelium(nodeId: number, mycelium: boolean, myceliumSeeds: MyceliumNetworkModel[] = []) {
+    if (!mycelium) return;
+    // check if network has mycelium or not
+    // const network = this.networks.find(network => {
+    //   return network["node_id"] === nodeId;
+    // });
+    const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId == nodeId);
+    if (this.network && this.network.mycelium && this.network.mycelium?.hex_key) {
+      if (myceliumSeeds && myceliumSeeds.length > 0 && myceliumNetworkSeed?.seed !== this.network.mycelium.hex_key) {
+        throw new ValidationError(`Another mycelium seed is used for this network ${this.name} on this ${nodeId}`);
+      }
+    } else {
+      // If network has no mycelium and user wanna update it and add mycelium.
+      let seed = generateRandomHexSeed(32);
+      if (this.network) {
+        if (myceliumNetworkSeed?.seed) {
+          validateHexSeed(myceliumNetworkSeed.seed, 32);
+          seed = myceliumNetworkSeed.seed;
+        }
+
+        this.network.mycelium = {
+          hex_key: seed,
+          peers: [],
+        };
+        this.getUpdatedNetwork(this.network);
+        this.updateNetworkDeployments();
+
+        const deploymentFactory = new DeploymentFactory(this.config);
+        const filteredDeployments = this.deployments.filter(deployment => deployment["node_id"] === nodeId);
+
+        for (const deployment of filteredDeployments) {
+          const d = await deploymentFactory.fromObj(deployment);
+          for (const workload of d["workloads"]) {
+            workload.data["mycelium"]["hex_key"] = seed;
+            workload.data = this.getUpdatedNetwork(workload["data"]);
+            workload.version += 1;
+          }
+          return d;
+        }
+      }
+    }
+  }
+  nodeExists(node_id: number): boolean {
+    if (this.network["node_id"] === node_id) {
+      return true;
+    }
+    return false;
   }
 
   validateUserIP(node_id: number, ip_address = "") {
