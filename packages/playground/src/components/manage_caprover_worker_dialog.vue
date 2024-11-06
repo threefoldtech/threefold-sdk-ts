@@ -40,7 +40,7 @@
         </template>
 
         <template #[`item.myceliumIP`]="{ item }">
-          {{ item.myceliumIP ? item.myceliumIP : "-" }}
+          {{ item.myceliumIP || "-" }}
         </template>
 
         <template #[`item.disk`]="{ item }">
