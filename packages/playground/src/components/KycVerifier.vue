@@ -18,7 +18,7 @@
 </template>
 <script lang="ts">
 import { KycErrors } from "@threefold/types";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 import { useKYC } from "@/stores/kyc";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -76,6 +76,7 @@ export default {
     };
     window.addEventListener("message", handleReceiveMessage, false);
     onMounted(getToken);
+    onUnmounted(() => window.removeEventListener("message", handleReceiveMessage, false));
     return {
       handleUpdateDialog,
       token,
