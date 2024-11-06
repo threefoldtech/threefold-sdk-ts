@@ -63,6 +63,7 @@ export default {
     };
 
     const handleReceiveMessage = (event: MessageEvent) => {
+      if (event.data?.status == undefined) return;
       window.removeEventListener("message", handleReceiveMessage, false);
       handleUpdateDialog(false); // close the dialog
       if (!event.data.status) console.error("Can't check the verification status", event.data);
