@@ -61,8 +61,10 @@ def test_stats(browser):
     """
     dashboard_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
-    stats = grid_proxy.get_stats()
+    stats = grid_proxy.get_stats_capicity()
     dashboard_stats = dashboard_page.get_dashboard_stats()
+    print(stats)
+    print(dashboard_stats)
     assert stats == dashboard_stats
 
 
