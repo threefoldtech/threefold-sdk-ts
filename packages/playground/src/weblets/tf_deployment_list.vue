@@ -382,10 +382,10 @@
               icon="mdi-cog"
               tooltip="Manage Domains"
               :disabled="item.fromAnotherClient"
-              @click="dialog = item.masters[0].name"
+              @click="dialog = item.masters.length"
             />
 
-            <ManageGatewayDialog v-if="dialog === item.masters[0].name" :k8s="item" @close="dialog = undefined" />
+            <ManageGatewayDialog v-if="dialog === item.masters.length" :k8s="item" @close="dialog = undefined" />
 
             <ManageK8SWorkerDialog
               v-if="dialog === item.name"
@@ -485,7 +485,7 @@ const tabs: Tab[] = [
 ];
 
 const layout = useLayout();
-const dialog = ref<string>();
+const dialog = ref<string | number>();
 const selectedItems = ref<any[]>([]);
 const deleting = ref(false);
 const deletingDialog = ref(false);
