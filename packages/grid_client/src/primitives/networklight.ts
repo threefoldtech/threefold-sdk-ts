@@ -31,6 +31,7 @@ interface NetworkMetadata {
 class ZNetworkLight {
   node: Node;
   capacity: Nodes;
+  NodeIds: number[];
   deployments: Deployment[] = [];
   network: NetworkLight;
   contracts: Required<GqlNodeContract>[];
@@ -45,7 +46,7 @@ class ZNetworkLight {
   constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
     if (Addr(ipRange).prefix !== 24) {
       this.ipRange = Addr(ipRange).mask(24);
-      this.ipRange.toString();
+      this.ipRange = this.ipRange.toString();
     }
     if (!this.isPrivateIP(ipRange)) {
       throw new ValidationError("Network ip_range should be a private range.");
@@ -94,6 +95,9 @@ class ZNetworkLight {
     subnet = "",
     myceliumSeeds: MyceliumNetworkModel[] = [],
   ): Promise<Workload | undefined> {
+    if (this.nodeExists(nodeId)) {
+      return;
+    }
     events.emit("logs", `Adding node ${nodeId} to network ${this.name}`);
     let znet_light = new NetworkLight();
     if (!subnet) {
@@ -101,6 +105,7 @@ class ZNetworkLight {
     } else {
       znet_light.subnet = subnet;
     }
+    znet_light["ip_range"] = this.ipRange;
     znet_light["node_id"] = nodeId;
 
     if (mycelium) {
@@ -119,6 +124,11 @@ class ZNetworkLight {
 
     this.network = znet_light;
     znet_light = this.getUpdatedNetwork(znet_light);
+    // console.log("znet_light.subnet: ", znet_light.subnet);
+    // console.log("subnet: ", subnet);
+    // if (znet_light.subnet !== subnet) {
+    //   throw new ValidationError(`The same network name ${this.name} with a different subnet already exists.`);
+    // }
 
     const znet_light_workload = new Workload();
     znet_light_workload.version = 0;
@@ -128,6 +138,7 @@ class ZNetworkLight {
     znet_light_workload.metadata = "";
     znet_light_workload.description = description;
 
+    this.node = new Node();
     this.node.node_id = nodeId;
 
     return znet_light_workload;
@@ -225,7 +236,7 @@ class ZNetworkLight {
     }
   }
   nodeExists(node_id: number): boolean {
-    if (this.network["node_id"] === node_id) {
+    if (this.NodeIds && this.NodeIds.includes(node_id)) {
       return true;
     }
     return false;
@@ -251,12 +262,8 @@ class ZNetworkLight {
   }
 
   getFreeSubnet(): string {
-    const reservedSubnets = this.getReservedSubnets();
-    let subnet = Addr(this.ipRange).mask(24).nextSibling().nextSibling();
-    while (reservedSubnets.includes(subnet.toString())) {
-      subnet = subnet.nextSibling();
-    }
-    this.reservedSubnets.push(subnet.toString());
+    console.log("this.ipRange", this.ipRange.toString());
+    const subnet = Addr(this.ipRange).mask(24).nextSibling().nextSibling();
     return subnet.toString();
   }
 
@@ -309,51 +316,10 @@ class ZNetworkLight {
     if (!(await this.exists())) {
       return;
     }
-    events.emit("logs", `Loading network ${this.name}`);
-
-    await this.loadNetworkFromContracts();
-
-    //  else {
-    //   const network = await this.getNetwork();
-    //   if (network["ip_range"] !== this.ipRange) {
-    //     throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
-    //   }
-
-    //   await this.tfClient.connect();
-    //   for (const node of network["nodes"]) {
-    //     const contract = await this.tfClient.contracts.get({
-    //       id: node.contract_id,
-    //     });
-    //     if (contract === null) continue;
-    //     const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
-    //     const payload = JSON.stringify({ contract_id: node.contract_id });
-    //     let res;
-    //     try {
-    //       res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
-    //     } catch (e) {
-    //       (e as Error).message = formatErrorMessage(`Failed to load network deployment ${node.contract_id}`, e);
-    //       throw e;
-    //     }
-    //     res["node_id"] = node.node_id;
-    //     for (const workload of res["workloads"]) {
-    //       if (
-    //         workload["type"] !== WorkloadTypes.network ||
-    //         !Addr(this.ipRange).contains(Addr(workload["data"]["subnet"]))
-    //       ) {
-    //         continue;
-    //       }
-    //       if (workload.result.state === "deleted") {
-    //         continue;
-    //       }
-    //       const znet = this._fromObj(workload["data"]);
-    //       znet["node_id"] = node.node_id;
-    //       const n: Node = node;
-    //       this.nodes.push(n);
-    //       this.networks.push(znet);
-    //       this.deployments.push(res);
-    //     }
-    //   }
-    // }
+    const contracts = await this.getMyNetworkContracts();
+    for (const contract of this.contracts) {
+      this.NodeIds.push(contract.nodeID);
+    }
   }
 
   private async getReservedIps(nodeId: number): Promise<string[]> {

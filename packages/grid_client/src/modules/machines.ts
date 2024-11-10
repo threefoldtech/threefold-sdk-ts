@@ -54,7 +54,6 @@ class MachinesModule extends BaseModule {
   async _createDeployment(options: MachinesModel): Promise<[TwinDeployment[], Network, string]> {
     let network;
     let contractMetadata;
-    let isZOS4 = false;
     for (const machine of options.machines) {
       if (network) break;
       const nodeTwinId = await this.capacity.getNodeTwinId(machine.node_id);
@@ -68,7 +67,6 @@ class MachinesModule extends BaseModule {
           name: options.name,
           projectName: this.config.projectName || `vm/${options.name}`,
         });
-        isZOS4 = true;
       } else {
         network = new Network(options.network.name, options.network.ip_range, this.config);
         await network.load();

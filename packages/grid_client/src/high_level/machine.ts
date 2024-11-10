@@ -155,28 +155,26 @@ class VMHL extends HighLevelBase {
     // reject the deployment in case of network light
     let ipName = "";
     let publicIps = 0;
-    if (isZOS4) {
-      throw new GridClientErrors.Farms.InvalidResourcesError(`Zmachine Light doesn't support public ips.`);
-    } else {
-      if (publicIp || publicIp6) {
-        const ip = new PublicIPPrimitive();
-        ipName = `${name}_pubip`;
-        workloads.push(ip.create(ipName, "", description, 0, publicIp, publicIp6));
-        if (publicIp) {
-          const node = await this.nodes.getNode(nodeId);
-          const _farm = await this.config.tfclient.farms.get({ id: node.farmId });
-          const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
-          if (freeIps < 1) {
-            throw new GridClientErrors.Farms.InvalidResourcesError(
-              `Farm ${_farm.id} doesn't have enough public IPs: requested IPs=1 for machine with name: ${name},
-              , available IPs=${freeIps}.`,
-            );
-          }
-          publicIps++;
+    if (publicIp || publicIp6) {
+      if (isZOS4) {
+        throw new GridClientErrors.Farms.InvalidResourcesError(`Zmachine Light doesn't support public ips.`);
+      }
+      const ip = new PublicIPPrimitive();
+      ipName = `${name}_pubip`;
+      workloads.push(ip.create(ipName, "", description, 0, publicIp, publicIp6));
+      if (publicIp) {
+        const node = await this.nodes.getNode(nodeId);
+        const _farm = await this.config.tfclient.farms.get({ id: node.farmId });
+        const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
+        if (freeIps < 1) {
+          throw new GridClientErrors.Farms.InvalidResourcesError(
+            `Farm ${_farm.id} doesn't have enough public IPs: requested IPs=1 for machine with name: ${name},
+            , available IPs=${freeIps}.`,
+          );
         }
+        publicIps++;
       }
     }
-
     if (gpus && gpus.length > 0) {
       const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
       const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
@@ -208,6 +206,7 @@ class VMHL extends HighLevelBase {
     let accessNodeSubnet;
     //ip el machine nafse we validate the subnet in network and network light
     if (ip) {
+      console.log("validating", ip);
       userIPsubnet = network.ValidateFreeSubnet(Addr(ip).mask(24).toString());
 
       //
@@ -228,11 +227,12 @@ class VMHL extends HighLevelBase {
       // check with ashraf regarding type
       networkContractMetadata = JSON.stringify({
         version: 4,
-        type: "network",
+        type: "network-light",
         name: network.name,
         projectName: this.config.projectName,
       });
     }
+    console.log("networkContractMetadata", networkContractMetadata);
 
     const deploymentFactory = new DeploymentFactory(this.config);
 
@@ -292,6 +292,8 @@ class VMHL extends HighLevelBase {
     }
 
     //
+
+    console.log("userIPsubnet", userIPsubnet);
     const znet_workload = await network.addNode(nodeId, mycelium, description, userIPsubnet, myceliumNetworkSeeds);
     // check if networks existsI'll do nothing incase network light and if network doesn't exist I'll create a network and deployment and push the deployment 3aleha
     if (network instanceof Network && (await network.exists()) && (znet_workload || access_net_workload)) {
