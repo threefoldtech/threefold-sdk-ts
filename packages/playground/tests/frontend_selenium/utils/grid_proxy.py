@@ -63,7 +63,7 @@ class GridProxy:
         return details
 
     def get_stats_capicity(self):
-        r = requests.post('https://stats.' + Base.net + '.grid.tf/api/stats-summary')
+        r = requests.post('https://stats.' + Base.net + '.grid.tf/api/stats-summary', timeout=10)
         stats_json = r.json()
         return list(stats_json.values())
 
