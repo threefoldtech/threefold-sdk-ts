@@ -62,9 +62,10 @@ export default {
       }
     };
 
-    const handleReceiveMessage = (event: MessageEvent) => {
-      if (event.data?.status == undefined) return;
+    const handleReceiveMessage = async (event: MessageEvent) => {
+      if (event.data?.status == undefined || event.data?.manualStatus == "waiting") return;
       window.removeEventListener("message", handleReceiveMessage, false);
+      await new Promise(r => setTimeout(r, 5000)); // wait for the verification to be completed
       handleUpdateDialog(false); // close the dialog
       if (!event.data.status) console.error("Can't check the verification status", event.data);
       const status = (event.data.status as string).toLowerCase();
