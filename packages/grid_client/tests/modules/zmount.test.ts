@@ -15,29 +15,43 @@ describe("Zmount module", () => {
 
     zmount.size = size;
 
-    const result = () => zmount.challenge();
+    const result = zmount.challenge();
 
-    expect(result).toThrow();
+    expect(result).toBe(size.toString());
   });
 
   test("Max value for size.", () => {
     const size = 100 * 1025 ** 4;
-
-    zmount.size = size;
-
     const result = () => zmount.challenge();
 
-    expect(result).toThrow();
+    expect(() => {
+      zmount.size = size;
+      result;
+    }).toThrow(
+      expect.objectContaining({
+        constraints: {
+          max: "size must not be greater than 10995116277760",
+        },
+      }),
+    );
   });
 
   test("Size doesn't accept decimal value.", () => {
     const size = 1.5;
 
-    zmount.size = size;
-
     const result = () => zmount.challenge();
 
-    expect(result).toThrow();
+    expect(() => {
+      zmount.size = size;
+      result;
+    }).toThrow(
+      expect.objectContaining({
+        constraints: {
+          isInt: "size must be an integer number",
+          min: "size must not be less than 104857600",
+        },
+      }),
+    );
   });
 
   test("Size empty value.", () => {
@@ -49,10 +63,17 @@ describe("Zmount module", () => {
   test("Size negative value.", () => {
     const negative_size = -1;
 
-    zmount.size = negative_size;
-
     const result = () => zmount.challenge();
 
-    expect(result).toThrow();
+    expect(() => {
+      zmount.size = negative_size;
+      result;
+    }).toThrow(
+      expect.objectContaining({
+        constraints: {
+          min: "size must not be less than 104857600",
+        },
+      }),
+    );
   });
 });
