@@ -3,7 +3,7 @@
     <KycVerifier
       v-if="kycDialog"
       :loading="kycDialogLoading"
-      @loaded="kycDialogLoading = false"
+      @update:loading="kycDialogLoading = $event"
       :moduleValue="kycDialog"
       @update:moduleValue="kycDialog = $event"
     />
@@ -143,7 +143,8 @@
                         :align-center="true"
                         :class="'d-flex align-center'"
                         location="end"
-                      /></div></v-list-item
+                      />
+                    </div> </v-list-item
                 ></v-col>
               </v-row>
               <v-row class="row-style">
@@ -160,17 +161,14 @@
                           text="Verify now"
                           size="small"
                           color="warning"
-                          @click="
-                            kycDialog = true;
-                            kycDialogLoading = true;
-                          "
+                          @click="kycDialog = true"
                           :loading="kycDialogLoading"
                         >
                           <template #prepend>
                             <v-icon>mdi-shield-plus</v-icon>
                           </template>
                         </v-btn>
-                        <p v-if="insufficientBalance" class="mt-1 text-caption text-red">
+                        <p v-if="balance && insufficientBalance" class="mt-1 text-caption text-red">
                           You need to have at least 100 TFT
                         </p>
                       </div>
@@ -179,7 +177,8 @@
                         :align-center="true"
                         :class="'d-flex align-center'"
                         location="end"
-                      /></div></v-list-item
+                      />
+                    </div> </v-list-item
                 ></v-col>
               </v-row>
             </v-list>
@@ -431,6 +430,7 @@ export default {
   .custom-list {
     font-size: 13px !important;
   }
+
   .edit_pen {
     display: inline-block !important;
   }
