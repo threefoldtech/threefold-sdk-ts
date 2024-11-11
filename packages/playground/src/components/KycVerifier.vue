@@ -30,7 +30,7 @@
         <v-card-text class="pb-0">
           We use iDenfy to verify your identity.
           <br />
-          Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which include
+          Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which includes
           their <span class="font-weight-bold">Terms & Conditions, Privacy Policy</span>, and other relevant documents.
           <v-checkbox hide-details v-model="agreedCheckbox">
             <template v-slot:label>
