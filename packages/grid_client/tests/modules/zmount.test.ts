@@ -5,8 +5,11 @@ const disk = 10;
 const memory = 1024;
 const CPUs = 2;
 
-const min = disk * 10 * memory ** CPUs;
-const max = disk * memory ** (CPUs * 2);
+const newDiskValue = 100;
+const newCPUValue = 4;
+
+const min = newDiskValue * memory ** CPUs;
+const max = disk * memory ** newCPUValue;
 
 beforeEach(() => {
   zmount = new Zmount();
@@ -18,12 +21,26 @@ describe("Zmount module", () => {
 
   test("Min value for size.", () => {
     expect(() => {
+      zmount.size = min;
+      zmount.challenge();
+    }).toBeDefined();
+  });
+
+  test("Less than the min value of size.", () => {
+    expect(() => {
       zmount.size = min - 1;
       zmount.challenge();
     }).toThrow();
   });
 
   test("Max value for size.", () => {
+    expect(() => {
+      zmount.size = max;
+      zmount.challenge();
+    }).toBeDefined();
+  });
+
+  test("Exceed the max value of size.", () => {
     expect(() => {
       zmount.size = max + 1;
       zmount.challenge();
