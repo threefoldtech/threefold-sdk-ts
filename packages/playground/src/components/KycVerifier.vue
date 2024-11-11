@@ -24,22 +24,20 @@
       <v-card>
         <v-card-title class="bg-primary d-flex align-center">
           <v-icon icon="mdi-security" />
-          <div class="pl-2">Terms and conditions</div>
+          <div class="pl-2">Terms & Conditions</div>
         </v-card-title>
 
         <v-card-text class="pb-0">
-          As part of the verification process, we utilize Idenfy to verify your identity.
+          We use iDenfy to verify your identity.
           <br />
-          Please ensure you review Idenfy’s <span class="font-weight-bold">Security and Compliance</span>, which include
+          Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which include
           their <span class="font-weight-bold">Terms & Conditions, Privacy Policy</span>, and other relevant documents.
           <v-checkbox hide-details v-model="agreedCheckbox">
             <template v-slot:label>
               <div>
                 I have read and agreed to
 
-                <a href="https://www.idenfy.com/security/" target="_blank" @click.stop>
-                  IDenfy Security and Compliance</a
-                >.
+                <a href="https://www.idenfy.com/security/" target="_blank" @click.stop> iDenfy Terms & Conditions</a>.
               </div>
             </template>
           </v-checkbox>
