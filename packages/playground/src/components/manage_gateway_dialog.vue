@@ -379,7 +379,8 @@ export default {
         suggestName();
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
-        layout.value.setStatus("failed", normalizeError(error, "Something went wrong."));
+        errorMessage.value = "Failed to add domain";
+        layout.value.setStatus("failed", normalizeError(errorMessage.value, "Something went wrong."));
       }
     }
 
