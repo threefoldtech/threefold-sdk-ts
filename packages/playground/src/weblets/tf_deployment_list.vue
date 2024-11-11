@@ -375,20 +375,24 @@
               icon="mdi-cube-outline"
               :disabled="item.fromAnotherClient"
               tooltip="Manage Workers"
-              @click="dialog = item.name"
+              @click="dialog = `W${item.name}`"
             />
 
             <IconActionBtn
               icon="mdi-cog"
               tooltip="Manage Domains"
               :disabled="item.fromAnotherClient"
-              @click="dialog = item.masters[0].name"
+              @click="dialog = `GW${item.masters[0].name}`"
             />
 
-            <ManageGatewayDialog v-if="dialog === item.masters[0].name" :k8s="item" @close="dialog = undefined" />
+            <ManageGatewayDialog
+              v-if="dialog === `GW${item.masters[0].name}`"
+              :k8s="item"
+              @close="dialog = undefined"
+            />
 
             <ManageK8SWorkerDialog
-              v-if="dialog === item.name"
+              v-if="dialog === `W${item.name}`"
               :data="item"
               @close="dialog = undefined"
               @update:k8s="item.workers = $event.workers"
