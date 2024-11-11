@@ -23,6 +23,7 @@ export async function getGrid(
       graphqlURL: window.env.GRAPHQL_URL,
       activationURL: window.env.ACTIVATION_SERVICE_URL,
       relayURL: window.env.RELAY_DOMAIN,
+      KycURL: window.env.KYC_URL,
     }),
   );
   try {

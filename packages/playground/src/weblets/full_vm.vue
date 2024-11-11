@@ -27,7 +27,7 @@
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
             (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 50 characters.', 50),
+            validators.maxLength('Name cannot exceed 35 characters.', 35),
           ]"
           #="{ props }"
         >
@@ -44,9 +44,8 @@
           v-model="solution"
         />
 
-        <Network
+        <Networks
           required
-          ref="network"
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
@@ -105,7 +104,7 @@
               (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]), 
               validators.minLength('Disk name minimum length is 2 characters.', 2), 
               validators.isAlphanumeric('Disk name only accepts alphanumeric characters.'),
-              validators.maxLength('Disk name maximum length is 50 characters.', 50),
+              validators.maxLength('Disk name maximum length is 35 characters.', 35),
             ]"
             #="{ props }"
           >
@@ -142,9 +141,9 @@ import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useGrid, useProfileManager } from "../stores";
+import { useGrid } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
@@ -155,7 +154,6 @@ const selectionDetails = ref<SelectionDetails>();
 
 const layout = useLayout();
 const tabs = ref();
-const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const images: VmImage[] = [
   {
@@ -188,15 +186,10 @@ const images: VmImage[] = [
 const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
-const wireguard = ref(false);
+const { ipv4, ipv6, mycelium, planetary, wireguard } = useNetworks();
 const dedicated = ref(false);
 const certified = ref(false);
 const disks = ref<Disk[]>([]);
-const network = ref();
 const hasGPU = ref(false);
 const rootFilesystemSize = computed(() =>
   flist.value?.name === "Ubuntu-24.04" || flist.value?.name === "Other" ? solution.value?.disk : 2,

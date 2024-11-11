@@ -20,7 +20,7 @@
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 50 characters.', 50),
+          validators.maxLength('Name cannot exceed 35 characters.', 35),
         ]"
         #="{ props }"
       >
@@ -65,9 +65,8 @@
         </input-validator>
       </password-input-wrapper>
 
-      <Network
+      <Networks
         required
-        ref="network"
         v-model:ipv4="ipv4"
         v-model:planetary="planetary"
         v-model:wireguard="wireguard"
@@ -119,11 +118,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
@@ -138,12 +137,7 @@ const selectionDetails = ref<SelectionDetails>();
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
-const wireguard = ref(false);
-const network = ref();
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",

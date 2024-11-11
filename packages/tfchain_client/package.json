@@ -1,6 +1,6 @@
 {
   "name": "@threefold/tfchain_client",
-  "version": "2.5.0",
+  "version": "2.6.0-rc3",
   "description": "A client for TF chain",
   "private": false,
   "publishConfig": {
@@ -13,7 +13,7 @@
     "es6-build": "tsc --build tsconfig-es6.json",
     "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
     "serve-docs": "http-server docs/api",
-    "generate-types" : "bash ./scripts/generateTypes.bash"
+    "generate-types": "bash ./scripts/generateTypes.bash"
   },
   "repository": {
     "type": "git",
@@ -39,16 +39,16 @@
     "/dist"
   ],
   "devDependencies": {
+    "@polkadot/typegen": "^8.9.1",
     "http-server": "^14.1.1",
     "npm-run-all": "^4.1.5",
     "ts-node": "^10.9.1",
     "typedoc": "^0.23.28",
-    "typescript": "^5.0.2",
-    "@polkadot/typegen": "^8.9.1"
+    "typescript": "^5.0.2"
   },
   "dependencies": {
     "@polkadot/api": "^8.9.1",
-    "@threefold/types": "2.5.0",
+    "@threefold/types": "2.6.0-rc3",
     "await-lock": "^2.2.2",
     "bip39": "^3.1.0",
     "moment": "^2.30.1"

@@ -2,6 +2,7 @@ import {
   ActivationMonitor,
   GraphQLMonitor,
   GridProxyMonitor,
+  KYCMonitor,
   RMBMonitor,
   ServiceUrlManager,
   StatsMonitor,
@@ -78,8 +79,16 @@ function defineGlobalProps(app: App<Element>) {
  * @returns A promise that resolves to `true` if all service URLs are successfully set, or `false` if any service URL is missing.
  */
 export async function setGlobalEnv() {
-  const { GRIDPROXY_STACKS, GRAPHQL_STACKS, STATS_STACKS, RELAY_STACKS, SUBSTRATE_STACKS, ACTIVATION_SERVICE_STACKS } =
-    window.env;
+  const {
+    GRIDPROXY_STACKS,
+    GRAPHQL_STACKS,
+    STATS_STACKS,
+    RELAY_STACKS,
+    SUBSTRATE_STACKS,
+    ACTIVATION_SERVICE_STACKS,
+    KYC_URL,
+  } = window.env;
+
   const urlManger = new ServiceUrlManager({
     services: [
       { URLs: GRIDPROXY_STACKS, service: new GridProxyMonitor() },
@@ -88,6 +97,7 @@ export async function setGlobalEnv() {
       { URLs: SUBSTRATE_STACKS, service: new TFChainMonitor() },
       { URLs: ACTIVATION_SERVICE_STACKS, service: new ActivationMonitor() },
       { URLs: RELAY_STACKS, service: new RMBMonitor() },
+      { URLs: [KYC_URL], service: new KYCMonitor() },
     ],
     silent: true,
   });

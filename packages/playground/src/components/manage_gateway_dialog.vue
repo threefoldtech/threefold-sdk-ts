@@ -19,9 +19,9 @@
           type="warning"
           variant="tonal"
           class="mb-4"
-          v-if="failedToListGws.length && gatewayTab === 0 && !loadingGateways"
+          v-if="errorMessage && gatewayTab === 0 && !loadingGateways"
         >
-          Failed to list {{ failedToListGws.length }} domains.
+          Failed to list {{ failedToListGws.length }} domain(s).
           <template #append>
             <v-btn
               icon="mdi-format-list-bulleted-square"
@@ -266,6 +266,7 @@ export default {
     const availableK8SNodesNames = availableK8SNodes.map(node => node.name);
     const selectedK8SNodeName = ref(availableK8SNodesNames[0]);
     const selectedNode = ref();
+    const errorMessage = ref("");
 
     watch(selectedK8SNodeName, getSupportedNetworks, { deep: true });
     const tableHeaders = ref([
@@ -323,15 +324,23 @@ export default {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
+        failedToListGws.value = [];
+        errorMessage.value = "";
+
         updateGrid(grid, { projectName: props.vm ? props.vm.projectName : props.k8s!.projectName });
 
         const { gateways: gws, failedToList } = await loadDeploymentGateways(grid, {
           filter: gw => true,
         });
         gateways.value = gws;
-        failedToListGws.value = failedToList;
+
+        if (failedToList.length != 0) {
+          failedToListGws.value = failedToList;
+          errorMessage.value = `Failed to list ${failedToListGws.value.length} domains`;
+        }
       } catch (error) {
-        layout.value.setStatus("failed", normalizeError(error, "Failed to list this deployment's domains."));
+        errorMessage.value = "Failed to list this deployment's domains";
+        layout.value.setStatus("failed", normalizeError(error, errorMessage.value));
       } finally {
         loadingGateways.value = false;
       }
@@ -468,7 +477,7 @@ export default {
       validators.isAlphanumeric("Subdomain should consist of letters and numbers only."),
       (subdomain: string) => validators.isAlpha("Subdomain must start with an alphabet char.")(subdomain[0]),
       validators.minLength("Subdomain must be at least 4 characters.", 4),
-      (subdomain: string) => validators.maxLength("Subdomain cannot exceed 50 characters.", 50)(subdomain),
+      (subdomain: string) => validators.maxLength("Subdomain cannot exceed 35 characters.", 35)(subdomain),
     ];
 
     const portRules = [validators.required("Port is required."), validators.isPort("Please provide a valid port.")];
@@ -509,6 +518,7 @@ export default {
       isWireGuard,
       availableK8SNodesNames,
       selectedK8SNodeName,
+      errorMessage,
     };
   },
 };

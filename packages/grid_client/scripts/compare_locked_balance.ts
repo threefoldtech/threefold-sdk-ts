@@ -71,7 +71,7 @@ async function getUsersWithContracts(grid: GridClient) {
 
   return users;
 }
-
+/** @deprecated */
 async function getContractsLockedAmount(grid: GridClient, contracts: Contract[]) {
   const contractLockDetails = await Promise.all(
     contracts.map(contract => grid.contracts.contractLock({ id: +contract.contractID })),

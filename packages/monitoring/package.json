@@ -1,6 +1,6 @@
 {
   "name": "@threefold/monitoring",
-  "version": "2.5.0",
+  "version": "2.6.0-rc3",
   "description": "Threefold monitoring package",
   "license": "Apache-2.0",
   "main": "./dist/node/index.js",
@@ -13,7 +13,7 @@
   "files": [
     "/dist"
   ],
-    "scripts": {
+  "scripts": {
     "example": "yarn run ts-node --project tsconfig-node.json",
     "build": "npm-run-all es6-build node-build",
     "node-build": "tsc --build tsconfig-node.json",
@@ -26,12 +26,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@threefold/rmb_direct_client": "2.5.0",
-    "@threefold/tfchain_client": "2.5.0",
-    "@threefold/types": "2.5.0",
+    "@threefold/rmb_direct_client": "2.6.0-rc3",
+    "@threefold/tfchain_client": "2.6.0-rc3",
+    "@threefold/types": "2.6.0-rc3",
     "chalk": "4.1.2",
     "ts-node": "^10.9.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "url-join": "^4.0.1"
   },
   "devDependencies": {
     "@types/jest": "29.5.11",
