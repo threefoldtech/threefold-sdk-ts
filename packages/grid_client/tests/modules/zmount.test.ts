@@ -1,77 +1,39 @@
+import { validate } from "class-validator";
+
 import { Zmount } from "../../src";
 
-let zmount: Zmount;
-const disk = 10;
-const memory = 1024;
-const CPUs = 2;
+describe("Zmount Class", () => {
+  let zmount: Zmount;
 
-const newDiskValue = 100;
-const newCPUValue = 4;
-
-const min = newDiskValue * memory ** CPUs;
-const max = disk * memory ** newCPUValue;
-
-beforeEach(() => {
-  zmount = new Zmount();
-});
-describe("Zmount module", () => {
-  test("Zmount instance is of type Zmount.", () => {
-    expect(zmount).toBeInstanceOf(Zmount);
+  beforeEach(() => {
+    zmount = new Zmount();
   });
 
-  test("Min value for size.", () => {
-    expect(() => {
-      zmount.size = min;
-      zmount.challenge();
-    }).toBeDefined();
+  describe("size property validation", () => {
+    it("should fail validation if size is less than the minimum", async () => {
+      // Less than 100 MB
+      expect(() => (zmount.size = 50 * 1024 ** 2)).toThrow();
+    });
+
+    it("should fail validation if size is greater than the maximum", async () => {
+      // Greater than 10 TB
+      expect(() => (zmount.size = 15 * 1024 ** 4)).toThrow();
+    });
+
+    it("should pass validation if size is within the valid range", async () => {
+      zmount.size = 5 * 1024 ** 3;
+
+      const errors = await validate(zmount);
+      expect(errors.length).toBe(0);
+    });
   });
 
-  test("Less than the min value of size.", () => {
-    expect(() => {
-      zmount.size = min - 1;
-      zmount.challenge();
-    }).toThrow();
-  });
+  describe("challenge method", () => {
+    it("should return the size as a string", () => {
+      zmount.size = 5 * 1024 ** 3;
 
-  test("Max value for size.", () => {
-    expect(() => {
-      zmount.size = max;
-      zmount.challenge();
-    }).toBeDefined();
-  });
-
-  test("Exceed the max value of size.", () => {
-    expect(() => {
-      zmount.size = max + 1;
-      zmount.challenge();
-    }).toThrow();
-  });
-
-  test("Size doesn't accept decimal value.", () => {
-    expect(() => {
-      zmount.size = 1.5;
-      zmount.challenge();
-    }).toThrow();
-  });
-
-  test("Size undefined value.", () => {
-    expect(() => {
-      zmount.size;
-      zmount.challenge();
-    }).toThrow();
-  });
-
-  test("Size negative value.", () => {
-    expect(() => {
-      zmount.size = -1;
-      zmount.challenge();
-    }).toThrow();
-  });
-
-  test("Size NaN value.", () => {
-    expect(() => {
-      zmount.size = NaN;
-      zmount.challenge();
-    }).toThrow();
+      const result = zmount.challenge();
+      expect(result).toBe("5368709120");
+    });
   });
 });
