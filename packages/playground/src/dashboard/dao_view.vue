@@ -360,9 +360,6 @@ onMounted(async () => {
 });
 
 function shareProposal(hash: string) {
-  const url = new URL(window.location.href);
-
-  //sharedLink.value = `${window.location.href}?hash=${hash}`;
   navigator.clipboard.writeText(`${window.location.href.split("?")[0]}?hash=${hash}`);
   createCustomToast("Copied!", ToastType.success);
 }
