@@ -82,7 +82,6 @@ export default {
       emit("update:moduleValue", event);
     };
     const handleAgreementDialog = (agreed: boolean) => {
-      console.log("agreed", agreed);
       if (!agreed) handleUpdateDialog(false);
       else {
         agreementDialog.value = false;
