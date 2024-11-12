@@ -334,7 +334,7 @@ const isValidFarm = ref(false);
 const selectedProposal = ref("");
 const selectedFarm = ref();
 const userFarms = ref<FarmInterface[]>();
-
+const sharedLink = ref("");
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
@@ -360,8 +360,9 @@ onMounted(async () => {
 });
 
 function shareProposal(hash: string) {
-  const link = `${window.location.href}?hash=${hash}`;
-  navigator.clipboard.writeText(link);
+  sharedLink.value = "";
+  sharedLink.value = `${window.location.href}?hash=${hash}`;
+  navigator.clipboard.writeText(sharedLink.value);
   createCustomToast("Copied!", ToastType.success);
 }
 
