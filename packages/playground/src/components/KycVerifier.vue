@@ -30,8 +30,9 @@
         <v-card-text class="pb-0">
           We use iDenfy to verify your identity.
           <br />
-          Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which includes
-          their <span class="font-weight-bold">Terms & Conditions, Privacy Policy</span>, and other relevant documents.
+          Please ensure you review iDenfy’s <span class="font-weight-bold">Security and Compliance</span>, which
+          includes their <span class="font-weight-bold">Terms & Conditions, Privacy Policy</span>, and other relevant
+          documents.
           <v-checkbox hide-details v-model="agreedCheckbox">
             <template v-slot:label>
               <div>
@@ -96,7 +97,6 @@ export default {
         handleUpdateLoading(true);
         agreed.value = true;
         if (!kyc.client) throw new Error("KYC client is not initialized");
-        await new Promise(r => setTimeout(r, 3000)); // wait for the dialog to be closed
         token.value = await kyc.client.getToken();
         window.addEventListener("message", handleReceiveMessage, false);
         kycDialog.value = true;
