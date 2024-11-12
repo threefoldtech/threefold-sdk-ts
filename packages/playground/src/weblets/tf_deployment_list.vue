@@ -511,7 +511,7 @@ async function onDelete(k8s = false) {
     const projectNameLower = props.projectName?.toLowerCase();
     const allSelectedItems = [...selectedItems.value];
     selectedItems.value.forEach(item => {
-      if (item.projectName.toLowerCase().includes(ProjectName.Caprover.toLowerCase()) && item.workers) {
+      if (item.projectName?.toLowerCase().includes(ProjectName.Caprover.toLowerCase()) && item.workers) {
         allSelectedItems.push(...item.workers);
       }
     });
@@ -541,6 +541,7 @@ async function onDelete(k8s = false) {
 
     table.value?.loadDeployments();
   } catch (e) {
+    console.error("Failed to delete deployment", e);
     createCustomToast((e as Error).message, ToastType.danger);
   } finally {
     selectedItems.value = [];
