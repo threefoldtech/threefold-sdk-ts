@@ -29,7 +29,7 @@
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
             (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 50 characters.', 50),
+            validators.maxLength('Name cannot exceed 35 characters.', 35),
           ]"
           #="{ props }"
         >
@@ -133,7 +133,7 @@
               }),
               validators.minLength('Disk name minimum length is 2 characters.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric characters.'),
-              validators.maxLength('Disk name maximum length is 50 characters.', 50),
+              validators.maxLength('Disk name maximum length is 35 characters.', 35),
             ]"
             #="{ props }"
           >

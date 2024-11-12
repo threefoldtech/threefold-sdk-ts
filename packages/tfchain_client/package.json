@@ -1,6 +1,6 @@
 {
   "name": "@threefold/tfchain_client",
-  "version": "2.6.0-rc2",
+  "version": "2.6.0-rc4",
   "description": "A client for TF chain",
   "private": false,
   "publishConfig": {
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@polkadot/api": "^8.9.1",
-    "@threefold/types": "2.6.0-rc2",
+    "@threefold/types": "2.6.0-rc4",
     "await-lock": "^2.2.2",
     "bip39": "^3.1.0",
     "moment": "^2.30.1"
