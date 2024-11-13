@@ -335,30 +335,21 @@ class Nodes {
       });
   }
   getFeaturesFromFilters(options: FilterOptions = {}): string[] {
-    const featuresSet = new Set<string>();
-    if (options.publicIPs || options.hasIPv6) {
-      featuresSet.add(WorkloadTypes.ip);
-      featuresSet.add(WorkloadTypes.zmachine);
-      featuresSet.add(WorkloadTypes.network);
+    const features: string[] = [];
+    if (options.publicIPs) {
+      features.push(WorkloadTypes.ipv4);
     }
-
-    if (options.planetary) {
-      featuresSet.add(WorkloadTypes.zmachine);
-      featuresSet.add(WorkloadTypes.network);
+    if (options.hasIPv6) {
+      features.push(WorkloadTypes.ip);
     }
     if (options.wireguard) {
-      featuresSet.add(WorkloadTypes.network);
-      featuresSet.add(WorkloadTypes.zmachine);
+      features.push("wireguard");
     }
-
-    if (options.mycelium && !options.planetary && !options.publicIPs && !options.hasIPv6 && !options.wireguard) {
-      featuresSet.add(WorkloadTypes.zmachinelight);
-      featuresSet.add(WorkloadTypes.networklight);
-      featuresSet.add(WorkloadTypes.zmachine);
-      featuresSet.add(WorkloadTypes.network);
-    } else {
-      featuresSet.add(WorkloadTypes.zmachine);
-      featuresSet.add(WorkloadTypes.network);
+    if (options.mycelium) {
+      features.push("mycelium");
+    }
+    if (options.planetary) {
+      features.push("yggdrasil");
     }
 
     // /   if (options.cru || options.mru || options.sru || options.hru ) {
@@ -375,20 +366,16 @@ class Nodes {
     //   featuresSet.add(WorkloadTypes.qsfs);
     // }
 
-    if (options.hasGPU) {
-      featuresSet.add(WorkloadTypes.zmachine);
-      featuresSet.add(WorkloadTypes.zmachinelight);
-    }
     if (options.gateway) {
-      featuresSet.add(WorkloadTypes.gatewayfqdnproxy);
-      featuresSet.add(WorkloadTypes.gatewaynameproxy);
+      features.push(WorkloadTypes.gatewayfqdnproxy);
+      features.push(WorkloadTypes.gatewaynameproxy);
     }
 
     // if (machine.zlogsOutput) {
     //   featuresSet.add(WorkloadTypes.zlogs);
     // }
 
-    return Array.from(featuresSet);
+    return features;
   }
 
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {
