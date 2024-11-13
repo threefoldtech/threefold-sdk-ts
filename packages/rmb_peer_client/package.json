@@ -1,7 +1,7 @@
 {
   "name": "@threefold/rmb_peer_client",
   "author": "Ahmed Hanafy",
-  "version": "2.6.0-rc3",
+  "version": "2.6.0",
   "license": "ISC",
   "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/blob/development/packages/rmb_peer_client/README.md",
   "repository": {

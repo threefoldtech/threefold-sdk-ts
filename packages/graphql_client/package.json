@@ -1,6 +1,6 @@
 {
   "name": "@threefold/graphql_client",
-  "version": "2.6.0-rc3",
+  "version": "2.6.0",
   "main": "./dist/node/index.js",
   "module": "./dist/es6/index.js",
   "exports": {
@@ -18,7 +18,7 @@
     "es6-build": "tsc --build tsconfig.json"
   },
   "dependencies": {
-    "@threefold/types": "2.6.0-rc3",
+    "@threefold/types": "2.6.0",
     "ts-mixer": "^6.0.2"
   },
   "devDependencies": {
