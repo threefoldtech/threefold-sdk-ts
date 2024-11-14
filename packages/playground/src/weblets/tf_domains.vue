@@ -29,16 +29,6 @@
           <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
         </div>
 
-        <input-tooltip tooltip="The port used to access the machine.">
-          <input-validator
-            :value="port"
-            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
-            #="{ props }"
-          >
-            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
-          </input-validator>
-        </input-tooltip>
-
         <input-tooltip
           tooltip="User's machine's IP: It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
         >
@@ -52,6 +42,16 @@
             #="{ props }"
           >
             <v-text-field label="IP" v-model="ip" v-bind="props" />
+          </input-validator>
+        </input-tooltip>
+
+        <input-tooltip tooltip="The port used to access the machine.">
+          <input-validator
+            :value="port"
+            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
+            #="{ props }"
+          >
+            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
           </input-validator>
         </input-tooltip>
 
