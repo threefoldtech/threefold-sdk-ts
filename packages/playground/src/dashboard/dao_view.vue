@@ -58,7 +58,7 @@
                 <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'" class="mx-3">
                   Go to Proposal
                 </v-btn>
-                <v-btn @click="shareProposal(proposal.hash)">Share</v-btn>
+                <v-btn @click="shareProposal(proposal.hash, proposal.end)">Share</v-btn>
               </div>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
@@ -334,7 +334,6 @@ const isValidFarm = ref(false);
 const selectedProposal = ref("");
 const selectedFarm = ref();
 const userFarms = ref<FarmInterface[]>();
-const sharedLink = ref("");
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
@@ -357,10 +356,18 @@ onMounted(async () => {
     userFarms.value = await getFarms(grid, { ownedBy: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
+  if (route.query.tab == "1") {
+    activeTab.value = 1;
+  }
 });
 
-function shareProposal(hash: string) {
-  navigator.clipboard.writeText(`${window.location.href.split("?")[0]}?hash=${hash}`);
+function shareProposal(hash: string, end: moment.Moment) {
+  if (end.isBefore(Date.now())) {
+    navigator.clipboard.writeText(`${window.location.href.split("?")[0]}?hash=${hash}&tab=1`);
+  } else {
+    navigator.clipboard.writeText(`${window.location.href.split("?")[0]}?hash=${hash}&tab=0`);
+  }
+
   createCustomToast("Copied!", ToastType.success);
 }
 
