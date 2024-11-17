@@ -334,6 +334,13 @@ class Nodes {
         throw new GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
       });
   }
+
+  /**
+   * Sets the features of the node according to filter options.
+   *
+   * @param options - An object containing filter options to set the node's features.
+   * @returns A string array representing the node's features.
+   */
   getFeaturesFromFilters(options: FilterOptions = {}): string[] {
     const features: string[] = [];
     if (options.publicIPs) {
@@ -352,28 +359,10 @@ class Nodes {
       features.push("yggdrasil");
     }
 
-    // /   if (options.cru || options.mru || options.sru || options.hru ) {
-    //   //     features.push(WorkloadTypes.volume);
-    //   //     features.push(WorkloadTypes.zdb);
-
-    //   //   }
-    // if (machine.disks && machine.disks.length > 0) {
-    //   featuresSet.add(WorkloadTypes.volume);
-    //   featuresSet.add(WorkloadTypes.zmount);
-    // }
-
-    // if (machine.qsfs_disks && machine.qsfs_disks.length > 0) {
-    //   featuresSet.add(WorkloadTypes.qsfs);
-    // }
-
     if (options.gateway) {
       features.push(WorkloadTypes.gatewayfqdnproxy);
       features.push(WorkloadTypes.gatewaynameproxy);
     }
-
-    // if (machine.zlogsOutput) {
-    //   featuresSet.add(WorkloadTypes.zlogs);
-    // }
 
     return features;
   }

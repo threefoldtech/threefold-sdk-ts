@@ -168,7 +168,7 @@ class TwinDeploymentHandler {
         continue;
       }
       const network_workloads = twinDeployment.deployment.workloads.filter(
-        workload => workload.type === WorkloadTypes.network,
+        workload => workload.type === WorkloadTypes.network || workload.type === WorkloadTypes.networklight,
       );
       if (network_workloads.length > 0 || twinDeployment.publicIps > 0) {
         deployments.push(twinDeployment);

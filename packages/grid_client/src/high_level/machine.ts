@@ -63,6 +63,7 @@ class VMHL extends HighLevelBase {
       });
     }
     const nodeInfo = await this.nodes.getNode(nodeId);
+    // Checks if the node is a zos4 node
     const isZOS4 = nodeInfo.features.some(item => item.includes("zmachine-light") || item.includes("network-light"));
     const deployments: TwinDeployment[] = [];
     const workloads: Workload[] = [];
@@ -152,7 +153,7 @@ class VMHL extends HighLevelBase {
     }
 
     // ipv4
-    // reject the deployment in case of network light
+    // Reject the deployment if the node is a zos4 node, as it doesn't support ipv4.
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
@@ -204,17 +205,15 @@ class VMHL extends HighLevelBase {
     // validate user ip subnet in case of no networks already
     let userIPsubnet;
     let accessNodeSubnet;
-    //ip el machine nafse we validate the subnet in network and network light
     if (ip) {
-      console.log("validating", ip);
       userIPsubnet = network.ValidateFreeSubnet(Addr(ip).mask(24).toString());
 
-      //
+      // If the node is not a zos4 node get accessNodeSubnet
       if (!isZOS4) {
         accessNodeSubnet = network.getFreeSubnet();
       }
     }
-    // network
+    // Set networkContractMetadata based on node's zos version
     let networkContractMetadata;
     if (!isZOS4) {
       networkContractMetadata = JSON.stringify({
@@ -224,7 +223,6 @@ class VMHL extends HighLevelBase {
         projectName: this.config.projectName,
       });
     } else {
-      // check with ashraf regarding type
       networkContractMetadata = JSON.stringify({
         version: 4,
         type: "network-light",
@@ -232,7 +230,6 @@ class VMHL extends HighLevelBase {
         projectName: this.config.projectName,
       });
     }
-    console.log("networkContractMetadata", networkContractMetadata);
 
     const deploymentFactory = new DeploymentFactory(this.config);
 
@@ -256,7 +253,6 @@ class VMHL extends HighLevelBase {
         addAccess &&
         !isZOS4
       ) {
-        // add node to any access node and deploy it
         const filteredAccessNodes: number[] = [];
         for (const accessNodeId of Object.keys(accessNodes)) {
           if (accessNodes[accessNodeId]["ipv4"]) {
@@ -283,7 +279,6 @@ class VMHL extends HighLevelBase {
       }
     }
     // If node exits on network check if mycelium needs to be added or not
-    // network light
     if (network.nodeExists(nodeId)) {
       const deployment = await network.checkMycelium(nodeId, mycelium, myceliumNetworkSeeds);
       if (deployment) {
@@ -291,11 +286,7 @@ class VMHL extends HighLevelBase {
       }
     }
 
-    //
-
-    console.log("userIPsubnet", userIPsubnet);
     const znet_workload = await network.addNode(nodeId, mycelium, description, userIPsubnet, myceliumNetworkSeeds);
-    // check if networks existsI'll do nothing incase network light and if network doesn't exist I'll create a network and deployment and push the deployment 3aleha
     if (network instanceof Network && (await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {
@@ -368,6 +359,7 @@ class VMHL extends HighLevelBase {
     }
 
     // vm
+    // Initalize vm based on node's zos version
     let vm;
     if (!isZOS4) {
       vm = new VMPrimitive();
@@ -453,6 +445,7 @@ class VMHL extends HighLevelBase {
       WorkloadTypes.zmachine,
       WorkloadTypes.qsfs,
       WorkloadTypes.zlogs,
+      WorkloadTypes.zmachinelight,
     ]);
   }
 }

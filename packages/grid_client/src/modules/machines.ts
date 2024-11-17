@@ -56,6 +56,7 @@ class MachinesModule extends BaseModule {
     let contractMetadata;
     for (const machine of options.machines) {
       if (network) break;
+      // Sets the network and contractMetadata based on the node's zos version
       const nodeTwinId = await this.capacity.getNodeTwinId(machine.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
       if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
@@ -201,7 +202,10 @@ class MachinesModule extends BaseModule {
    */
   async getObj(deploymentName: string): Promise<ZmachineData[]> {
     const deployments = await this._get(deploymentName);
-    const workloads = await this._getWorkloadsByTypes(deploymentName, deployments, [WorkloadTypes.zmachine]);
+    const workloads = await this._getWorkloadsByTypes(deploymentName, deployments, [
+      WorkloadTypes.zmachine,
+      WorkloadTypes.zmachinelight,
+    ]);
     const promises = workloads.map(
       async workload => await this._getZmachineData(deploymentName, deployments, workload),
     );

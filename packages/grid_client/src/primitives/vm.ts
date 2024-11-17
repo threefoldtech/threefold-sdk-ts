@@ -142,14 +142,14 @@ class VMLightPrimitive {
     zmachine_light.corex = corex;
     zmachine_light.gpu = gpus;
 
-    const zmachine_workload = new Workload();
-    zmachine_workload.version = version || 0;
-    zmachine_workload.name = name;
-    zmachine_workload.type = WorkloadTypes.zmachine;
-    zmachine_workload.data = zmachine_light;
-    zmachine_workload.metadata = metadata;
-    zmachine_workload.description = description;
-    return zmachine_workload;
+    const zmachine_light_workload = new Workload();
+    zmachine_light_workload.version = version || 0;
+    zmachine_light_workload.name = name;
+    zmachine_light_workload.type = WorkloadTypes.zmachinelight;
+    zmachine_light_workload.data = zmachine_light;
+    zmachine_light_workload.metadata = metadata;
+    zmachine_light_workload.description = description;
+    return zmachine_light_workload;
   }
 }
 export { VMPrimitive, VMLightPrimitive };

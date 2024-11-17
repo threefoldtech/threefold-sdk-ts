@@ -124,16 +124,11 @@ class ZNetworkLight {
 
     this.network = znet_light;
     znet_light = this.getUpdatedNetwork(znet_light);
-    // console.log("znet_light.subnet: ", znet_light.subnet);
-    // console.log("subnet: ", subnet);
-    // if (znet_light.subnet !== subnet) {
-    //   throw new ValidationError(`The same network name ${this.name} with a different subnet already exists.`);
-    // }
 
     const znet_light_workload = new Workload();
     znet_light_workload.version = 0;
     znet_light_workload.name = this.name;
-    znet_light_workload.type = WorkloadTypes.network;
+    znet_light_workload.type = WorkloadTypes.networklight;
     znet_light_workload.data = znet_light;
     znet_light_workload.metadata = "";
     znet_light_workload.description = description;
