@@ -142,6 +142,7 @@ class MachineModel {
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
   @Expose() @IsString({ each: true }) @IsOptional() gpus?: string[];
+  @Expose() @IsString({ each: true }) @IsOptional() features?: string[];
 }
 
 class MachinesModel {
