@@ -36,16 +36,7 @@
           </template>
           <div class="d-flex justify-space-between align-baseline">
             <div>{{ title }} requires a KYC verification.</div>
-            <v-btn
-              text="Verify now"
-              size="small"
-              color="error"
-              :loading="kycDialogLoading"
-              @click="
-                kycDialog = true;
-                kycDialogLoading = true;
-              "
-            />
+            <v-btn text="Verify now" size="small" color="error" @click="kycDialog = true" :loading="kycDialogLoading" />
           </div>
         </VAlert>
       </template>
@@ -59,7 +50,7 @@
   <KycVerifier
     v-if="kycDialog"
     :loading="kycDialogLoading"
-    @loaded="kycDialogLoading = false"
+    @update:loading="kycDialogLoading = $event"
     :moduleValue="kycDialog"
     @update:moduleValue="kycDialog = $event"
   />

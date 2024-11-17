@@ -82,7 +82,6 @@ export default {
       emit("update:moduleValue", event);
     };
     const handleAgreementDialog = (agreed: boolean) => {
-      console.log("agreed", agreed);
       if (!agreed) handleUpdateDialog(false);
       else {
         agreementDialog.value = false;
@@ -97,7 +96,6 @@ export default {
         handleUpdateLoading(true);
         agreed.value = true;
         if (!kyc.client) throw new Error("KYC client is not initialized");
-        await new Promise(r => setTimeout(r, 3000)); // wait for the dialog to be closed
         token.value = await kyc.client.getToken();
         window.addEventListener("message", handleReceiveMessage, false);
         kycDialog.value = true;

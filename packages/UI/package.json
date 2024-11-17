@@ -1,6 +1,6 @@
 {
   "name": "@threefold/ui",
-  "version": "2.6.0-rc4",
+  "version": "2.6.0",
   "private": false,
   "main": "dist/threefold-ui.umd.js",
   "publishConfig": {
