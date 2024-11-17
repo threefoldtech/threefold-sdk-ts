@@ -151,6 +151,9 @@ import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VCard } from "vuetify/components/VCard";
 
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { normalizeError } from "@/utils/helpers";
+
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
@@ -167,7 +170,6 @@ import {
   validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
-
 export default {
   name: "TfAutoNodeSelector",
   components: { TfNodeDetailsCard },
@@ -299,14 +301,26 @@ export default {
 
     const nodeInputValidateTask = useAsync<boolean, string, [NodeInfo | undefined]>(
       async node => {
-        if (node && node?.rentContractId !== 0) {
-          const { state } = await gridStore.grid.contracts.get({
-            id: node?.rentContractId,
-          });
-          if (state.gracePeriod) {
-            return false;
+        try {
+          if (node && node.rentContractId !== 0) {
+            const { state } = await gridStore.grid.contracts.get({
+              id: node?.rentContractId,
+            });
+            if (state.gracePeriod) {
+              createCustomToast(
+                `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
+                ToastType.danger,
+              );
+            }
           }
+        } catch (error) {
+          const err = normalizeError(
+            error,
+            "Something went wrong while checking status of the node. Please check your connection and try again.",
+          );
+          throw err;
         }
+
         const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
         const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
 
