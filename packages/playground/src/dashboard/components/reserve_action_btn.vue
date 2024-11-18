@@ -18,14 +18,14 @@
     </v-dialog>
     <v-btn
       :loading="loadingReserveNode"
-      v-if="node.rentedByTwinId === 0"
+      v-if="!reserved"
       :disabled="disableButton || hasInsufficientBalance"
       @click.stop="reserveNode"
       color="primary"
     >
       Reserve
     </v-btn>
-    <span v-if="node.rentedByTwinId === 0" class="ml-2">
+    <span v-if="!reserved" class="ml-2">
       <v-tooltip text="You must acquire a minimum of 2 TFTs in order to reserve any node." location="bottom">
         <template #activator="{ props }">
           <VIcon icon="mdi-information-outline" v-bind="props" />
@@ -37,7 +37,7 @@
       color="error"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      v-if="node.rentedByTwinId === profile?.twinId"
+      v-if="reserved"
       @click.stop="removeReserve"
     >
       Unreserve
@@ -49,7 +49,7 @@
 import type { GridClient } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
-import { computed, type PropType, ref, watch } from "vue";
+import { computed, onMounted, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -83,7 +83,7 @@ export default {
     const freeBalance = computed(() => balance.value?.free ?? 0);
     const gridStore = useGrid();
     const grid = gridStore.client as GridClient;
-
+    const reserved = ref(true);
     watch(
       freeBalance,
       (newFreeBalance, _) => {
@@ -100,6 +100,10 @@ export default {
       openUnreserveDialog.value = true;
     }
 
+    onMounted(() => {
+      if (props.node.rentedByTwinId == 0) reserved.value = false;
+    });
+
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
@@ -111,21 +115,22 @@ export default {
           createCustomToast(`node ${props.node.nodeId} has active contracts`, ToastType.info);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
-        } else {
-          createCustomToast(`unreserving node ${props.node.nodeId}`, ToastType.info);
-          await grid?.nodes.unreserve({ nodeId: +props.node.nodeId });
-          createCustomToast(`Transaction succeeded node ${props.node.nodeId} Unreserved`, ToastType.success);
-          loadingUnreserveNode.value = false;
-          openUnreserveDialog.value = false;
-          loadingUnreserveBtn.value = true;
-          notifyDelaying();
-          disableButton.value = true;
-          setTimeout(() => {
-            disableButton.value = false;
-            loadingUnreserveBtn.value = false;
-            emit("updateTable");
-          }, 20000);
         }
+
+        createCustomToast(`unreserving node ${props.node.nodeId}`, ToastType.info);
+        await grid?.nodes.unreserve({ nodeId: +props.node.nodeId });
+        createCustomToast(`Transaction succeeded node ${props.node.nodeId} Unreserved`, ToastType.success);
+        loadingUnreserveNode.value = false;
+        openUnreserveDialog.value = false;
+        loadingUnreserveBtn.value = true;
+        notifyDelaying();
+        disableButton.value = true;
+        setTimeout(() => {
+          disableButton.value = false;
+          loadingUnreserveBtn.value = false;
+          emit("updateTable");
+          reserved.value = false;
+        }, 20000);
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
@@ -133,28 +138,27 @@ export default {
           console.log(e);
           createCustomToast("Failed to delete rent contract.", ToastType.danger);
         }
+      } finally {
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
       }
     }
 
     async function reserveNode() {
+      if (!profile.value) {
+        createCustomToast("Please Login first to continue.", ToastType.danger);
+      }
       try {
-        if (profile.value) {
-          loadingReserveNode.value = true;
-          createCustomToast("Transaction Submitted", ToastType.info);
-          await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
-          createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
-          notifyDelaying();
-          disableButton.value = true;
-          setTimeout(() => {
-            disableButton.value = false;
-            loadingReserveNode.value = false;
-            emit("updateTable");
-          }, 20000);
-        } else {
-          createCustomToast("Please Login first to continue.", ToastType.danger);
-        }
+        loadingReserveNode.value = true;
+        disableButton.value = true;
+        createCustomToast("Transaction Submitted", ToastType.info);
+        await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
+        createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
+        notifyDelaying();
+        setTimeout(() => {
+          emit("updateTable");
+          reserved.value = true;
+        }, 20000);
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't create rent contract due to Insufficient balance`, ToastType.danger);
@@ -162,6 +166,8 @@ export default {
           console.log(e);
           createCustomToast("Failed to create rent contract.", ToastType.danger);
         }
+      } finally {
+        disableButton.value = false;
         loadingReserveNode.value = false;
       }
     }
@@ -177,6 +183,7 @@ export default {
       loadingUnreserveBtn,
       profile,
       hasInsufficientBalance,
+      reserved,
     };
   },
 };
