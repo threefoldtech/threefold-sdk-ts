@@ -97,7 +97,12 @@
               <!-- Domain -->
               <input-validator
                 :value="config.domain"
-                :rules="[domain => validators.isURL('Wrong domain format.')(domain)]"
+                :rules="[
+                  validators.required('Domain is required.'),
+                  validators.pattern('Please provide a valid domain.', {
+                    pattern: /^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/,
+                  }),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
