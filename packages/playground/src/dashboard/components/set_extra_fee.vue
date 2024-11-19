@@ -105,7 +105,7 @@ export default {
 
     watch(fee, async (value, _) => {
       const currentFee = await getExtraFee();
-      if (value == currentFee || value === null) {
+      if (Number(value) == currentFee || value === null) {
         isDisabled.value = true;
       } else {
         isDisabled.value = false;
