@@ -185,8 +185,8 @@
           </v-col>
 
           <v-divider vertical aria-colspan="1"></v-divider>
-          <v-col lg="4" md="12" sm="12" class="my-4" v-if="profileManager.profile">
-            <div class="text-center my-3 mx-2">
+          <v-col v-if="profileManager.profile">
+            <div class="text-center my-3">
               <p>
                 Scan the QR code using
                 <a class="app-link" :href="manual.tf_connect_app" target="_blank"> ThreeFold Connect </a>
