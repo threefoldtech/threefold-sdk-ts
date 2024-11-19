@@ -307,10 +307,7 @@ export default {
               id: node?.rentContractId,
             });
             if (state.gracePeriod) {
-              createCustomToast(
-                `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
-                ToastType.danger,
-              );
+              throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
             }
           }
         } catch (error) {
