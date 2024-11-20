@@ -99,7 +99,7 @@
                 :value="config.domain"
                 :rules="[
                   validators.required('Domain is required.'),
-                  validators.isDomain('Please provide a valid domain.'),
+                  validators.isFQDN('Please provide a valid domain.'),
                 ]"
                 #="{ props }"
               >
