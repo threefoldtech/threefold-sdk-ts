@@ -99,9 +99,7 @@
                 :value="config.domain"
                 :rules="[
                   validators.required('Domain is required.'),
-                  validators.pattern('Please provide a valid domain.', {
-                    pattern: /^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/,
-                  }),
+                  validators.isDomain('Please provide a valid domain.'),
                 ]"
                 #="{ props }"
               >

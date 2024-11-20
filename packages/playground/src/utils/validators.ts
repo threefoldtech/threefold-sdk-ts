@@ -782,6 +782,14 @@ export function pattern(msg: string, config: RegexPattern) {
   };
 }
 
+export function isDomain(msg: string) {
+  return (value: string) => {
+    if (!/^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/.test(value)) {
+      return { message: msg, requiredTrue: true };
+    }
+  };
+}
+
 export function isValidDecimalNumber(length: number, msg: string) {
   return (value: string) => {
     if (!(value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= length : true)) {
