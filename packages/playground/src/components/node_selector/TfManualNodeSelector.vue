@@ -66,6 +66,7 @@ import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeS
 import { normalizeError } from "../../utils/helpers";
 import {
   checkNodeCapacityPool,
+  getFeatures,
   normalizeNodeFilters,
   release,
   resolveAsync,
@@ -105,15 +106,11 @@ export default {
 
     // reset node to mark form as invalid
     const placeholderNode = ref<NodeInfo>();
-    const filters = computed(() => normalizeNodeFilters(props.filters));
 
     watch(nodeId, () => {
       bindModelValue();
       placeholderNode.value = undefined;
     });
-    function getFeatures(gridStore: ReturnType<typeof useGrid>, filters: FilterOptions) {
-      return gridStore.client.capacity.getFeaturesFromFilters(filters);
-    }
 
     const validationTask = useAsync<true | string, string, [id: number | undefined]>(
       async nodeId => {
@@ -135,7 +132,7 @@ export default {
         }
 
         placeholderNode.value = node;
-        const features = getFeatures(gridStore, filters.value);
+        const features = getFeatures(gridStore, normalizeNodeFilters(props.filters));
         if (node === undefined || node === null) {
           throw `Node ${nodeId} is not on the grid`;
         }
