@@ -286,6 +286,7 @@ const filteredHeaders = computed(() => {
         value(item: any) {
           return item[0].workloads[0].data.backends.join(", ");
         },
+        sortable: false,
       },
       {
         title: "Domain",
