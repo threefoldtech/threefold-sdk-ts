@@ -229,10 +229,7 @@ export async function validateRentContract(
         id: node.rentContractId,
       });
       if (contractInfo.state.gracePeriod) {
-        createCustomToast(
-          `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
-          ToastType.danger,
-        );
+        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
       }
     }
 
