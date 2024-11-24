@@ -36,8 +36,8 @@
   - config.ini
     ```bash
       [Base]
-        net = main
-        ```
+      net = main
+      ```
 
   - base.by
   ```bash
