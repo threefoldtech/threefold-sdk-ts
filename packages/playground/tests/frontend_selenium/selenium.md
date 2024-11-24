@@ -17,20 +17,16 @@
 
 ### First (Run Tests against local dashboard)
 
-
 #### Prepare dashboard locally
 
-  - In the root directory 'tfgrid-sdk-ts/', run:
+- In the root directory 'tfgrid-sdk-ts/', run:
   
-            `yarn install`
-            `yarn lerna run build`
-            `make run project=playground`
+            `yarn install`, `yarn lerna run build`, `make run project=playground`
   
-  - You need to leave the localhost running and open a new terminal.
+- You need to leave the localhost running and open a new terminal.
 
 
 ### Second (Run Tests against any live environment)
-
 
 #### update the config files to point to the target environment
 
