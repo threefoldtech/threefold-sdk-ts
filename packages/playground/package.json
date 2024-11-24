@@ -41,6 +41,7 @@
     "mosha-vue-toastify": "^1.0.23",
     "pinia": "^2.0.32",
     "qrcode": "^1.5.1",
+    "url-join": "^5.0.0",
     "validator": "^13.9.0",
     "vue": "^3.2.47",
     "vue-chartjs": "^5.2.0",
