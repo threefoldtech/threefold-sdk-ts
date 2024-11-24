@@ -34,10 +34,10 @@
 - Ex.: to run agains Mainnet
 
   - config.ini
-    ```bash
-      [Base]
-      net = main
-      ```
+  ```bash
+    [Base]
+    net = main
+    ```
 
   - base.by
   ```bash
