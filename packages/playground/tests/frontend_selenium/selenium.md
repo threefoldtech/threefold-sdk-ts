@@ -33,16 +33,14 @@
 - Update the env url and some other variables directly in these files config.ini and base.by
 - Ex.: to run agains Mainnet
   - config.ini:
-    ```
-        [Base]
-        net = main
-
-    ```
+  ```
+    [Base]
+      net = main
+  ```
   - base.by:
-    ```
-      base_url = 'https://dashboard.grid.tf/'
-
-    ```
+  ```
+    base_url = 'https://dashboard.grid.tf/'
+  ```
 
 ### Setup environment configurations
 
