@@ -10,6 +10,7 @@
 | [webdriver-manager](https://pypi.org/project/webdriver-manager/) | `4.0.2`  |
 
 ## Running selenium
+
   There are two ways to run the Automation selenium tests:
   
     1- Run Tests against the local dashboard environment which installed from latest commit on development branch.
@@ -25,7 +26,6 @@
   
 - You need to leave the localhost running and open a new terminal.
 
-
 ### Second (Run Tests against any live environment)
 
 #### update the config files to point to the target environment
@@ -33,14 +33,16 @@
 - Update the env url and some other variables directly in these files config.ini and base.by
 - Ex.: to run agains Mainnet
   - config.ini:
-      ```
+    ```
         [Base]
         net = main
-      ```
+
+    ```
   - base.by:
-      ```
+    ```
       base_url = 'https://dashboard.grid.tf/'
-      ```
+
+    ```
 
 ### Setup environment configurations
 
@@ -54,7 +56,6 @@
   - `address`: a stellar address with a TFT trustline that will be used in TFT bridge-related tests.
   - `email`: a valid email that will be used for all the automated tests.
 - If the port in serve changes from `5173` for any reason, you should update the `port` under the `Base` section in [config.ini](../frontend_selenium/Config.ini) to reflect the new value.
-
 
 ### Prepare tests requirements
 
