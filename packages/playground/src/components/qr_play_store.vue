@@ -1,0 +1,50 @@
+<template>
+  <div class="d-flex flex-column text-center align-center">
+    <b> OR </b>
+    <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p>
+    <div class="d-flex justify-center py-2">
+      <QrcodeGenerator :data="props.qr" />
+    </div>
+    <div class="d-flex justify-center align-center my-4">
+      <a
+        v-for="app in apps"
+        :key="app.alt"
+        :style="{ cursor: 'pointer', width: '9rem' }"
+        class=""
+        :title="app.alt"
+        v-html="app.src"
+        :href="app.url"
+        target="_blank"
+      />
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+const props = defineProps({
+  qr: String,
+});
+
+const apps = [
+  {
+    src: `<a title="Google Play, Public domain, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Google_Play_Store_badge_EN.svg"><img width="128" alt="“Get it on Google Play” badge" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/128px-Google_Play_Store_badge_EN.svg.png?20220907104002"></a>`,
+    alt: "play-store",
+    url: "https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US",
+  },
+  {
+    src: `<a title="Apple Inc., Public domain, via Wikimedia Commons" href="https://commons.wikimedia.org/wiki/File:Download_on_the_App_Store_RGB_blk.svg"><img width="128" alt="Download on the App Store RGB blk" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Download_on_the_App_Store_RGB_blk.svg/128px-Download_on_the_App_Store_RGB_blk.svg.png?20180317110059"></a>`,
+    alt: "app-store",
+    url: "https://apps.apple.com/us/app/threefold-connect/id1459845885",
+  },
+];
+</script>
+<script lang="ts">
+import { defineComponent } from "vue";
+
+import QrcodeGenerator from "../components/qrcode_generator.vue";
+
+export default defineComponent({
+  name: "QRPlayStore",
+
+  components: { QrcodeGenerator },
+});
+</script>
