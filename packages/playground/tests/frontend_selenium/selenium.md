@@ -11,36 +11,43 @@
 
 ## Running selenium
 
-  There are two ways to run the Automation selenium tests:
-  
-    1- Run Tests against the local dashboard environment which installed from latest commit on development branch.
-    2- Run Tests against any live environment (Devnet, QAnet, Testnet and Mainnet)
+There are two ways to run the Automation selenium tests:
+
+- Run Tests against the local dashboard environment which installed from latest commit on development branch.
+
+- Run Tests against any live environment (Devnet, QAnet, Testnet and Mainnet)
 
 ### First (Run Tests against local dashboard)
 
 #### Prepare dashboard locally
 
 - In the root directory 'tfgrid-sdk-ts/', run:
-  
-            `yarn install`, `yarn lerna run build`, `make run project=playground`
-  
+
+  ```bash
+  yarn install
+  yarn lerna run build
+  make run project=playground
+  ```
+
 - You need to leave the localhost running and open a new terminal.
 
 ### Second (Run Tests against any live environment)
 
 #### update the config files to point to the target environment
 
-- Update the env url and some other variables directly in these files config.ini and base.by
-- Ex.: to run agains Mainnet
+- Update the env url and some other variables directly in these files config.ini and base.py
+- Ex.: to run against Mainnet
 
   - config.ini
-  ```bash
+
+    ```ini
     [Base]
     net = main
     ```
 
-  - base.by
-  ```bash
+  - base.py
+
+    ```python
     base_url = "https://dashboard.grid.tf/"
     ```
 
