@@ -17,19 +17,23 @@
 
 ### First (Run Tests against local dashboard)
 
+
 #### Prepare dashboard locally
-- In the root directory 'tfgrid-sdk-ts/', run:
+
+  - In the root directory 'tfgrid-sdk-ts/', run:
   
             `yarn install`
             `yarn lerna run build`
             `make run project=playground`
   
-- You need to leave the localhost running and open a new terminal.
+  - You need to leave the localhost running and open a new terminal.
 
 
 ### Second (Run Tests against any live environment)
 
+
 #### update the config files to point to the target environment
+
 - Update the env url and some other variables directly in these files config.ini and base.by
 - Ex.: to run agains Mainnet
   - config.ini:
@@ -43,6 +47,7 @@
       ```
 
 ### Setup environment configurations
+
 - Add your configuration either in [config.ini](../frontend_selenium/Config.ini) or by exporting `TFCHAIN_MNEMONICS`, `TFCHAIN_NODE_MNEMONICS`, `STELLAR_ADDRESS`, and `EMAIL`.
 - Description of config under `Base` section:
   - `port`: the port that the localhost is running on.
@@ -56,6 +61,7 @@
 
 
 ### Prepare tests requirements
+
 - Change directory to frontend selenium by running `cd packages/playground/tests/frontend_selenium/` in the command line.
 - Install the recommended version of the pip package listed above for a stable run, or you can just install Python 3 and use the command:
   - `pip install -r requirements.txt --break-system-packages` (Use this if you don't use any of the listed packages).
