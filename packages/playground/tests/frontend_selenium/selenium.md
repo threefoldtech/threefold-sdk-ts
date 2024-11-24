@@ -16,26 +16,28 @@
     2- Run Tests against any live environment (Devnet, QAnet, Testnet and Mainnet)
 
 ### First (Run Tests against local dashboard)
+
 #### Prepare dashboard locally
-  - In the root directory 'tfgrid-sdk-ts/', run:
+- In the root directory 'tfgrid-sdk-ts/', run:
   
             `yarn install`
             `yarn lerna run build`
             `make run project=playground`
   
-  - You need to leave the localhost running and open a new terminal.
+- You need to leave the localhost running and open a new terminal.
 
 
 ### Second (Run Tests against any live environment)
+
 #### update the config files to point to the target environment
-  - In order to do that; will need to update the env url and some other variables directly in these files config.ini and base.by
-  - Ex.: to run agains Mainnet
-    - config.ini:
+- Update the env url and some other variables directly in these files config.ini and base.by
+- Ex.: to run agains Mainnet
+  - config.ini:
       ```
         [Base]
         net = main
       ```
-    - base.by:
+  - base.by:
       ```
       base_url = 'https://dashboard.grid.tf/'
       ```
