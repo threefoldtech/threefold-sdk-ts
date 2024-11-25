@@ -24,8 +24,7 @@
             e.g. GPUs) while renting.
           </v-card-text>
           <v-card-text>
-            <VProgressLinear indeterminate color="primary" height="2" v-if="loading" />
-            <form-validator v-model="valid" v-else>
+            <form-validator v-model="valid">
               <input-validator
                 :value="inputFee"
                 :rules="[
@@ -43,11 +42,13 @@
                     suffix="USD/month"
                     outlined
                     label="Additional Fees"
-                    :disabled="isSetting"
+                    :disabled="isSetting || loading"
+                    :loading="loading"
                   ></v-text-field>
                 </input-tooltip>
               </input-validator>
             </form-validator>
+
             <v-divider></v-divider>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
@@ -102,7 +103,7 @@ export default {
       currentNodeId.value = props.nodeId;
       currentFee.value = (await getExtraFee()) ?? 0;
       inputFee.value = currentFee.value;
-      loading.value = false;
+      // loading.value = false;
     }
     async function getExtraFee() {
       try {
