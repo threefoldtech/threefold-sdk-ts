@@ -30,7 +30,7 @@ export default {
           "Nostr is a simple, open protocol that enables global, decentralized, and censorship-resistant social media.",
         icon: "nostr.png",
         route: DashboardRoutes.Applications.Nostr,
-        releaseDate: new Date("2024-10-02"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Gitea",
@@ -38,7 +38,7 @@ export default {
           "Gitea is a forge software package for hosting software development version control using Git as well as other collaborative features like bug tracking, code review, continuous integration, kanban boards, tickets, and wikis. It supports self-hosting but also provides a free public first-party instance.",
         icon: "gitea.png",
         route: DashboardRoutes.Applications.Gitea,
-        releaseDate: new Date("2024-10-02"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "TFRobot",
@@ -46,7 +46,7 @@ export default {
           "TFRobot is a command line interface tool that offers simultaneous mass deployment of groups of VMs on the ThreeFold Grid, with support of multiple retries for failed deployments, and customizable configurations.",
         icon: "tfrobot.png",
         route: DashboardRoutes.Applications.TFRobot,
-        releaseDate: new Date("2024-10-02"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Jenkins",
@@ -54,7 +54,7 @@ export default {
           "Jenkins is a popular open-source automation server that enables developers to build, test, and deploy their applications continuously.",
         icon: "jenkins.png",
         route: DashboardRoutes.Applications.Jenkins,
-        releaseDate: new Date("2024-10-02"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Peertube",
@@ -97,7 +97,7 @@ export default {
           "Static Website is an application where a user provides a Github repository url and it's automatically served using Caddy.",
         icon: "static_website.png",
         route: DashboardRoutes.Applications.StaticWebsite,
-        releaseDate: new Date("2024-10-02"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Nextcloud",
@@ -162,7 +162,7 @@ export default {
           "Jitsi Meet is a set of Open Source projects which empower users to use and deploy video conferencing platforms with state-of-the-art video quality and features.",
         icon: "jitsi.png",
         route: DashboardRoutes.Applications.Jitsi,
-        releaseDate: new Date("2024-10-02"),
+        releaseDate: new Date("2024-11-13"),
       },
     ];
     cards = cards.sort((a, b) => a.title.localeCompare(b.title));

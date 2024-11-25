@@ -70,7 +70,7 @@
                   :items="[
                     { title: 'Up', value: UnifiedNodeStatus.Up },
                     { title: 'Standby', value: UnifiedNodeStatus.Standby },
-                    { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                    { title: 'Up or Standby', value: UnifiedNodeStatus.UpStandby },
                     { title: 'Down', value: UnifiedNodeStatus.Down },
                   ]"
                   label="Select Nodes Status"
