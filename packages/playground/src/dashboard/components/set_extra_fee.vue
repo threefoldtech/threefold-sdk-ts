@@ -68,7 +68,7 @@
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
 import { ValidationError } from "@threefold/types";
-import { onMounted, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
@@ -88,7 +88,9 @@ export default {
     const valid = ref(false);
     const isSetting = ref(false);
     const inputFee = ref(0);
-    const isDisabled = ref(false);
+    const isDisabled = computed(() => {
+      return currentFee.value === inputFee.value;
+    });
     const currentFee = ref(0);
     const currentNodeId = ref(0);
 
@@ -106,10 +108,6 @@ export default {
         console.log(error);
       }
     }
-
-    watch(inputFee, async () => {
-      isDisabled.value = currentFee.value == inputFee.value;
-    });
 
     async function setExtraFee() {
       try {
