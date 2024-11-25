@@ -148,10 +148,7 @@ import { RequestError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { VCard } from "vuetify/components/VCard";
 
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { normalizeError } from "@/utils/helpers";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
