@@ -83,8 +83,9 @@ class MachinesModule extends BaseModule {
     let wireguardConfig = "";
 
     const machines_names: string[] = [];
-
     for (const machine of options.machines) {
+      console.log("mavhine.ip", machine.ip);
+
       if (machines_names.includes(machine.name))
         throw new ValidationError(`Another machine with the same name ${machine.name} already exists.`);
       machines_names.push(machine.name);
