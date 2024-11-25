@@ -103,7 +103,7 @@ export default {
       currentNodeId.value = props.nodeId;
       currentFee.value = (await getExtraFee()) ?? 0;
       inputFee.value = currentFee.value;
-      // loading.value = false;
+      loading.value = false;
     }
     async function getExtraFee() {
       try {
