@@ -58,6 +58,16 @@ For UI changes, Please provide the Documetation PR on [info_grid](https://github
 - Can this code become too complex to understand for other devs?
 - Can this code cause future integration problems?
 
+### Testing Checklist
+
+- [ ] Meet the specified acceptance criteria.
+- [ ] Test if can affect any other functionality.
+- [ ] Tested with unit, integration, and end-to-end tests.
+- [ ] Tested the un-happy path and Rollback scenarios.
+- [ ] Documentation updated to meat the latest changes.
+- [ ] Tested if the gridproxy/graphql/chain is failing.
+- [ ] Can be covered by automated tests.
+
 ### Checklist
 
 - [ ] Tests included
