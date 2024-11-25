@@ -26,9 +26,8 @@
               { title: 'Mycelium IP', key: 'myceliumIP', sortable: false },
             ],
           },
-          { title: 'CPU(vCores)', key: 'capacity.cpu' },
-          { title: 'Memory(MB)', key: 'capacity.memory' },
-          { title: 'Disk(GB)', key: 'disk' },
+          { title: 'Created At', key: 'created' },
+          { title: 'Health', key: 'status', sortable: false },
         ]"
         :items="data"
         :loading="false"
@@ -43,6 +42,23 @@
           {{ item.myceliumIP || "-" }}
         </template>
 
+        <template #[`item.created`]="{ item }">
+          {{ toHumanDate(item.created) }}
+        </template>
+
+        <template #[`item.status`]="{ item }">
+          <v-chip :color="getNodeHealthColor(item.status as string).color">
+            <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">{{
+              item.message
+            }}</v-tooltip>
+            <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top"
+              >The deployment contract is in grace period</v-tooltip
+            >
+            <span class="text-uppercase">
+              {{ getNodeHealthColor(item.status as string).type }}
+            </span>
+          </v-chip>
+        </template>
         <template #[`item.disk`]="{ item }">
           {{ calcDiskSize(item.mounts) }}
         </template>
@@ -92,6 +108,9 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
+
+import toHumanDate from "@/utils/date";
+import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useGrid } from "../stores";
 import { addMachine, deleteMachine, loadVM } from "../utils/deploy_vm";
