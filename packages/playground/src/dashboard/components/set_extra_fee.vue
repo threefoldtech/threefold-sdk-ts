@@ -24,7 +24,8 @@
             e.g. GPUs) while renting.
           </v-card-text>
           <v-card-text>
-            <form-validator v-model="valid">
+            <VProgressLinear indeterminate color="primary" height="2" v-if="loading" />
+            <form-validator v-model="valid" v-else>
               <input-validator
                 :value="inputFee"
                 :rules="[
@@ -93,12 +94,15 @@ export default {
     });
     const currentFee = ref(0);
     const currentNodeId = ref(0);
+    const loading = ref(false);
 
     async function setupDialog() {
+      loading.value = true;
       showDialogue.value = true;
       currentNodeId.value = props.nodeId;
       currentFee.value = (await getExtraFee()) ?? 0;
       inputFee.value = currentFee.value;
+      loading.value = false;
     }
     async function getExtraFee() {
       try {
@@ -139,6 +143,7 @@ export default {
       isDisabled,
       setExtraFee,
       setupDialog,
+      loading,
     };
   },
 };
