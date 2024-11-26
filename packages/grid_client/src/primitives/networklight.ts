@@ -146,14 +146,11 @@ class ZNetworkLight {
 
   getFreeIP(node_id: number, subnet = ""): string | undefined {
     let ip;
-    if (this.NodeIds && !this.NodeIds.includes(node_id) && subnet) {
+
+    if (this.network["node_id"] !== node_id && subnet) {
       ip = Addr(subnet).mask(32).increment().increment();
-    } else if (this.NodeIds.includes(node_id)) {
+    } else if (this.network["node_id"] === node_id) {
       ip = Addr(this.getNodeSubnet(node_id)).mask(32).increment().increment();
-      const reserved_ips = this.getNodeReservedIps(node_id);
-      while (reserved_ips.includes(ip.toString().split("/")[0])) {
-        ip = ip.increment();
-      }
     } else {
       throw new ValidationError("node_id or subnet must be specified.");
     }
@@ -175,24 +172,12 @@ class ZNetworkLight {
       throw new ValidationError(`subnet ${subnet} is not free.`);
     }
   }
-  deleteReservedIp(node_id: number, ip: string): string {
-    if (this.node.node_id === node_id) {
-      this.node.reserved_ips = this.node.reserved_ips.filter(item => item !== ip);
-    }
 
-    return ip;
-  }
-  getNodeReservedIps(node_id: number): string[] {
-    if (this.node.node_id !== node_id) {
-      return [];
-    }
-    return this.node.reserved_ips;
-  }
   updateNetworkDeployments(): void {
     for (const deployment of this.deployments) {
       const workloads = deployment["workloads"];
       for (const workload of workloads) {
-        if (workload["type"] !== WorkloadTypes.networklight) {
+        if (workload["type"] !== WorkloadTypes.network) {
           continue;
         }
         if (this.network.subnet === workload["data"]["subnet"]) {
@@ -266,7 +251,7 @@ class ZNetworkLight {
   }
 
   getNodeSubnet(node_id: number): string | undefined {
-    if (this.NodeIds.includes(node_id)) {
+    if (this.network["node_id"] === node_id) {
       return this.network.subnet;
     }
   }
@@ -326,9 +311,8 @@ class ZNetworkLight {
     if (!(await this.exists())) {
       return;
     }
-    this.NodeIds = [];
     const contracts = await this.getMyNetworkContracts();
-    for (const contract of contracts) {
+    for (const contract of this.contracts) {
       this.NodeIds.push(contract.nodeID);
     }
   }

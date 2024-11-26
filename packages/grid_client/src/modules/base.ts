@@ -1025,17 +1025,13 @@ class BaseModule {
     };
 
     if (!(await this._list()).includes(name)) {
-      console.log("In heree", name);
       return contracts;
     }
-    console.log("In here cont", contracts);
 
     const deployments = await this._get(name);
     const highlvl = new HighLevelBase(this.config);
 
     for (const deployment of deployments) {
-      console.log("In here dep", deployment);
-
       const twinDeployments = await highlvl._delete(deployment, []);
       const contract = await this.twinDeploymentHandler.handle(twinDeployments);
       contracts.deleted = contracts.deleted.concat(contract.deleted as unknown as Contract);
@@ -1046,7 +1042,6 @@ class BaseModule {
     for (const c of contracts.deleted) {
       deletedContracts.push(c.contractId);
     }
-    console.log("In here deletedContracts", deletedContracts);
 
     const updatedContracts: Contract[] = [];
     for (const c of contracts.updated) {

@@ -367,7 +367,6 @@ class VMHL extends HighLevelBase {
       vm = new VMLightPrimitive();
     }
     let machine_ip;
-    console.log("ffffffffffff", ip);
     if (ip !== "") {
       machine_ip = network.validateUserIP(nodeId, ip);
     } else {

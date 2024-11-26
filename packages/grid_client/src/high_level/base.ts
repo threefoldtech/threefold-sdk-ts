@@ -7,7 +7,6 @@ import { events } from "../helpers/events";
 import { Operations, TwinDeployment } from "../high_level/models";
 import { DeploymentFactory } from "../primitives/deployment";
 import { Network } from "../primitives/network";
-import { ZNetworkLight } from "../primitives/networklight";
 import { Nodes } from "../primitives/nodes";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -180,8 +179,6 @@ class HighLevelBase {
       WorkloadTypes.gatewayfqdnproxy,
       WorkloadTypes.gatewaynameproxy,
       WorkloadTypes.zlogs,
-      WorkloadTypes.networklight,
-      WorkloadTypes.zmachinelight,
     ],
   ): Promise<TwinDeployment[]> {
     if (types.includes(WorkloadTypes.network)) {
