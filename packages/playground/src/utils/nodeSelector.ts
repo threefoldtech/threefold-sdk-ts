@@ -501,7 +501,3 @@ export async function checkNodeCapacityPool(
     throw err;
   }
 }
-
-export function getFeatures(gridStore: ReturnType<typeof useGrid>, filters: FilterOptions) {
-  return gridStore.client.capacity.getFeaturesFromFilters(filters);
-}

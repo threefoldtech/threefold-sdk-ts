@@ -115,7 +115,6 @@ export interface Machine {
   publicIpv6?: boolean;
   planetary?: boolean;
   mycelium?: boolean;
-  wireguard?: boolean;
   cpu: number;
   memory: number;
   rootFilesystemSize?: number;
@@ -159,7 +158,6 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
     rentedBy: options.hasGPU ? grid.twinId : undefined,
     planetary: options.planetary,
     mycelium: options.mycelium,
-    wireguard: options.wireguard,
   };
 
   const machine = new AddMachineModel();
