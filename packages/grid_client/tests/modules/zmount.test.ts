@@ -4,6 +4,9 @@ import { Zmount } from "../../src";
 
 describe("Zmount Class", () => {
   let zmount: Zmount;
+  const minSize = 50 * 1024 ** 2; // Less than 100 MB
+  const maxSize = 15 * 1024 ** 4; // Greater than 10 TB
+  const validSize = 5 * 1024 ** 3;
 
   beforeEach(() => {
     zmount = new Zmount();
@@ -17,23 +20,6 @@ describe("Zmount Class", () => {
   });
 
   describe("size property validation", () => {
-    it("should fail validation if size is less than the minimum", async () => {
-      // Less than 100 MB
-      expect(() => (zmount.size = 50 * 1024 ** 2)).toThrow();
-    });
-
-    it("should fail validation if size is greater than the maximum", async () => {
-      // Greater than 10 TB
-      expect(() => (zmount.size = 15 * 1024 ** 4)).toThrow();
-    });
-
-    it("should pass validation if size is within the valid range", async () => {
-      zmount.size = 5 * 1024 ** 3;
-
-      const errors = await validate(zmount);
-      expect(errors.length).toBe(0);
-    });
-
     it("should fail validation if size is set to a non-numeric value", async () => {
       expect(() => (zmount.size = "not a number" as any)).toThrow();
     });
@@ -45,10 +31,25 @@ describe("Zmount Class", () => {
     it("should fail validation if size is undefined", async () => {
       expect(() => (zmount.size = undefined as any)).toThrow();
     });
+
+    it("should fail validation if size is less than the minimum", async () => {
+      expect(() => (zmount.size = minSize)).toThrow();
+    });
+
+    it("should fail validation if size is greater than the maximum", async () => {
+      expect(() => (zmount.size = maxSize)).toThrow();
+    });
+
+    it("should pass validation if size is within the valid range", async () => {
+      zmount.size = validSize;
+
+      const errors = await validate(zmount);
+      expect(errors.length).toBe(0);
+    });
   });
   describe("challenge method", () => {
     it("should return the size as a string", () => {
-      zmount.size = 5 * 1024 ** 3;
+      zmount.size = validSize;
 
       const result = zmount.challenge();
       expect(result).toBe("5368709120");
