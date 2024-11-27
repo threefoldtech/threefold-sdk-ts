@@ -123,6 +123,7 @@ class ZNetworkLight {
     }
 
     this.network = znet_light;
+    this.network["node_id"] === nodeId;
     znet_light = this.getUpdatedNetwork(znet_light);
 
     const znet_light_workload = new Workload();
@@ -142,6 +143,21 @@ class ZNetworkLight {
   _fromObj(net: NetworkLight): NetworkLight {
     const znet_light = plainToInstance(NetworkLight, net);
     return znet_light;
+  }
+  deleteReservedIp(node_id: number, ip: string): string {
+    console.log("deleteReservedI node_id", node_id);
+    console.log("deleteReservedI this.NodeIds", this.NodeIds);
+    console.log("deleteReservedI this.NodeIds", this.node);
+    if (this.NodeIds.includes(node_id) && this.node) {
+      this.node.reserved_ips = this.node?.reserved_ips?.filter(item => item !== ip);
+    }
+    return ip;
+  }
+  getNodeReservedIps(node_id: number): string[] {
+    if (this.NodeIds.includes(node_id)) {
+      return this.node ? this.node?.reserved_ips : [];
+    }
+    return [];
   }
 
   getFreeIP(node_id: number, subnet = ""): string | undefined {
@@ -311,8 +327,9 @@ class ZNetworkLight {
     if (!(await this.exists())) {
       return;
     }
+    this.NodeIds = [];
     const contracts = await this.getMyNetworkContracts();
-    for (const contract of this.contracts) {
+    for (const contract of contracts) {
       this.NodeIds.push(contract.nodeID);
     }
   }
@@ -368,8 +385,7 @@ class ZNetworkLight {
       }
     }
   }
-
-  private async getDeploymentContracts(name: string) {
+  async getDeploymentContracts(name: string) {
     const contracts = await this.getMyNetworkContracts(true);
     return contracts.filter(c => c.parsedDeploymentData.name === name);
   }
