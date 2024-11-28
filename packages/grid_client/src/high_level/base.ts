@@ -69,7 +69,6 @@ class HighLevelBase {
     }
 
     if (names.length !== 0 && types.includes(WorkloadTypes.zmachinelight)) {
-      console.log("In here");
       const Workloads = deployment.workloads.filter(item => item.type === WorkloadTypes.zmachinelight);
       for (const workload of Workloads) {
         if (!names.includes(workload.name)) {
@@ -157,50 +156,27 @@ class HighLevelBase {
           continue;
         }
       }
-      if (network instanceof Network) {
-        contract_id = await network.deleteNode(node_id);
-      } else if (network instanceof ZNetworkLight) {
-        const contracts = await network.getDeploymentContracts(network.name);
-        contract_id = contracts[0].contractID;
-      }
-      console.log("contract_id", contract_id);
-      console.log("remainingWorkloads in delete", remainingWorkloads);
-      console.log("deployment.contract_id", deployment.contract_id);
+      contract_id = await network.deleteNode(node_id);
 
       if (contract_id === deployment.contract_id) {
-        console.log("in hereee contract_id", contract_id);
         if (remainingWorkloads.length === 1) {
           twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
           remainingWorkloads = [];
         } else {
-          console.log("Remaining workloads in else", remainingWorkloads);
           remainingWorkloads = remainingWorkloads.filter(item => item.name !== network?.name);
           deletedIps.push(deletedIp);
           deletedNodes.push(node_id);
         }
       } else {
-        console.log("outer else");
-        if (network instanceof ZNetworkLight) {
-          twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
-        }
-        console.log("network.deployments", network.deployments);
-        console.log("network.", network);
-
         // check that the deployment doesn't have another workloads
         for (let d of network.deployments) {
-          console.log("network.deployments", d);
-
           d = await deploymentFactory.fromObj(d);
           if (d.contract_id !== contract_id) {
             continue;
           }
           if (d.workloads.length === 1) {
-            console.log("outer else workloads =1");
-
             twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, "", network));
           } else {
-            console.log("outer else not workloads =1");
-
             d.workloads = d.workloads.filter(item => item.name !== network?.name);
             twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, "", network));
           }

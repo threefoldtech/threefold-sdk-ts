@@ -123,7 +123,7 @@ class ZNetworkLight {
     }
 
     this.network = znet_light;
-    this.network["node_id"] === nodeId;
+    this.updateNetworkDeployments();
     znet_light = this.getUpdatedNetwork(znet_light);
 
     const znet_light_workload = new Workload();
@@ -148,13 +148,13 @@ class ZNetworkLight {
     console.log("deleteReservedI node_id", node_id);
     console.log("deleteReservedI this.NodeIds", this.NodeIds);
     console.log("deleteReservedI this.NodeIds", this.node);
-    if (this.NodeIds.includes(node_id) && this.node) {
+    if (this.nodeExists(node_id) && this.node) {
       this.node.reserved_ips = this.node?.reserved_ips?.filter(item => item !== ip);
     }
     return ip;
   }
   getNodeReservedIps(node_id: number): string[] {
-    if (this.NodeIds.includes(node_id)) {
+    if (this.nodeExists(node_id)) {
       return this.node ? this.node?.reserved_ips : [];
     }
     return [];
@@ -162,7 +162,6 @@ class ZNetworkLight {
 
   getFreeIP(node_id: number, subnet = ""): string | undefined {
     let ip;
-
     if (this.network["node_id"] !== node_id && subnet) {
       ip = Addr(subnet).mask(32).increment().increment();
     } else if (this.network["node_id"] === node_id) {
@@ -193,7 +192,7 @@ class ZNetworkLight {
     for (const deployment of this.deployments) {
       const workloads = deployment["workloads"];
       for (const workload of workloads) {
-        if (workload["type"] !== WorkloadTypes.network) {
+        if (workload["type"] !== WorkloadTypes.networklight) {
           continue;
         }
         if (this.network.subnet === workload["data"]["subnet"]) {
@@ -206,10 +205,6 @@ class ZNetworkLight {
   }
   async checkMycelium(nodeId: number, mycelium: boolean, myceliumSeeds: MyceliumNetworkModel[] = []) {
     if (!mycelium) return;
-    // check if network has mycelium or not
-    // const network = this.networks.find(network => {
-    //   return network["node_id"] === nodeId;
-    // });
     const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId == nodeId);
     if (this.network && this.network.mycelium && this.network.mycelium?.hex_key) {
       if (myceliumSeeds && myceliumSeeds.length > 0 && myceliumNetworkSeed?.seed !== this.network.mycelium.hex_key) {
@@ -218,6 +213,7 @@ class ZNetworkLight {
     } else {
       // If network has no mycelium and user wanna update it and add mycelium.
       let seed = generateRandomHexSeed(32);
+      console.log("this.network in here", this.network);
       if (this.network) {
         if (myceliumNetworkSeed?.seed) {
           validateHexSeed(myceliumNetworkSeed.seed, 32);
@@ -233,7 +229,6 @@ class ZNetworkLight {
 
         const deploymentFactory = new DeploymentFactory(this.config);
         const filteredDeployments = this.deployments.filter(deployment => deployment["node_id"] === nodeId);
-
         for (const deployment of filteredDeployments) {
           const d = await deploymentFactory.fromObj(deployment);
           for (const workload of d["workloads"]) {
@@ -328,10 +323,7 @@ class ZNetworkLight {
       return;
     }
     this.NodeIds = [];
-    const contracts = await this.getMyNetworkContracts();
-    for (const contract of contracts) {
-      this.NodeIds.push(contract.nodeID);
-    }
+    await this.loadNetworkFromContracts();
   }
 
   private async getReservedIps(nodeId: number): Promise<string[]> {
@@ -362,7 +354,7 @@ class ZNetworkLight {
       res["node_id"] = contract.nodeID;
       for (const workload of res.workloads) {
         const data = workload.data as NetworkLight;
-        if (workload.type !== WorkloadTypes.network || workload.name !== this.name) {
+        if (workload.type !== WorkloadTypes.networklight || workload.name !== this.name) {
           continue;
         }
         if (workload.result.state === "deleted") {
@@ -372,21 +364,38 @@ class ZNetworkLight {
         znet_light["node_id"] = contract.nodeID;
         const reservedIps = await this.getReservedIps(contract.nodeID);
 
-        if (znet_light.subnet !== this.ipRange) {
-          throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
-        }
         this.node = {
           contract_id: +contract.contractID,
           node_id: contract.nodeID,
           reserved_ips: reservedIps,
         };
         this.network = znet_light;
+        this.network["node_id"] = contract.nodeID;
         this.deployments.push(res);
       }
     }
   }
+  async deleteNode(node_id: number): Promise<number> {
+    if (!(await this.exists())) {
+      return 0;
+    }
+    events.emit("logs", `Deleting node ${node_id} from network ${this.name}`);
+    let contract_id = 0;
+    const node = new Node();
+    if (this.node.node_id !== node_id) {
+      this.node = node;
+    } else {
+      contract_id = this.node.contract_id;
+    }
+    this.reservedSubnets = this.reservedSubnets.filter(subnet => subnet === this.network.subnet);
+
+    return contract_id;
+  }
   async getDeploymentContracts(name: string) {
     const contracts = await this.getMyNetworkContracts(true);
+    for (const contract of contracts) {
+      this.NodeIds.push(contract.nodeID);
+    }
     return contracts.filter(c => c.parsedDeploymentData.name === name);
   }
 
