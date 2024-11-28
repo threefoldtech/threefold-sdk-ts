@@ -82,6 +82,9 @@ async function deploy(layout: any) {
     .catch(error => {
       const e = typeof error === "string" ? error : error.message;
       layout.setStatus("failed", e);
+    })
+    .finally(() => {
+      worker.value = createWorker();
     });
 }
 
