@@ -97,8 +97,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { defineComponent, type PropType, ref, watch } from "vue";
-import { onMounted } from "vue";
+import { defineComponent, onMounted, type PropType, ref, watch } from "vue";
 
 import { useGrid } from "@/stores";
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
