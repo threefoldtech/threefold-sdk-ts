@@ -111,7 +111,7 @@ function swapAddressCheck() {
   ];
   if (blockedAddresses.includes(target.value)) {
     return {
-      message: "Blocked Address",
+      message: "Bridge address cannot be used as Stellar target wallet address.",
     };
   }
   if (!isValid || target.value.match(/\W/)) {
