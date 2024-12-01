@@ -72,7 +72,7 @@
       <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
-          <a class="app-link" :href="manual.tf_connect_app" target="_blank"> the manual </a>
+          <a class="app-link" :href="manual.tf_connect_wallet" target="_blank"> the manual </a>
           get started.
         </p>
       </v-alert>
