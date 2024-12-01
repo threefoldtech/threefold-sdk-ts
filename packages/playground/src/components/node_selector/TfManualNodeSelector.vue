@@ -136,6 +136,7 @@ export default {
 
         placeholderNode.value = node;
         const features = getFeatures(gridStore, filters.value);
+        const missingFeatures = features.filter(value => !node.features.includes(value));
         if (node === undefined || node === null) {
           throw `Node ${nodeId} is not on the grid`;
         }
@@ -170,8 +171,8 @@ export default {
 
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
-          case !features.every(value => node.features.includes(value)):
-            throw `Node ${nodeId}'s features don't match with the given filters`;
+          case missingFeatures.length > 0:
+            throw `Node ${nodeId} doesn't support [ ${missingFeatures} ] features't`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;
