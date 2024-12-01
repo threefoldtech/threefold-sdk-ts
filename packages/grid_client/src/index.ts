@@ -9,3 +9,4 @@ export * from "./modules";
 export * from "./storage";
 export * from "./client";
 export * from "./config";
+export * from "./mayar-client";
