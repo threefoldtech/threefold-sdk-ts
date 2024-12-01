@@ -541,7 +541,7 @@ class TwinDeploymentHandler {
         if (!twinDeployment.network) {
           break;
         }
-        if (workload.type === WorkloadTypes.network) {
+        if (workload.type === WorkloadTypes.network || workload.type === WorkloadTypes.networklight) {
           events.emit("logs", `Updating network workload with name: ${workload.name}`);
           twinDeployment.network.updateWorkload(twinDeployment.nodeId, workload);
         }

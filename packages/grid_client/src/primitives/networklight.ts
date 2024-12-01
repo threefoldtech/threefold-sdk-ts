@@ -81,7 +81,7 @@ class ZNetworkLight {
     return workload;
   }
   getUpdatedNetwork(znet_light): NetworkLight {
-    if (this.network.subnet === znet_light.subnet) {
+    if (this.network?.subnet === znet_light.subnet) {
       return this.network;
     }
 
@@ -145,9 +145,6 @@ class ZNetworkLight {
     return znet_light;
   }
   deleteReservedIp(node_id: number, ip: string): string {
-    console.log("deleteReservedI node_id", node_id);
-    console.log("deleteReservedI this.NodeIds", this.NodeIds);
-    console.log("deleteReservedI this.NodeIds", this.node);
     if (this.nodeExists(node_id) && this.node) {
       this.node.reserved_ips = this.node?.reserved_ips?.filter(item => item !== ip);
     }

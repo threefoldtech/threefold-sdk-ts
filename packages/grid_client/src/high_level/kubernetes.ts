@@ -169,6 +169,7 @@ class KubernetesHL extends HighLevelBase {
   async delete(deployment: Deployment, names: string[]) {
     return await this._delete(deployment, names, [
       WorkloadTypes.zmachine,
+      WorkloadTypes.zmachinelight,
       WorkloadTypes.zmount,
       WorkloadTypes.volume,
       WorkloadTypes.ip,

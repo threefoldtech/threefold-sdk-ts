@@ -86,7 +86,6 @@ class HighLevelBase {
 
         names.push(...toRemoveZlogs.map(x => x.name));
 
-        names.push(workload.data["network-light"].public_ip);
         deletedMachineWorkloads.push(workload);
       }
     }
