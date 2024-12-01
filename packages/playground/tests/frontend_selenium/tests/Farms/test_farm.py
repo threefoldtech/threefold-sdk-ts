@@ -156,7 +156,9 @@ def test_farmpayout_address(browser):
     assert farm_page.wait_for_farm_name(farm_name)
     farm_page.search_functionality("")
     farm_page.setup_farmpayout_address(farm_name)
-    farm_page.wait_for_button(browser.find_element(*farm_page.add_v2_button)).click()
+    self.browser.execute_script("arguments[0].scrollIntoView();", self.browser.find_element(*farm_page.add_v2_button))
+    self.wait_for_no_overlay()
+    self.wait_until_clickable(farm_page.add_v2_button).click()
     cases = [' ', 'dgdd', generate_string(), 'gdhjP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6Bcfg']
     for case in cases:
         assert farm_page.add_farmpayout_address(case).is_enabled()==False
@@ -166,7 +168,9 @@ def test_farmpayout_address(browser):
     assert farm_page.wait_for('Address Added successfully!')
     assert farm_page.farmpayout_address_value()[:-3] in case
     case = "GAK2AN6ZC4REV2GXZPTMJG2JKLRJQX746JNG7ACKNC4RSJE7ETAZSE7D"
-    farm_page.wait_for_button(browser.find_element(*farm_page.add_v2_button)).click()
+    self.browser.execute_script("arguments[0].scrollIntoView();", self.browser.find_element(*farm_page.add_v2_button))
+    self.wait_for_no_overlay()
+    self.wait_until_clickable(farm_page.add_v2_button).click()
     farm_page.wait_for_button(farm_page.add_farmpayout_address(case)).click()
     assert farm_page.wait_for('This action will be reflected in a bit')
     assert farm_page.wait_for('Address Added successfully!')
@@ -215,8 +219,8 @@ def test_ip(browser):
     cases = [gateway, '2.0.0.1',  '3.0.0.0', '139.255.255.255', '59.15.35.78']
     for case in cases:
         farm_page.setup_gateway('125.25.25.25/16', case, farm_name, False)
-        assert farm_page.wait_for('Gateway IP not in the provided IP range.')
-        assert browser.find_element(*farm_page.save_button).is_enabled()==False
+        assert farm_page.wait_for('Gateway IP not in the provided IP range.'), f"Expected error message for {case}"
+        assert not browser.find_element(*farm_page.save_button).is_enabled(), "Save button should be disabled"
         farm_page.close_ip()
     farm_page.setup_gateway(gateway, gateway, farm_name, False)
     assert farm_page.wait_for('IPs cannot be the same.')
@@ -300,6 +304,8 @@ def test_range_ips(browser):
         assert farm_page.wait_for('Not a valid IP')
         assert browser.find_element(*farm_page.save_button).is_enabled()==False
     farm_page.add_range_ips('255.0.0.1/32', 0, 0).is_enabled()
+    assert farm_page.wait_for('IP is not public'), "Expected 'IP is not public' error"
+    assert not browser.find_element(*farm_page.save_button).is_enabled(), "Save button should be disabled for invalid IP"
     assert farm_page.wait_for('IP is not public')
     assert browser.find_element(*farm_page.save_button).is_enabled()==False
     assert farm_page.wait_for_button(farm_page.add_range_ips('1.1.1.254/16', '1.1.1.255/16', '1.1.1.1')).is_enabled()==True

@@ -98,14 +98,21 @@ class FarmPage:
         return table
     
     def search_functionality_invalid_name(self, farm_name):
-        sleep(2)
-        self.browser.find_element(*self.search_bar).send_keys(Keys.CONTROL + "a")
-        self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
-        for char in farm_name:
-            self.browser.find_element(*self.search_bar).send_keys(char)
-        table = self.browser.find_element(*self.table).text
-        sleep(3)
-        return table
+        # sleep(2)
+        # self.browser.find_element(*self.search_bar).send_keys(Keys.CONTROL + "a")
+        # self.browser.find_element(*self.search_bar).send_keys(Keys.DELETE)
+        # for char in farm_name:
+        #     self.browser.find_element(*self.search_bar).send_keys(char)
+        # table = self.browser.find_element(*self.table).text
+        # sleep(3)
+        # return table
+        self.wait_until_visible(self.search_bar)
+        self.browser.find_element(*self.search_bar).clear()
+        self.browser.find_element(*self.search_bar).send_keys(farm_name)
+        WebDriverWait(self.browser, 30).until(
+            lambda driver: "No data available" in driver.find_element(*self.table).text or farm_name in driver.find_element(*self.table).text
+        )
+        return self.browser.find_element(*self.table).text
 
     def display_all_farms(self):
         self.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
