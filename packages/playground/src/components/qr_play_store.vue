@@ -26,7 +26,7 @@ const props = defineProps({
 
 const apps = [
   {
-    src: `<img width="138"  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/128px-Google_Play_Store_badge_EN.svg.png?20220907104002">`,
+    src: `<img width="140"  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/128px-Google_Play_Store_badge_EN.svg.png?20220907104002">`,
     alt: "Threefold Connect on Google Play Store",
     url: "https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US",
   },
