@@ -387,6 +387,7 @@
             <section class="qr d-flex flex-column align-center">
               <QRPlayStore
                 :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
+                :msg="qrHeader"
               />
             </section>
           </v-col>
@@ -453,6 +454,9 @@ const props = defineProps({
     default: () => true,
     type: Boolean,
   },
+});
+const qrHeader = computed(() => {
+  return `Scan the QR code using <a class="app-link" href="${manual.tf_connect_app}" target="_blank">Threefold Connect</a> to fund your account.`;
 });
 const mnemonicRef = ref();
 const emailRef = ref();

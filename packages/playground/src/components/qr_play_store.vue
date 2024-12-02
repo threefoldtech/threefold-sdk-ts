@@ -1,7 +1,6 @@
 <template>
   <div class="d-flex flex-column text-center align-center">
-    <b> OR </b>
-    <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p>
+    <span v-html="msg"></span>
     <div class="d-flex justify-center py-2">
       <QrcodeGenerator :data="props.qr" />
     </div>
@@ -22,6 +21,7 @@
 <script setup lang="ts">
 const props = defineProps({
   qr: String,
+  msg: String,
 });
 
 const apps = [
