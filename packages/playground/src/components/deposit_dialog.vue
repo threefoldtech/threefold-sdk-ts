@@ -47,7 +47,10 @@
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
               <v-col>
-                <QRPlayStore :qr="qrCodeText" :msg="qrHeader" />
+                <QRPlayStore :qr="qrCodeText"
+                  ><b> OR </b>
+                  <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p></QRPlayStore
+                >
               </v-col>
             </v-row>
           </v-container>
@@ -94,8 +97,6 @@ const props = defineProps({
   openDepositDialog: Boolean,
   twinId: Number,
 });
-const qrHeader = `<b> OR </b>
-      <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p>`;
 
 function loadingDots() {
   if (dots.value === "...") {

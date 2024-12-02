@@ -188,8 +188,11 @@
           <v-col lg="4" md="12" sm="12" class="my-4" v-if="profileManager.profile">
             <QRPlayStore
               :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
-              :msg="qrHeader"
-            />
+            >
+              Scan the QR code using
+              <a class="app-link" :href="manual.tf_connect_app" target="_blank">Threefold Connect</a> to fund your
+              account.</QRPlayStore
+            >
           </v-col>
         </v-row>
         <v-card-actions v-if="updateRelay" class="justify-end mb-1 mr-2">
@@ -236,9 +239,7 @@ const kycDialogLoading = ref(false);
 const profileManagerController = useProfileManagerController();
 const balance = profileManagerController.balance;
 const insufficientBalance = computed(() => balance.value?.free == undefined || balance.value?.free < 100);
-const qrHeader = computed(() => {
-  return `Scan the QR code using <a class="app-link" href="${manual.tf_connect_app}" target="_blank">Threefold Connect</a> to fund your account.`;
-});
+
 onMounted(async () => {
   const profile = profileManager.profile!;
   if (!grid) {

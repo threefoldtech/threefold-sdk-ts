@@ -387,8 +387,11 @@
             <section class="qr d-flex flex-column align-center">
               <QRPlayStore
                 :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
-                :msg="qrHeader"
-              />
+              >
+                Scan the QR code using
+                <a class="app-link" :href="manual.tf_connect_app" target="_blank">Threefold Connect</a> to fund your
+                account.
+              </QRPlayStore>
             </section>
           </v-col>
         </v-row>
@@ -413,7 +416,6 @@
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
-import { KYC } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import { marked } from "marked";
@@ -455,9 +457,7 @@ const props = defineProps({
     type: Boolean,
   },
 });
-const qrHeader = computed(() => {
-  return `Scan the QR code using <a class="app-link" href="${manual.tf_connect_app}" target="_blank">Threefold Connect</a> to fund your account.`;
-});
+
 const mnemonicRef = ref();
 const emailRef = ref();
 
