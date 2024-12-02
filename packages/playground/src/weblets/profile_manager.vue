@@ -857,7 +857,7 @@ function parseAcceptTermsImage(tempDiv: HTMLDivElement, url: string) {
 }
 
 function parseAcceptTermsLink(tempDiv: HTMLDivElement) {
-  const url = "https://library.threefold.me/info/legal#";
+  const url = "https://manual.grid.tf/knowledge_base/legal/terms_conditions_all3.html";
   const linkElements = tempDiv.querySelectorAll("a");
   linkElements.forEach(linkElement => {
     const currentDomainMatch = linkElement.href.match(/^(https?:\/\/[^\\/]+)/);
@@ -873,7 +873,7 @@ function parseAcceptTermsLink(tempDiv: HTMLDivElement) {
 watch(openAcceptTerms, async () => {
   if (openAcceptTerms.value) {
     try {
-      const url = "https://library.threefold.me/info/legal/";
+      const url = "https://manual.grid.tf/knowledge_base/legal/terms_conditions_all3.html";
       const response = await fetch(url + "readme.md");
       const mdContent = await response.text();
       const parsedContent = marked.parse(mdContent);
