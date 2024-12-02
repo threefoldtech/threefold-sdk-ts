@@ -131,7 +131,7 @@
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
           <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" @click="copy">Copy</v-btn>
+          <v-btn color="secondary" v-if="showType == 1" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -10,6 +10,7 @@
         { value: 20, title: '20' },
         { value: 50, title: '50' },
       ]"
+      no-data-text="No IPs added on this farm"
       :deleting="isRemoving"
       v-model="selectedItems"
     >
@@ -39,9 +40,6 @@
       >
         Delete
       </v-btn>
-    </div>
-    <div v-else>
-      <p class="my-4">No IPs added on this farm.</p>
     </div>
     <v-dialog v-model="showDialogue" max-width="600" attach="#modals">
       <v-card>
