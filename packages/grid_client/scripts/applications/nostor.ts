@@ -9,7 +9,7 @@ async function deploy(client, vms, subdomain, gatewayNode) {
   log("================= Deploying VM =================");
 
   const vmPlanetary = (await client.machines.getObj(vms.name))[0].planetary;
-  // Name Gateway Model
+
   const gw: GatewayNameModel = {
     name: subdomain,
     node_id: gatewayNode.nodeId,
@@ -48,7 +48,6 @@ async function main() {
   const subdomain = "nt" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
 
-  // VMNode Selection
   const vmQueryOptions: FilterOptions = {
     cru: instanceCapacity.cru,
     mru: instanceCapacity.mru,
@@ -56,11 +55,12 @@ async function main() {
     availableFor: grid3.twinId,
     farmId: 1,
   };
-  // GatewayNode Selection
+
   const gatewayQueryOptions: FilterOptions = {
     gateway: true,
     availableFor: grid3.twinId,
   };
+
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
@@ -69,7 +69,7 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "ntnet",
+      name: "nostrnet",
       ip_range: "10.252.0.0/16",
     },
     machines: [
@@ -78,7 +78,7 @@ async function main() {
         node_id: vmNode,
         disks: [
           {
-            name: "ntDisk",
+            name: "nsDisk",
             size: instanceCapacity.sru,
             mountpoint: "/mnt/data",
           },
@@ -99,7 +99,7 @@ async function main() {
       },
     ],
     metadata: "",
-    description: "test deploying Nostr via ts grid3 client",
+    description: "Deploying Nostr instance via TS Grid3 client",
   };
 
   // Deploy VMs
