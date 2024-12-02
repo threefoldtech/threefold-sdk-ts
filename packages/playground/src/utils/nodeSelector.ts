@@ -19,7 +19,6 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
-import { createCustomToast, ToastType } from "./custom_toast";
 import { normalizeError } from "./helpers";
 
 export interface GetLocationsConfig {
