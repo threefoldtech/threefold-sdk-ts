@@ -304,7 +304,11 @@ export default {
               id: node?.rentContractId,
             });
             if (state.gracePeriod) {
-              throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
+              await new Promise((_, reject) => {
+                setTimeout(() => {
+                  reject(Error(`You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`));
+                }, 2000);
+              });
             }
           }
         } catch (error) {
