@@ -21,7 +21,6 @@
 <script setup lang="ts">
 const props = defineProps({
   qr: String,
-  msg: String,
 });
 
 const apps = [
