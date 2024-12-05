@@ -12,7 +12,7 @@ export const useStatsStore = defineStore("stats-store", () => {
   const stats = computed(() => [
     {
       label: "Capacity",
-      value: data.value?.capacity,
+      value: data.value?.ssd,
       image: "capacity.png",
     },
     {
