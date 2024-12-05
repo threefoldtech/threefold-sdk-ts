@@ -29,13 +29,7 @@
           </v-col>
           <v-col v-if="Istats.length !== 0" cols="12" md="4">
             <v-row>
-              <v-col
-                v-for="(item, index) of Istats"
-                :key="item.title"
-                :cols="index === Istats.length - 1 ? 12 : 6"
-                :md="index === Istats.length - 1 ? 12 : 6"
-                class="d-flex flex-grow-1"
-              >
+              <v-col v-for="item of Istats" :key="item.title" :cols="6" :md="6" class="d-flex flex-grow-1">
                 <StatisticsCard :item="item" />
               </v-col>
             </v-row>
