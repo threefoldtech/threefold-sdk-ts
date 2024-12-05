@@ -23,7 +23,7 @@
             sortable: false,
             children: [
               { title: 'Public IPv4', key: 'publicIP.ip', sortable: false },
-              { title: 'MyCelium IP', key: 'myceliumIP', sortable: false },
+              { title: 'Mycelium IP', key: 'myceliumIP', sortable: false },
             ],
           },
           { title: 'Created At', key: 'created' },
