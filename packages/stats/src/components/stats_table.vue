@@ -51,7 +51,7 @@ import { computed, type PropType, type Ref, ref, watch } from "vue";
 
 import type { IStatistics, NetworkStats } from "../types/index";
 import { formatData, getStats } from "../utils/stats";
-import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
+import toTeraOrGigaOrPeta, { toTeraOrGigaStats } from "../utils/toTeraOrGegaOrPeta";
 import StatisticsCard from "./statistics_card.vue";
 
 const props = defineProps({
@@ -83,12 +83,7 @@ const Istats = computed((): IStatistics[] => {
       { data: formattedStats.value.countries, title: "Countries", icon: "mdi-earth" },
       { data: formattedStats.value.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
       { data: formattedStats.value.gpus, title: "GPUs", icon: "mdi-memory" },
-      { data: toTeraOrGigaOrPeta(formattedStats.value.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
-      {
-        data: toTeraOrGigaOrPeta(formattedStats.value.totalHru.toString()),
-        title: "HDD Storage",
-        icon: "mdi-harddisk",
-      },
+      { data: toTeraOrGigaStats(formattedStats.value.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
       { data: toTeraOrGigaOrPeta(formattedStats.value.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
       { data: formattedStats.value.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
       { data: formattedStats.value.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
