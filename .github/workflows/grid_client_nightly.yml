@@ -136,8 +136,8 @@ jobs:
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
             - **Kubernetes**: ${{ steps.k8s.outcome }}
-            - **Vmq QSFS**: skipped
-            - **Kubernetes QSFS**: skipped
+            - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
+            - **Kubernetes QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kvstore**: ${{ steps.kvstore.outcome }}
             - **Zdb**: ${{ steps.zdb.outcome }}
             - **Delete all contracts**: ${{ steps.delete_all.outcome }}
