@@ -141,7 +141,6 @@ const fetchData = async () => {
         { data: stats!.countries, title: "Countries", icon: "mdi-earth" },
         { data: stats!.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
         { data: formatResourceSize(stats!.totalSru), title: "SSD Storage", icon: "mdi-nas" },
-        { data: formatResourceSize(stats!.totalHru), title: "HDD Storage", icon: "mdi-harddisk" },
         { data: formatResourceSize(stats!.totalMru), title: "RAM", icon: "mdi-memory" },
         { data: stats!.gpus, title: "GPUs", icon: "mdi-memory" },
         { data: stats!.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
