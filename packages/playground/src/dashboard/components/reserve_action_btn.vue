@@ -112,7 +112,8 @@ export default {
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
         if (result.length > 0) {
-          createCustomToast(`node ${props.node.nodeId} has active contracts`, ToastType.info);
+          // checking if the node has an active contract
+          createCustomToast(`Node ${props.node.nodeId} has active contracts`, ToastType.danger);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
         }
@@ -148,14 +149,16 @@ export default {
       if (!profile.value) {
         createCustomToast("Please Login first to continue.", ToastType.danger);
       }
+      loadingReserveNode.value = true;
+      disableButton.value = true;
       try {
-        loadingReserveNode.value = true;
-        disableButton.value = true;
         createCustomToast("Transaction Submitted", ToastType.info);
         await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
         createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
         notifyDelaying();
         setTimeout(() => {
+          disableButton.value = false;
+          loadingReserveNode.value = false;
           emit("updateTable");
           reserved.value = true;
         }, 20000);
@@ -167,7 +170,6 @@ export default {
           createCustomToast("Failed to create rent contract.", ToastType.danger);
         }
       } finally {
-        disableButton.value = false;
         loadingReserveNode.value = false;
       }
     }
