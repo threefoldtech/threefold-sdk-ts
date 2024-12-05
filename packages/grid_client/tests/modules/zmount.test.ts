@@ -1,6 +1,7 @@
 import { validate } from "class-validator";
 
 import { Zmount } from "../../src";
+import { getRandomNumber } from "../../src/helpers/utils";
 
 describe("Zmount Class", () => {
   let zmount: Zmount;
@@ -40,13 +41,14 @@ describe("Zmount Class", () => {
       expect(() => (zmount.size = maxSize)).toThrow();
     });
 
-    it("should pass validation if size is within the valid range", async () => {
+    it("should pass validation if size is a valid number within the range", async () => {
+      const validSize = getRandomNumber(minSize, maxSize);
       zmount.size = validSize;
-
       const errors = await validate(zmount);
       expect(errors.length).toBe(0);
     });
   });
+
   describe("challenge method", () => {
     it("should return the size as a string", () => {
       zmount.size = validSize;
