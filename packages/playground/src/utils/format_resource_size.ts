@@ -49,3 +49,21 @@ function toFixedTwo(val: number) {
 function formatSpeed(val: number) {
   return Math.round(val);
 }
+
+export function toTeraOrGigaStats(sizeInBytes: number) {
+  const giga = 1024 ** 3;
+
+  if (!sizeInBytes) return "0 GB";
+
+  const val = +sizeInBytes;
+  if (val === 0 || isNaN(val)) return "0 GB";
+
+  const gb = val / giga;
+
+  if (gb < 100) {
+    return gb.toFixed(2) + " GB";
+  }
+
+  const tb = gb / 1024;
+  return tb.toFixed(2) + " TB";
+}

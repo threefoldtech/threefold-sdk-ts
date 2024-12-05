@@ -11,7 +11,7 @@ export const useStatsStore = defineStore("stats-store", () => {
   const data = computed(() => res.value.data);
   const stats = computed(() => [
     {
-      label: "Capacity",
+      label: "SSD Capacity",
       value: data.value?.ssd,
       image: "capacity.png",
     },

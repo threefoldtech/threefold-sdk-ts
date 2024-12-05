@@ -44,7 +44,7 @@
 import { NodeStatus, type Stats as GridProxyStats } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 
-import formatResourceSize from "@/utils/format_resource_size";
+import formatResourceSize, { toTeraOrGigaStats } from "@/utils/format_resource_size";
 
 import { gridProxyClient } from "../clients";
 import StatisticsCard from "../components/statistics_card.vue";
@@ -134,7 +134,7 @@ const fetchData = async () => {
         { data: stats!.farms, title: "Farms", icon: "mdi-tractor" },
         { data: stats!.countries, title: "Countries", icon: "mdi-earth" },
         { data: stats!.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
-        { data: formatResourceSize(stats!.totalSru), title: "SSD Storage", icon: "mdi-nas" },
+        { data: toTeraOrGigaStats(stats!.totalSru), title: "SSD Storage", icon: "mdi-nas" },
         { data: formatResourceSize(stats!.totalMru), title: "RAM", icon: "mdi-memory" },
         { data: stats!.gpus, title: "GPUs", icon: "mdi-memory" },
         { data: stats!.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
