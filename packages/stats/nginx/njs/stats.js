@@ -13,6 +13,10 @@ let URLS = [
 
 async function getStats(r) {
   const cachedData = cache.readCache(cache_path);
+  if (!cachedData.valid || cachedData.error) {
+    await updateStats(r);
+    return;
+  }
 
   r.return(200, JSON.stringify(cachedData.summary));
 }
