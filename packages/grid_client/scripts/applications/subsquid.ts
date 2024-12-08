@@ -55,6 +55,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: ["wiregaurd"],
   };
   //GatewayNode Selection
   const gatewayQueryOptions: FilterOptions = {

@@ -34,6 +34,7 @@ async function main() {
     mru: 1, // GB
     sru: 10,
     farmId: 1,
+    features: ["wireguard"],
   };
 
   const worker: AddWorkerModel = {

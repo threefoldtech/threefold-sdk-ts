@@ -34,6 +34,7 @@ async function main() {
     sru: 10,
     farmId: 1,
     availableFor: grid3.twinId,
+    features: ["ipv4", "wireguard"],
   };
 
   const vms: MachinesModel = {

@@ -47,6 +47,8 @@ async function main() {
   const grid3 = await getClient(`mattermost/${name}`);
   const subdomain = "mm" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
+  // Change to true if smtp is configured
+  const smtp = false;
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {
@@ -55,6 +57,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: smtp ? ["ipv4", "wiregaurd"] : [],
   };
   //GatewayNode Selection
   const gatewayQueryOptions: FilterOptions = {

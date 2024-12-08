@@ -35,6 +35,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: ["ipv4", "wiregaurd", "ip"],
   };
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);

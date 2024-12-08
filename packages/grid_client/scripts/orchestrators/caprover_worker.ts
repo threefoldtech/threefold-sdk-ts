@@ -32,6 +32,7 @@ async function main() {
     mru: 4, // GB
     sru: 10,
     farmId: 1,
+    features: ["ipv4", "wireguard"],
   };
 
   const vms: MachinesModel = {

@@ -50,6 +50,7 @@ async function main() {
     sru: 6,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: ["wireguard"],
   };
 
   const qsfsQueryOptions: FilterOptions = {
