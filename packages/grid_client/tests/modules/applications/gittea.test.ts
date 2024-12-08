@@ -3,12 +3,12 @@ import { setTimeout } from "timers/promises";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
-
+import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils"; // Corrected path
 jest.setTimeout(1250000);
 
 let gridClient: GridClient;
 let deploymentName: string;
+let result: any;
 
 beforeAll(async () => {
   gridClient = await getClient();
@@ -22,7 +22,28 @@ beforeAll(async () => {
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
 test("TCXXXX - Applications: Deploy Gitea", async () => {
-  // Test Data
+  /**********************************************
+     Test Suite: Grid3_Client_TS (Automated)
+     Test Cases: TC2689 - Applications: Deploy Mattermost
+     Scenario:
+        - Generate Test Data/mattermost Config/Gateway Config.
+        - Select a Node To Deploy the mattermost on.
+        - Select a Gateway Node To Deploy the gateway on.
+        - Deploy the mattermost solution.
+        - Assert that the generated data matches
+          the deployment details.
+        - Pass the IP of the Created mattermost to the Gateway
+          Config.
+        - Deploy the Gateway.
+        - Assert that the generated data matches
+          the deployment details.
+        - Assert that the Gateway points at the IP
+          of the created mattermost.
+        - Assert that the returned domain is working
+          and returns correct data.
+    **********************************************/
+
+  //Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const tlsPassthrough = false;
   const cpu = 2;
@@ -91,13 +112,6 @@ test("TCXXXX - Applications: Deploy Gitea", async () => {
         env: {
           SSH_KEY: config.ssh_key,
           GITEA__HOSTNAME: domain,
-          GITEA__mailer__PROTOCOL: "smtp",
-          GITEA__mailer__ENABLED: "true",
-          GITEA__mailer__HOST: "smtp.example.com",
-          GITEA__mailer__FROM: "admin@example.com",
-          GITEA__mailer__PORT: "25",
-          GITEA__mailer__USER: "admin",
-          GITEA__mailer__PASSWD: "123456",
         },
       },
     ],
@@ -142,7 +156,21 @@ test("TCXXXX - Applications: Deploy Gitea", async () => {
   expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
   expect(result[0].mounts[0]["state"]).toBe("ok");
 
-  const backends = ["http://[" + result[0].planetary + "]:3000"];
+  const host = result[0].planetary;
+  const user = "root";
+
+  //SSH to the Created VM
+  const ssh = await RemoteRun(host, user);
+
+  try {
+    //Verify that the added env var was successfully passed to the VM.
+    await ssh.execCommand("ufw allow 3000/tcp").then(async function (result) {});
+  } finally {
+    //Disconnect from the machine
+    await ssh.dispose();
+  }
+
+  const backends = ["http://[" + result[0].myceliumIP + "]:3000"];
   log(backends);
 
   // Name Gateway Model
@@ -188,6 +216,7 @@ test("TCXXXX - Applications: Deploy Gitea", async () => {
         log(res.statusText);
         log(res.data);
         expect(res.status).toBe(200);
+        expect(res.statusText).toBe("OK");
         reachable = true;
       })
       .catch(() => {
@@ -210,6 +239,20 @@ afterAll(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
+
+  // const host = result[0].myceliumIP;
+  // const user = "root";
+
+  // //SSH to the Created VM
+  // const ssh = await RemoteRun(host, user);
+
+  // try {
+  //   //Verify that the added env var was successfully passed to the VM.
+  //   await ssh.execCommand("ufw allow 3000/tcp").then(async function (result) {});
+  // } finally {
+  //   //Disconnect from the machine
+  //   await ssh.dispose();
+  // }
 
   const gwNames = await gridClient.gateway.list();
   for (const name of gwNames) {

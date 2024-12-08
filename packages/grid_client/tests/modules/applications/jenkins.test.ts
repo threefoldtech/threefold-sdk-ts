@@ -91,7 +91,7 @@ test("TCXXXX - Applications: Deploy Jenkins", async () => {
         env: {
           SSH_KEY: config.ssh_key,
           JENKINS_HOSTNAME: domain,
-          JENKINS_ADMIN_USERNAME: "admin",
+          JENKINS_ADMIN_USERNAME: "admin123",
           JENKINS_ADMIN_PASSWORD: "admin123",
         },
       },
