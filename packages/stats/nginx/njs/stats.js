@@ -18,7 +18,7 @@ async function getStats(r) {
     return;
   }
 
-  r.return(304, JSON.stringify(cachedData.summary));
+  r.return(200, JSON.stringify(cachedData.summary));
 }
 
 async function updateStats(r) {
@@ -30,7 +30,7 @@ async function updateStats(r) {
     r.error(`Failed to fetch stats: ${error}`);
     r.error(`Returning cached data`);
     const cachedData = cache.readCache(cache_path);
-    r.return(304, JSON.stringify(cachedData.summary));
+    r.return(200, JSON.stringify(cachedData.summary));
     return;
   }
 }
