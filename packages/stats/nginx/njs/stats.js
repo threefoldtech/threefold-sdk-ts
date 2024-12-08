@@ -13,6 +13,10 @@ let URLS = [
 
 async function getStats(r) {
   const cachedData = cache.readCache(cache_path);
+  if (!cachedData.valid || cachedData.error) {
+    await updateStats(r);
+    return;
+  }
 
   r.return(200, JSON.stringify(cachedData.summary));
 }
@@ -24,7 +28,9 @@ async function updateStats(r) {
     return;
   } catch (error) {
     r.error(`Failed to fetch stats: ${error}`);
-    r.return(500, `Failed to fetch stats: ${error}`);
+    r.error(`Returning cached data`);
+    const cachedData = cache.readCache(cache_path);
+    r.return(200, JSON.stringify(cachedData.summary));
     return;
   }
 }
@@ -131,7 +137,7 @@ function toTeraOrGiga(value) {
   return gb.toFixed(2) + " PB";
 }
 
-export function toTeraOrGigaStats(value) {
+function toTeraOrGigaStats(value) {
   const giga = 1024 ** 3;
 
   if (!value) return "0 GB";
