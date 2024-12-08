@@ -131,7 +131,7 @@ function toTeraOrGiga(value) {
   return gb.toFixed(2) + " PB";
 }
 
-export function toTeraOrGigaStats(value) {
+function toTeraOrGigaStats(value) {
   const giga = 1024 ** 3;
 
   if (!value) return "0 GB";
