@@ -5,9 +5,9 @@ import { getRandomNumber } from "../../src/helpers/utils";
 
 describe("Zmount Class", () => {
   let zmount: Zmount;
-  const minSize = getRandomNumber(0, 50 * 1024 ** 2 - 1);
-  const maxSize = getRandomNumber(10, 15 * 1024 ** 4 + 1);
-  const validSize = getRandomNumber(minSize, maxSize);
+  const minSize = getRandomNumber(0, 100 * 1024 ** 2 - 1);
+  const maxSize = getRandomNumber(10 * 1024 ** 4 + 1, 10 * 1024 ** 5);
+  const validSize = getRandomNumber(100 * 1024 ** 2, 10 * 1024 ** 4);
 
   beforeEach(() => {
     zmount = new Zmount();
