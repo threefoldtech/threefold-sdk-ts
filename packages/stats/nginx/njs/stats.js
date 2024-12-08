@@ -13,6 +13,10 @@ let URLS = [
 
 async function getStats(r) {
   const cachedData = cache.readCache(cache_path);
+  if (!cachedData.valid || cachedData.error) {
+    await updateStats(r);
+    return;
+  }
 
   r.return(200, JSON.stringify(cachedData.summary));
 }
@@ -24,7 +28,9 @@ async function updateStats(r) {
     return;
   } catch (error) {
     r.error(`Failed to fetch stats: ${error}`);
-    r.return(500, `Failed to fetch stats: ${error}`);
+    r.error(`Returning cached data`);
+    const cachedData = cache.readCache(cache_path);
+    r.return(200, JSON.stringify(cachedData.summary));
     return;
   }
 }
@@ -78,10 +84,10 @@ function mergeStatsData(stats) {
 
   const result = {};
   result.capacity = toTeraOrGiga(res.totalHru + res.totalSru);
+  result.ssd = toTeraOrGigaStats(res.totalSru);
   result.nodes = res.nodes;
   result.countries = res.countries;
   result.cores = res.totalCru;
-
   return result;
 }
 
@@ -129,6 +135,24 @@ function toTeraOrGiga(value) {
 
   gb = gb / 1024;
   return gb.toFixed(2) + " PB";
+}
+
+function toTeraOrGigaStats(value) {
+  const giga = 1024 ** 3;
+
+  if (!value) return "0 GB";
+
+  const val = +value;
+  if (val === 0 || isNaN(val)) return "0 GB";
+
+  const gb = val / giga;
+
+  if (gb < 100) {
+    return gb.toFixed(2) + " GB";
+  }
+
+  const tb = gb / 1024;
+  return tb.toFixed(2) + " TB";
 }
 
 // Exporting the main function for Nginx

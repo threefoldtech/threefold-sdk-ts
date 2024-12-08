@@ -91,12 +91,12 @@ def test_twin_id(browser):
     cases = [' ', generate_string(), invalid_address(), generate_leters()]
     for case in cases:
       transfer_page.recipient_id_input(case)
-      assert transfer_page.wait_for('Twin ID should be a number')
+      assert transfer_page.wait_for('Twin ID should be a valid integer')
       assert transfer_page.get_id_submit().is_enabled() == False
     cases = ['0', '-52']
     for case in cases:
       transfer_page.recipient_id_input(case)
-      assert transfer_page.wait_for('Twin ID should be more than 0')
+      assert transfer_page.wait_for('Twin ID should be greater than zero')
       assert transfer_page.get_id_submit().is_enabled() == False
 
 

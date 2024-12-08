@@ -24,7 +24,11 @@ def test_validate_homepage_links(browser):
     """
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
-    assert dashboard_page.navigate_to_explore_capacity() == ( 'https://stats.' + Base.net + '.grid.tf/')
+    if Base.net == 'main':
+        stats_url = 'https://stats.grid.tf/'
+    else:
+        stats_url = 'https://stats.' + Base.net + '.grid.tf/'
+    assert dashboard_page.navigate_to_explore_capacity() == ( stats_url )
     assert dashboard_page.navigate_to_learn_about_grid() == ('https://www.manual.grid.tf/')
 
 
@@ -61,7 +65,7 @@ def test_stats(browser):
     """
     dashboard_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
-    stats = grid_proxy.get_stats()
+    stats = grid_proxy.get_stats_capicity()
     dashboard_stats = dashboard_page.get_dashboard_stats()
     assert stats == dashboard_stats
 
