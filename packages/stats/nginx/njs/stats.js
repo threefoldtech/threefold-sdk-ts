@@ -84,7 +84,7 @@ function mergeStatsData(stats) {
 
   const result = {};
   result.capacity = toTeraOrGiga(res.totalHru + res.totalSru);
-  result.ssd = toTeraOrGigaStats(res.totalSru);
+  result.ssd = formatNumberWithCommas(res.totalSru);
   result.nodes = res.nodes;
   result.countries = res.countries;
   result.cores = res.totalCru;
@@ -137,7 +137,7 @@ function toTeraOrGiga(value) {
   return gb.toFixed(2) + " PB";
 }
 
-function toTeraOrGigaStats(value) {
+function formatNumberWithCommas(value) {
   const giga = 1024 ** 3;
 
   if (!value) return "0 GB";
@@ -145,14 +145,16 @@ function toTeraOrGigaStats(value) {
   const val = +value;
   if (val === 0 || isNaN(val)) return "0 GB";
 
-  const gb = val / giga;
+  const gb = Math.round(val / giga).toString();
 
-  if (gb < 100) {
-    return gb.toFixed(2) + " GB";
+  let res = "";
+  let count = 0;
+  for (let i = gb.length - 1; i >= 0; i--) {
+    res = gb[i] + res;
+    count++;
+    if (count % 3 === 0 && i !== 0) res = "," + res;
   }
-
-  const tb = gb / 1024;
-  return tb.toFixed(2) + " TB";
+  return res + " GB";
 }
 
 // Exporting the main function for Nginx

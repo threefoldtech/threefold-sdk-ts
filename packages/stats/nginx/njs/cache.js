@@ -16,7 +16,7 @@ function isLessThan24Hours(timestamp) {
 
 const DUMMY_DATA = {
   capacity: "17.46 PB",
-  ssd: "6800.54 TB",
+  ssd: "8,108,670 GB",
   nodes: 2081,
   countries: 52,
   cores: 59828,

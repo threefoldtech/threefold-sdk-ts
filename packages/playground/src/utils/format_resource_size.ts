@@ -50,20 +50,19 @@ function formatSpeed(val: number) {
   return Math.round(val);
 }
 
-export function toTeraOrGigaStats(sizeInBytes: number) {
+export function formatNumberWithCommas(sizeInBytes: number) {
   const giga = 1024 ** 3;
 
   if (!sizeInBytes) return "0 GB";
 
-  const val = +sizeInBytes;
-  if (val === 0 || isNaN(val)) return "0 GB";
+  const gb = Math.round(sizeInBytes / giga).toString();
 
-  const gb = val / giga;
-
-  if (gb < 100) {
-    return gb.toFixed(2) + " GB";
+  let res = "";
+  let count = 0;
+  for (let i = gb.length - 1; i >= 0; i--) {
+    res = gb[i] + res;
+    count++;
+    if (count % 3 === 0 && i !== 0) res = "," + res;
   }
-
-  const tb = gb / 1024;
-  return tb.toFixed(2) + " TB";
+  return res + " GB";
 }
