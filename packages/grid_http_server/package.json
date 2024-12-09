@@ -1,7 +1,7 @@
 {
   "name": "@threefold/grid_http_server",
   "author": "Ahmed Hanafy",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "license": "ISC",
   "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/blob/development/packages/grid_http_server/README.md",
   "repository": {
@@ -12,7 +12,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@threefold/grid_client": "^2.6.1",
+    "@threefold/grid_client": "2.6.3",
     "express": "^4.21.2",
     "http-server": "^14.1.1",
     "typescript": "^4.7.4"
