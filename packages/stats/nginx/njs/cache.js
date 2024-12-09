@@ -15,10 +15,11 @@ function isLessThan24Hours(timestamp) {
 }
 
 const DUMMY_DATA = {
-  capacity: "32.74 PB",
-  nodes: 2569,
-  countries: 61,
-  cores: 63968,
+  capacity: "17.46 PB",
+  ssd: "6800.54 TB",
+  nodes: 2081,
+  countries: 52,
+  cores: 59828,
 };
 function readCache(path) {
   try {
