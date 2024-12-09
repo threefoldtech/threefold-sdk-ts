@@ -1,6 +1,6 @@
 {
   "name": "@threefold/types",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "main": "dist/node/index.js",
   "types": "dist/es6/index.d.ts",
   "scripts": {
