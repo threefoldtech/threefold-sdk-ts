@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
+import urlJoin from "url-join";
 import { ref } from "vue";
-
 interface StateData {
   label: string;
   value: string;
@@ -10,7 +10,7 @@ interface StateData {
 export const useStatsStore = defineStore("stats-store", () => {
   const stats = ref<StateData[]>([]);
   window.$$monitorLock
-    .then(() => fetch(window.env.STATS_URL + "/api/stats-summary"))
+    .then(() => fetch(urlJoin(window.env.STATS_URL, "/api/stats-summary")))
     .then(res => res.json())
     .then(data => {
       stats.value = [
