@@ -83,7 +83,7 @@ const Istats = computed((): IStatistics[] => {
       { data: formattedStats.value.countries, title: "Countries", icon: "mdi-earth" },
       { data: formattedStats.value.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
       { data: formattedStats.value.gpus, title: "GPUs", icon: "mdi-memory" },
-      { data: formatNumberWithCommas(formattedStats.value.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
+      { data: formatNumberWithCommas(formattedStats.value.totalSru), title: "SSD Storage", icon: "mdi-nas" },
       { data: toTeraOrGigaOrPeta(formattedStats.value.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
       { data: formattedStats.value.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
       { data: formattedStats.value.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
