@@ -48,6 +48,8 @@ type MountData = BaseMountData | ExtendedMountData;
 interface ZmachineData {
   /** The version of the workload */
   version: number;
+  /** The type of the workload */
+  type: string;
   /** The contract ID associated with the workload */
   contractId: number;
   /** The node ID where the workload is deployed */
