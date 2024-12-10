@@ -189,9 +189,11 @@
             <QRPlayStore
               :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
             >
-              Scan the QR code using
-              <a class="app-link" :href="manual.tf_connect_app" target="_blank">Threefold Connect</a> to fund your
-              account.</QRPlayStore
+              <p>
+                Scan the QR code using
+                <a class="app-link" :href="manual.tf_connect_app" target="_blank">Threefold Connect</a> to fund your
+                account.
+              </p></QRPlayStore
             >
           </v-col>
         </v-row>

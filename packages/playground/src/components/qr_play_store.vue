@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column text-center align-center">
-    <p><slot></slot></p>
+    <slot></slot>
     <div class="d-flex justify-center py-2">
       <QrcodeGenerator :data="props.qr" />
     </div>
