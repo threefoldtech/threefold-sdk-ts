@@ -45,51 +45,40 @@ class HighLevelBase {
       );
     }
 
-    if (names.length !== 0 && types.includes(WorkloadTypes.zmachine)) {
-      const Workloads = deployment.workloads.filter(item => item.type === WorkloadTypes.zmachine);
-      for (const workload of Workloads) {
-        if (!names.includes(workload.name)) {
-          continue;
+    if (names.length !== 0 && (types.includes(WorkloadTypes.zmachine) || types.includes(WorkloadTypes.zmachinelight))) {
+      const workloadTypes = [WorkloadTypes.zmachine, WorkloadTypes.zmachinelight];
+
+      for (const type of workloadTypes) {
+        if (!types.includes(type)) continue;
+
+        const Workloads = deployment.workloads.filter(item => item.type === type);
+
+        for (const workload of Workloads) {
+          if (!names.includes(workload.name)) {
+            continue;
+          }
+
+          for (const mount of workload.data["mounts"]) {
+            names.push(mount.name);
+          }
+
+          const toRemoveZlogs = deployment.workloads.filter(item => {
+            const x = item.type === WorkloadTypes.zlogs;
+            const y =
+              (item.data as any)[type === WorkloadTypes.zmachine ? "zmachine" : "zmachine-light"] === workload.name;
+            return x && y;
+          });
+
+          names.push(...toRemoveZlogs.map(x => x.name));
+
+          if (type === WorkloadTypes.zmachine) {
+            names.push(workload.data["network"].public_ip);
+          }
+
+          deletedMachineWorkloads.push(workload);
         }
-        for (const mount of workload.data["mounts"]) {
-          names.push(mount.name);
-        }
-
-        const toRemoveZlogs = deployment.workloads.filter(item => {
-          const x = item.type === WorkloadTypes.zlogs;
-          const y = (item.data as any)["zmachine"] === workload.name;
-          return x && y;
-        });
-
-        names.push(...toRemoveZlogs.map(x => x.name));
-
-        names.push(workload.data["network"].public_ip);
-        deletedMachineWorkloads.push(workload);
       }
     }
-
-    if (names.length !== 0 && types.includes(WorkloadTypes.zmachinelight)) {
-      const Workloads = deployment.workloads.filter(item => item.type === WorkloadTypes.zmachinelight);
-      for (const workload of Workloads) {
-        if (!names.includes(workload.name)) {
-          continue;
-        }
-        for (const mount of workload.data["mounts"]) {
-          names.push(mount.name);
-        }
-
-        const toRemoveZlogs = deployment.workloads.filter(item => {
-          const x = item.type === WorkloadTypes.zlogs;
-          const y = (item.data as any)["zmachine-light"] === workload.name;
-          return x && y;
-        });
-
-        names.push(...toRemoveZlogs.map(x => x.name));
-
-        deletedMachineWorkloads.push(workload);
-      }
-    }
-
     const remainingWorkloads: Workload[] = [];
     for (const workload of deployment.workloads) {
       if (workload.type === WorkloadTypes.network || workload.type === WorkloadTypes.networklight) {
