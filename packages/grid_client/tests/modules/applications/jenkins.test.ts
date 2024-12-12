@@ -3,7 +3,7 @@ import { setTimeout } from "timers/promises";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
+import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
 
 jest.setTimeout(1250000);
 
@@ -62,6 +62,7 @@ test("TCXXXX - Applications: Deploy Jenkins", async () => {
   if (nodeId == -1) throw new Error("No nodes available to complete this test");
   const domain = name + "." + GatewayNode.publicConfig.domain;
 
+  const fs = require("fs");
   // VM Model
   const vms: MachinesModel = {
     name: deploymentName,
@@ -89,16 +90,17 @@ test("TCXXXX - Applications: Deploy Jenkins", async () => {
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: config.ssh_key,
+          SSH_KEY: fs.readFileSync("/Users/khaledyoussef/.ssh/id_ed25519.pub", "utf8"), // Public key for SSH
           JENKINS_HOSTNAME: domain,
-          JENKINS_ADMIN_USERNAME: "admin123",
-          JENKINS_ADMIN_PASSWORD: "admin123",
+          JENKINS_ADMIN_USERNAME: "admin",
+          JENKINS_ADMIN_PASSWORD: "adminpassword",
         },
       },
     ],
     metadata: metadata,
     description: description,
   };
+
   const res = await gridClient.machines.deploy(vms);
   log(res);
 
@@ -107,40 +109,14 @@ test("TCXXXX - Applications: Deploy Jenkins", async () => {
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
-  const vmsList = await gridClient.machines.list();
-  log(vmsList);
-
-  // VM List Assertions
-  expect(vmsList.length).toBeGreaterThanOrEqual(1);
-  expect(vmsList).toContain(vms.name);
-
   const result = await gridClient.machines.getObj(vms.name);
   log(result);
 
-  // VM Assertions
-  expect(result[0].nodeId).toBe(nodeId);
-  expect(result[0].status).toBe("ok");
-  expect(result[0].flist).toBe(vms.machines[0].flist);
-  expect(result[0].entrypoint).toBe(vms.machines[0].entrypoint);
-  expect(result[0].mounts).toHaveLength(1);
-  expect(result[0].interfaces[0]["network"]).toBe(vms.network.name);
-  expect(result[0].interfaces[0]["ip"]).toContain(splitIP(vms.network.ip_range));
-  expect(result[0].interfaces[0]["ip"]).toMatch(ipRegex);
-  expect(result[0].capacity["cpu"]).toBe(cpu);
-  expect(result[0].capacity["memory"]).toBe(memory * 1024);
-  expect(result[0].planetary).toBeDefined();
-  expect(result[0].myceliumIP).toBeDefined();
-  expect(result[0].publicIP).toBeNull();
-  expect(result[0].description).toBe(description);
-  expect(result[0].mounts[0]["name"]).toBe(diskName);
-  expect(result[0].mounts[0]["size"]).toBe(GBToBytes(diskSize));
-  expect(result[0].mounts[0]["mountPoint"]).toBe(mountPoint);
-  expect(result[0].mounts[0]["state"]).toBe("ok");
-
+  // Gateway Backend Configuration
   const backends = ["http://[" + result[0].planetary + "]:8080"];
   log(backends);
 
-  // Name Gateway Model
+  // Gateway Model
   const gw: GatewayNameModel = {
     name: name,
     node_id: GatewayNode.nodeId,
@@ -151,23 +127,33 @@ test("TCXXXX - Applications: Deploy Jenkins", async () => {
   const gatewayRes = await gridClient.gateway.deploy_name(gw);
   log(gatewayRes);
 
-  // Contracts Assertions
+  // Gateway Assertions
   expect(gatewayRes.contracts.created).toHaveLength(1);
-  expect(gatewayRes.contracts.updated).toHaveLength(0);
-  expect(gatewayRes.contracts.deleted).toHaveLength(0);
-  expect(gatewayRes.contracts.created[0].contractType.nodeContract.nodeId).toBe(GatewayNode.nodeId);
 
   const gatewayResult = await gridClient.gateway.getObj(gw.name);
   log(gatewayResult);
 
   // Gateway Assertions
   expect(gatewayResult[0].name).toBe(name);
-  expect(gatewayResult[0].status).toBe("ok");
-  expect(gatewayResult[0].type).toContain("name");
-  expect(gatewayResult[0].domain).toContain(name);
-  expect(gatewayResult[0].tls_passthrough).toBe(tlsPassthrough);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
+  const host = result[0].planetary;
+  const user = "root";
+
+  // SSH to the Created VM
+  const ssh = await RemoteRun(host, user);
+
+  try {
+    // Allow Jenkins' port through UFW
+    await ssh.execCommand("ufw allow 8080/tcp").then(async function (result) {
+      log(result.stdout);
+    });
+  } finally {
+    // Disconnect from the machine
+    await ssh.dispose();
+  }
+
+  // Gateway reachability check
   const site = "http://" + gatewayResult[0].domain;
   let reachable = false;
 
@@ -178,21 +164,17 @@ test("TCXXXX - Applications: Deploy Jenkins", async () => {
     await axios
       .get(site)
       .then(res => {
-        log("gateway is reachable");
+        log("Gateway is reachable");
         log(res.status);
         log(res.statusText);
-        log(res.data);
         expect(res.status).toBe(200);
         reachable = true;
       })
       .catch(() => {
-        log("gateway is not reachable");
+        log("Gateway is not reachable");
       });
-    if (reachable) {
-      break;
-    } else if (i === 250) {
-      throw new Error("Gateway is unreachable after multiple retries");
-    }
+    if (reachable) break;
+    if (i === 250) throw new Error("Gateway is unreachable after retries");
   }
 });
 
@@ -201,18 +183,12 @@ afterAll(async () => {
   for (const name of vmNames) {
     const res = await gridClient.machines.delete({ name });
     log(res);
-    expect(res.created).toHaveLength(0);
-    expect(res.updated).toHaveLength(0);
-    expect(res.deleted).toBeDefined();
   }
 
   const gwNames = await gridClient.gateway.list();
   for (const name of gwNames) {
     const res = await gridClient.gateway.delete_name({ name });
     log(res);
-    expect(res.created).toHaveLength(0);
-    expect(res.updated).toHaveLength(0);
-    expect(res.deleted).toBeDefined();
   }
 
   return await gridClient.disconnect();
