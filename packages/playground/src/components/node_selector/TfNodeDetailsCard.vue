@@ -103,7 +103,7 @@
           </VTooltip>
 
           <VTooltip
-            v-if="rentable || rented"
+            v-if="(rentable || rented) && node.status !== 'down'"
             location="top"
             :text="
               rentable ? 'You can rent it exclusively for your workloads' : 'Rented as full node for a single user'

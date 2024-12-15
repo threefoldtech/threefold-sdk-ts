@@ -235,9 +235,10 @@ export default {
           timestamp: log.timestamp,
           message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
         });
-
-        logs.value.push(item);
-        scrollToBottom();
+        if (logs.value) {
+          logs.value.push(item);
+          scrollToBottom();
+        }
       }
     }
 

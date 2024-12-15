@@ -569,6 +569,7 @@ function createTFChainRoutes(): RouteRecordRaw[] {
 
         {
           path: DashboardRoutes.TFChain.TFDAO,
+          name: "Dao",
           component: () => import("../dashboard/dao_view.vue"),
           meta: { title: "Dao" },
         },
