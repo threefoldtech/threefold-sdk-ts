@@ -167,7 +167,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Password is required')
     assert dashboard_page.wait_for_button(dashboard_page.login_account('123456')).is_enabled() == True
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
 def test_login_links(browser):
     """
       Test Case: TC1801 - Verify login profile manager links

@@ -3,4 +3,3 @@ selenium==4.23.1
 webdriver_manager==4.0.2
 requests==2.32.3
 pyvirtualdisplay==3.0
-pytest-html==4.1.1
