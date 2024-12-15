@@ -1,38 +1,43 @@
 import { defineStore } from "pinia";
-import { computed } from "vue";
-
-import { useAsync } from "@/hooks";
-const url = window.env.STATS_URL || "https://stats.grid.tf";
+import urlJoin from "url-join";
+import { ref } from "vue";
+interface StateData {
+  label: string;
+  value: string;
+  image: string;
+}
 
 export const useStatsStore = defineStore("stats-store", () => {
-  const res = useAsync(() => fetch(url + "/api/stats-summary").then(resp => resp.json()), {
-    init: true,
-  });
-  const data = computed(() => res.value.data);
-  const stats = computed(() => [
-    {
-      label: "SSD Capacity",
-      value: data.value?.ssd,
-      image: "capacity.png",
-    },
-    {
-      label: "Nodes",
-      value: data.value?.nodes,
-      image: "nodes.png",
-    },
-    {
-      label: "Countries",
-      value: data.value?.countries,
-      image: "countries.png",
-    },
-    {
-      label: "Cores",
-      value: data.value?.cores,
-      image: "cores.png",
-    },
-  ]);
-  return {
-    data,
-    stats,
-  };
+  const stats = ref<StateData[]>([]);
+  window.$$monitorLock
+    .then(() => fetch(urlJoin(window.env.STATS_URL, "/api/stats-summary")))
+    .then(res => res.json())
+    .then(data => {
+      stats.value = [
+        {
+          label: "SSD Capacity",
+          value: data.ssd,
+          image: "capacity.png",
+        },
+        {
+          label: "Nodes",
+          value: data.nodes,
+          image: "nodes.png",
+        },
+        {
+          label: "Countries",
+          value: data.countries,
+          image: "countries.png",
+        },
+        {
+          label: "Cores",
+          value: data.cores,
+          image: "cores.png",
+        },
+      ];
+    })
+    .catch(error => {
+      console.error("Failed to fetch stats", error);
+    });
+  return { stats };
 });
