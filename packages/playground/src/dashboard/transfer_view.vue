@@ -225,15 +225,16 @@ async function transfer(recipientTwin: Twin) {
   }
 }
 async function submitFormAddress() {
+  isValidAddressTransfer.value = false;
   loadingAddressTransfer.value = true;
   await transfer(recepTwinFromAddress.value!);
   loadingAddressTransfer.value = false;
-  isValidAddressTransfer.value = false;
 }
 function createInvalidTransferToast(message: string) {
   createCustomToast(message, ToastType.danger);
 }
 async function submitFormTwinID() {
+  isValidTwinIDTransfer.value = false;
   if (gridStore) {
     const twinDetails = await gridStore.client.twins.get({
       id: parseInt(recipientTwinId.value.trim()),
@@ -246,6 +247,5 @@ async function submitFormTwinID() {
       createInvalidTransferToast("twin ID doesn't exist");
     }
   }
-  isValidTwinIDTransfer.value = false;
 }
 </script>
