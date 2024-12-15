@@ -228,6 +228,7 @@ async function submitFormAddress() {
   loadingAddressTransfer.value = true;
   await transfer(recepTwinFromAddress.value!);
   loadingAddressTransfer.value = false;
+  isValidAddressTransfer.value = false;
 }
 function createInvalidTransferToast(message: string) {
   createCustomToast(message, ToastType.danger);
@@ -245,5 +246,6 @@ async function submitFormTwinID() {
       createInvalidTransferToast("twin ID doesn't exist");
     }
   }
+  isValidTwinIDTransfer.value = false;
 }
 </script>
