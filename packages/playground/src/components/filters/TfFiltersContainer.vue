@@ -21,7 +21,7 @@
           color="secondary"
           density="compact"
           @click.stop="apply"
-          :text="valid || changed ? 'Apply' : 'Refresh'"
+          :text="!valid || !changed ? 'Refresh' : 'Apply'"
           :loading="loading"
           class="mx-2"
         />
