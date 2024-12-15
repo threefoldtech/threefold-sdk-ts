@@ -60,11 +60,11 @@ For UI changes, Please provide the Documetation PR on [info_grid](https://github
 
 ### Testing Checklist
 
-- [ ] Meet the specified acceptance criteria.
-- [ ] Test if can affect any other functionality.
+- [ ] Meets the specified acceptance criteria.
+- [ ] Test if changes can affect any other functionality.
 - [ ] Tested with unit, integration, and end-to-end tests.
-- [ ] Tested the un-happy path and Rollback scenarios.
-- [ ] Documentation updated to meat the latest changes.
+- [ ] Tested the un-happy path and rollback scenarios.
+- [ ] Documentation updated to meet the latest changes.
 - [ ] Tested if the gridproxy/graphql/chain is failing.
 - [ ] Can be covered by automated tests.
 
