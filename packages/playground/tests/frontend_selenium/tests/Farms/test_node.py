@@ -180,7 +180,7 @@ def test_config_validation(browser):
     cases = [generate_inavalid_ip(), generate_inavalid_gateway(), generate_string(), generate_leters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
     for case in cases:
         node_page.add_config_input( 0, 0, 0, 0, case)
-        assert node_page.wait_for('Wrong domain format.')
+        assert node_page.wait_for('Please provide a valid domain.')
         assert node_page.get_save_button().is_enabled()==False
 
 
