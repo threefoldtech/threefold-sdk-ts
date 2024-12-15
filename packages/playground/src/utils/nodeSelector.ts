@@ -228,11 +228,13 @@ export async function validateRentContract(
         id: node.rentContractId,
       });
       if (contractInfo.state.gracePeriod) {
+        const err = `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
         await new Promise((_, reject) => {
           setTimeout(() => {
-            reject(Error(`You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`));
+            reject(Error(err));
           }, 2000);
         });
+        console.error(err);
       }
     }
 
