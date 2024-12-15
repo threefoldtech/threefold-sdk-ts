@@ -68,8 +68,7 @@
               {{ item.name }}
             </template>
 
-            <template #[`item.tls_passthrough`]="{ item }"> {{ item.tls_passthrough ? "Yes" : "No" }} </template>Manage
-            Domains
+            <template #[`item.tls_passthrough`]="{ item }"> {{ item.tls_passthrough ? "Yes" : "No" }} </template>
 
             <template #[`item.backends`]="{ item }">
               {{ (Array.isArray(item.backends) ? item.backends[0] : item.backends) ?? "-" }}
@@ -188,7 +187,7 @@
 </template>
 
 <script lang="ts">
-import type { GridClient, ZmachineData } from "@threefold/grid_client";
+import { type GridClient, WorkloadTypes, type ZmachineData } from "@threefold/grid_client";
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import { useGrid } from "../stores";
@@ -416,14 +415,14 @@ export default {
         (networks.value = []);
       const { publicIP, planetary, myceliumIP, interfaces } = selectedNode.value;
 
-      if (props.vm && props.vm.type === "zmachine") {
+      if (props.vm && props.vm.type === WorkloadTypes.zmachine) {
         addNetwork(NetworkInterfaces.WireGuard, interfaces?.[0]?.ip);
         addNetwork(NetworkInterfaces.PublicIPV4, publicIP?.ip.split("/")[0]);
         addNetwork(NetworkInterfaces.Planetary, planetary);
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
         addNetwork(NetworkInterfaces.PublicIPV6, publicIP?.ip6.split("/")[0]);
       }
-      if (props.vm && props.vm.type === "zmachine-light") {
+      if (props.vm && props.vm.type === WorkloadTypes.zmachinelight) {
         addNetwork(NetworkInterfaces.Mycelium, myceliumIP);
       }
       selectedIPAddress.value = networks.value[0];

@@ -172,7 +172,7 @@ export default {
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
           case missingFeatures.length > 0:
-            throw `Node ${nodeId} doesn't support [ ${missingFeatures} ] features't`;
+            throw `Node ${nodeId} doesn't support [ ${missingFeatures} ] features`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;

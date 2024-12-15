@@ -8,7 +8,7 @@ import urlJoin from "url-join";
 
 import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
-import { formatErrorMessage } from "../helpers";
+import { Features, formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
 import { convertObjectToQueryString } from "../helpers/utils";
 import { FarmFilterOptions, FilterOptions, MachineModel, NodeStatus } from "../modules/models";
@@ -342,21 +342,21 @@ class Nodes {
    * @returns A string array representing the node's features.
    */
   getFeaturesFromFilters(options: FilterOptions = {}): string[] {
-    const features: string[] = [];
+    const features: string[] = options.features || [];
     if (options.publicIPs) {
-      features.push(WorkloadTypes.ipv4);
+      features.push(Features.ipv4);
     }
     if (options.hasIPv6) {
-      features.push(WorkloadTypes.ip);
+      features.push(Features.ip);
     }
     if (options.wireguard) {
-      features.push("wireguard");
+      features.push(Features.wireguard);
     }
     if (options.mycelium) {
-      features.push("mycelium");
+      features.push(Features.mycelium);
     }
     if (options.planetary) {
-      features.push("yggdrasil");
+      features.push(Features.yggdrasil);
     }
 
     if (options.gateway) {

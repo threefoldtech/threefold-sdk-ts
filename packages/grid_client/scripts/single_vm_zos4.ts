@@ -47,7 +47,7 @@ async function main() {
       ip_range: "10.249.0.0/16",
       myceliumSeeds: [
         {
-          nodeId: 168,
+          nodeId: vmNode,
           /**
            * ### Mycelium Network Seed:
            * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.

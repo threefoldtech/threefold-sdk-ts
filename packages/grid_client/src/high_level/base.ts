@@ -63,13 +63,13 @@ class HighLevelBase {
           }
 
           const toRemoveZlogs = deployment.workloads.filter(item => {
-            const x = item.type === WorkloadTypes.zlogs;
-            const y =
+            const zlog = item.type === WorkloadTypes.zlogs;
+            const workloadtypename =
               (item.data as any)[type === WorkloadTypes.zmachine ? "zmachine" : "zmachine-light"] === workload.name;
-            return x && y;
+            return zlog && workloadtypename;
           });
 
-          names.push(...toRemoveZlogs.map(x => x.name));
+          names.push(...toRemoveZlogs.map(zlog => zlog.name));
 
           if (type === WorkloadTypes.zmachine) {
             names.push(workload.data["network"].public_ip);
@@ -107,7 +107,6 @@ class HighLevelBase {
     const deletedIps: string[] = [];
     const deploymentFactory = new DeploymentFactory(this.config);
     let network: Network | ZNetworkLight | null = null;
-    let deletedIp;
     let contract_id;
 
     let numberOfIps;
@@ -124,7 +123,7 @@ class HighLevelBase {
       }
       const machineIp = workload.data["network"].interfaces[0].ip;
       events.emit("logs", `Deleting ip: ${machineIp} from node: ${node_id}, network ${network.name}`);
-      deletedIp = network.deleteReservedIp(node_id, machineIp);
+      const deletedIp = network.deleteReservedIp(node_id, machineIp);
       if (remainingWorkloads.length === 0) {
         twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
       }

@@ -40,12 +40,11 @@ class ZNetworkLight {
   static newContracts: GqlNodeContract[] = [];
   static deletedContracts: number[] = [];
   rmb: RMB;
-  wireguardConfig: string;
   tfClient: TFClient;
 
   constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
-    if (Addr(ipRange).prefix !== 24) {
-      this.ipRange = Addr(ipRange).mask(24);
+    if (Addr(ipRange).prefix !== 16) {
+      this.ipRange = Addr(ipRange).mask(16);
       this.ipRange = this.ipRange.toString();
     }
     if (!this.isPrivateIP(ipRange)) {
