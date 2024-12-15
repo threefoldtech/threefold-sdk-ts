@@ -20,9 +20,8 @@
           variant="outlined"
           color="secondary"
           density="compact"
-          :disabled="!valid || !changed"
           @click.stop="apply"
-          text="Apply"
+          :text="valid || changed ? 'Apply' : 'Refresh'"
           :loading="loading"
           class="mx-2"
         />
