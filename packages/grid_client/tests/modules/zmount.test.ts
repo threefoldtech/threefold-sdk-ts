@@ -53,7 +53,7 @@ describe("Zmount Class", () => {
       zmount.size = validSize;
 
       const result = zmount.challenge();
-      expect(typeof result).toBe("string");
+      expect(result).toBe(validSize.toString());
     });
   });
 });

@@ -1,6 +1,6 @@
 {
   "network": "dev",
-  "mnemonic": "",
+  "mnemonic": "chicken forest enable make cute blur wait sustain armor silk carpet pet",
   "storeSecret": "",
-  "ssh_key": ""
+  "ssh_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWXpWaHZGX7Yp2kgLAZ8Ebv6dT+ZctsBEgYQrYBsTde samar@del"
 }
