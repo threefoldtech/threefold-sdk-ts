@@ -36,4 +36,4 @@ jobs:
           TFCHAIN_NODE_MNEMONICS: ${{ secrets.TFCHAIN_NODE_MNEMONICS }}
           STELLAR_ADDRESS: ${{ secrets.STELLAR_ADDRESS }}
           EMAIL: ${{ secrets.EMAIL }}
-        run: python -m pytest -v
+        run: python -m pytest -v --html=report.html
