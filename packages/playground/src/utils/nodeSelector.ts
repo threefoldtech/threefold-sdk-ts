@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { gqlClient, gridProxyClient } from "../clients";
 import type { usePagination } from "../hooks";
-import { type useGrid, useProfileManager } from "../stores";
+import { type useGrid } from "../stores";
 import type {
   Locations,
   NormalizeFarmFiltersOptions,
@@ -324,6 +324,7 @@ export function isNodeValid(
 }
 
 export async function selectValidNode(
+  gridStore: ReturnType<typeof useGrid>,
   getFarm: GetFarmFn,
   nodes: NodeInfo[],
   selectedMachines: SelectedMachine[],
@@ -331,26 +332,13 @@ export async function selectValidNode(
   oldSelectedNodeId?: number,
   nodesLock?: AwaitLock,
 ): Promise<NodeInfo | void> {
-  let locked = true;
-  if (nodesLock && !nodesLock.acquired) {
-    locked = false;
-    await nodesLock.acquireAsync();
-  }
-  const profileManager = useProfileManager();
-  let node;
-  node = nodes.find(n => {
-    return n.rentedByTwinId === profileManager?.profile?.twinId;
+  const locked = true;
+
+  const rentedNode = nodes.find(n => {
+    return n.rentedByTwinId === gridStore.grid.twinId;
   });
-
-  if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
-    if (nodesLock && !locked) {
-      release(nodesLock);
-    }
-    return node;
-  }
-
-  if (oldSelectedNodeId) {
-    node = nodes.find(n => n.nodeId === oldSelectedNodeId);
+  if (oldSelectedNodeId || rentedNode) {
+    const node = rentedNode || nodes.find(n => n.nodeId === oldSelectedNodeId);
 
     if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
       if (nodesLock && !locked) {
