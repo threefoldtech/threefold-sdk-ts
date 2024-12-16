@@ -12,6 +12,7 @@ export interface DeleteDeploymentOptions {
   projectName: ProjectName;
   ip?: string[];
   k8s?: boolean;
+  isCaprover?: boolean;
 }
 
 export async function deleteDeployment(grid: GridClient, options: DeleteDeploymentOptions) {
@@ -49,8 +50,8 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
     }
     return grid.k8s.delete({ name: options.name });
   }
-
-  if (options.deploymentName) {
+  // if Caprover deployment should handled by machines.delete
+  if (options.deploymentName && !options.isCaprover) {
     return grid.machines.delete_machine({ deployment_name: options.deploymentName, name: options.name });
   }
 
