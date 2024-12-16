@@ -71,7 +71,7 @@ For UI changes, Please provide the Documentation PR on [info_grid](https://githu
 - [ ] Check automated tests working successfully with the changes.
 - [ ] Can be covered by automated tests.
 
-### Checklist
+### General Checklist
 
 - [ ] Tests included
 - [ ] Build pass
