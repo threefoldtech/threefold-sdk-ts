@@ -1,4 +1,4 @@
-import { FilterOptions, GridClient, K8SModel, QSFSZDBSModel } from "../../src";
+import { Features, FilterOptions, GridClient, K8SModel, QSFSZDBSModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -50,7 +50,7 @@ async function main() {
     sru: 6,
     availableFor: grid3.twinId,
     farmId: 1,
-    features: ["wireguard"],
+    features: [Features.wireguard],
   };
 
   const qsfsQueryOptions: FilterOptions = {

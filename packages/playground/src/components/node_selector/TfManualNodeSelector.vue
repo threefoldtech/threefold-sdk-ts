@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import type { FilterOptions, NodeInfo } from "@threefold/grid_client";
+import type { Features, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import type { Farm } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
@@ -136,7 +136,7 @@ export default {
 
         placeholderNode.value = node;
         const features = getFeatures(gridStore, filters.value);
-        const missingFeatures = features.filter(value => !node.features.includes(value));
+        const missingFeatures = features.filter(value => !node.features.includes(value as Features));
         if (node === undefined || node === null) {
           throw `Node ${nodeId} is not on the grid`;
         }

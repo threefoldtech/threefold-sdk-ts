@@ -107,9 +107,8 @@ class HighLevelBase {
     const deletedIps: string[] = [];
     const deploymentFactory = new DeploymentFactory(this.config);
     let network: Network | ZNetworkLight | null = null;
-    let contract_id;
+    let network_contract_id;
 
-    let numberOfIps;
     for (const workload of deletedMachineWorkloads) {
       if (!network) {
         const networkName = workload.data["network"].interfaces[0].network;
@@ -127,7 +126,7 @@ class HighLevelBase {
       if (remainingWorkloads.length === 0) {
         twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
       }
-      numberOfIps = network.getNodeReservedIps(node_id).length;
+      const numberOfIps = network.getNodeReservedIps(node_id).length;
       if (numberOfIps !== 0) {
         console.log(`network ${network.name} still has ${numberOfIps} ip(s) reserved`);
         deletedIps.push(deletedIp);
@@ -143,9 +142,9 @@ class HighLevelBase {
           continue;
         }
       }
-      contract_id = await network.deleteNode(node_id);
+      network_contract_id = await network.deleteNode(node_id);
 
-      if (contract_id === deployment.contract_id) {
+      if (network_contract_id === deployment.contract_id) {
         if (remainingWorkloads.length === 1) {
           twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
           remainingWorkloads = [];
@@ -158,7 +157,7 @@ class HighLevelBase {
         // check that the deployment doesn't have another workloads
         for (let d of network.deployments) {
           d = await deploymentFactory.fromObj(d);
-          if (d.contract_id !== contract_id) {
+          if (d.contract_id !== network_contract_id) {
             continue;
           }
           if (d.workloads.length === 1) {

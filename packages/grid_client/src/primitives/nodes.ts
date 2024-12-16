@@ -63,7 +63,7 @@ interface NodeInfo {
   rentable: boolean;
   rented: boolean;
   price_usd: number;
-  features: string[];
+  features: Features[];
 }
 interface PublicConfig {
   domain: string;
@@ -341,30 +341,32 @@ class Nodes {
    * @param options - An object containing filter options to set the node's features.
    * @returns A string array representing the node's features.
    */
-  getFeaturesFromFilters(options: FilterOptions = {}): string[] {
-    const features: string[] = options.features || [];
+  getFeaturesFromFilters(options: FilterOptions = {}): Features[] {
+    const featuresSet: Set<Features> = new Set(options.features || []);
+
     if (options.publicIPs) {
-      features.push(Features.ipv4);
+      featuresSet.add(Features.ipv4);
+      featuresSet.add(Features.ip);
     }
     if (options.hasIPv6) {
-      features.push(Features.ip);
+      featuresSet.add(Features.ip);
     }
     if (options.wireguard) {
-      features.push(Features.wireguard);
+      featuresSet.add(Features.wireguard);
     }
     if (options.mycelium) {
-      features.push(Features.mycelium);
+      featuresSet.add(Features.mycelium);
     }
     if (options.planetary) {
-      features.push(Features.yggdrasil);
+      featuresSet.add(Features.yggdrasil);
     }
 
     if (options.gateway) {
-      features.push(WorkloadTypes.gatewayfqdnproxy);
-      features.push(WorkloadTypes.gatewaynameproxy);
+      featuresSet.add(Features.gatewayfqdnproxy);
+      featuresSet.add(Features.gatewaynameproxy);
     }
 
-    return features;
+    return Array.from(featuresSet);
   }
 
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {

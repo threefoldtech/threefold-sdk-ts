@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -56,7 +56,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
-    features: ["wiregaurd"],
+    features: [Features.wireguard],
   };
   //GatewayNode Selection
   const gatewayQueryOptions: FilterOptions = {

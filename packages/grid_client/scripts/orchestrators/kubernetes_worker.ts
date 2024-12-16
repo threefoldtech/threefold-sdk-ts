@@ -1,4 +1,4 @@
-import { AddWorkerModel, FilterOptions } from "../../src";
+import { AddWorkerModel, Features, FilterOptions } from "../../src";
 import { getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -34,7 +34,7 @@ async function main() {
     mru: 1, // GB
     sru: 10,
     farmId: 1,
-    features: ["wireguard"],
+    features: [Features.wireguard],
   };
 
   const worker: AddWorkerModel = {

@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel } from "../../src";
+import { Features, FilterOptions, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -32,7 +32,7 @@ async function main() {
     mru: 4, // GB
     sru: 10,
     farmId: 1,
-    features: ["ipv4", "wireguard"],
+    features: [Features.wireguard, Features.ip, Features.ipv4],
   };
 
   const vms: MachinesModel = {

@@ -1,4 +1,4 @@
-import { FilterOptions, generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
+import { Features, FilterOptions, generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -35,7 +35,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
-    features: ["zmachine-light"],
+    features: [Features.zmachinelight, Features.networklight, Features.mycelium],
   };
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
