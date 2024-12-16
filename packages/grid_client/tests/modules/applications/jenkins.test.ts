@@ -21,7 +21,27 @@ beforeAll(async () => {
 // Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TCXXXX - Applications: Deploy Jenkins", async () => {
+test("TC2953 - Applications: Deploy Jenkins", async () => {
+  /**********************************************
+     Test Suite: Grid3_Client_TS (Automated)
+     Test Cases: TC2953 - Applications: Deploy jenkins
+     Scenario:
+        - Generate Test Data/jenkins Config/Gateway Config.
+        - Select a Node To Deploy the jenkins on.
+        - Select a Gateway Node To Deploy the gateway on.
+        - Deploy the jenkins solution.
+        - Assert that the generated data matches
+          the deployment details.
+        - Pass the IP of the Created jenkins to the Gateway
+          Config.
+        - Deploy the Gateway.
+        - Assert that the generated data matches
+          the deployment details.
+        - Assert that the Gateway points at the IP
+          of the created jenkins.
+        - Assert that the returned domain is working
+          and returns correct data.
+    **********************************************/
   // Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const tlsPassthrough = false;

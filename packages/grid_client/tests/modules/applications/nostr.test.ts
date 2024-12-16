@@ -21,7 +21,28 @@ beforeAll(async () => {
 // Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TCXXXX - Applications: Deploy Nostr", async () => {
+test("TC2955 - Applications: Deploy Nostr", async () => {
+  /**********************************************
+     Test Suite: Grid3_Client_TS (Automated)
+     Test Cases: TC2955 - Applications: Deploy Nostr
+     Scenario:
+        - Generate Test Data/Nostr Config/Gateway Config.
+        - Select a Node To Deploy the Nostr instance on.
+        - Select a Gateway Node To Deploy the Gateway on.
+        - Deploy the Nostr solution.
+        - Assert that the generated data matches
+          the deployment details.
+        - Pass the IP of the Created Nostr instance to the Gateway
+          Config.
+        - Deploy the Gateway.
+        - Assert that the generated data matches
+          the deployment details.
+        - Assert that the Gateway points at the IP
+          of the created Nostr instance.
+        - Assert that the returned domain is working
+          and returns correct data.
+**********************************************/
+
   // Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const tlsPassthrough = false;

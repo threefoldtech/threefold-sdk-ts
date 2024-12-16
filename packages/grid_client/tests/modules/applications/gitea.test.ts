@@ -21,7 +21,27 @@ beforeAll(async () => {
 // Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-test("TCXXXX - Applications: Deploy Gitea", async () => {
+test("TC2954 - Applications: Deploy Gitea", async () => {
+  /**********************************************
+     Test Suite: Grid3_Client_TS (Automated)
+     Test Cases: TC2954 - Applications: Deploy Gitea
+     Scenario:
+        - Generate Test Data/Gitea Config/Gateway Config.
+        - Select a Node To Deploy the Gitea on.
+        - Select a Gateway Node To Deploy the gateway on.
+        - Deploy the Gitea solution.
+        - Assert that the generated data matches
+          the deployment details.
+        - Pass the IP of the Created Gitea to the Gateway
+          Config.
+        - Deploy the Gateway.
+        - Assert that the generated data matches
+          the deployment details.
+        - Assert that the Gateway points at the IP
+          of the created Gitea.
+        - Assert that the returned domain is working
+          and returns correct data.
+    **********************************************/
   const name = "gw" + generateString(10).toLowerCase();
   const tlsPassthrough = false;
   const cpu = 1;
