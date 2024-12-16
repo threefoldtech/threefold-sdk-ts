@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { gqlClient, gridProxyClient } from "../clients";
 import type { usePagination } from "../hooks";
-import { type useGrid } from "../stores";
+import type { useGrid } from "../stores";
 import type {
   Locations,
   NormalizeFarmFiltersOptions,
@@ -335,7 +335,7 @@ export async function selectValidNode(
   const locked = true;
 
   const rentedNode = nodes.find(n => {
-    return n.rentedByTwinId === gridStore.grid.twinId;
+    n.rentedByTwinId === gridStore.grid.twinId;
   });
   if (oldSelectedNodeId || rentedNode) {
     const node = rentedNode || nodes.find(n => n.nodeId === oldSelectedNodeId);
