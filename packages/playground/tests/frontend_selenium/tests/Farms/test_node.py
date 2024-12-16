@@ -183,8 +183,6 @@ def test_config_validation(browser):
         assert node_page.wait_for('Please provide a valid domain.')
         assert node_page.get_save_button().is_enabled()==False
 
-
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3677")
 def test_add_config(browser):
     """
       Test Case: TC1221 - Add a public config
@@ -213,7 +211,6 @@ def test_add_config(browser):
             time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == new_ipv4
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3677")
 def test_remove_config(browser):
     """
       Test Case: TC1222 - Remove a public config
@@ -241,7 +238,6 @@ def test_remove_config(browser):
             time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == ''
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3677")
 def test_additional_fee(browser):
     """
       Test Case: TC1750 - Additional Fee

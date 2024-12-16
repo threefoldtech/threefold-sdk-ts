@@ -237,7 +237,7 @@ def test_ip(browser):
     assert farm_page.wait_for('IP is deleted successfully!')
     assert farm_page.get_ip(ip, gateway) == (0,0)
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_gateway(browser):
     """
     Test Case: TC1142 - Enter valid Gateway
