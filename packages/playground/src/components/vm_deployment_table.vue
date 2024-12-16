@@ -110,7 +110,7 @@
       </template>
 
       <template #[`item.billing`]="{ item }">
-        {{ item.billing }}
+        {{ item.billing || "No Data Available" }}
       </template>
       <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.created) }}
