@@ -2,6 +2,7 @@ from utils.utils import get_email, generate_email, generate_string, get_seed
 from pages.twin import TwinPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
+import pytest
 
 #  Time required for the run (6 cases) is approximately 3 minutes.
 
