@@ -334,9 +334,23 @@ export async function selectValidNode(
 ): Promise<NodeInfo | void> {
   const locked = true;
 
-  const rentedNode = nodes.find(n => {
-    n.rentedByTwinId === gridStore.grid.twinId;
+  const rentedNodes = nodes.filter(n => {
+    return n.rentedByTwinId === gridStore.grid.twinId;
   });
+  let rentedNode;
+  for (const node of rentedNodes) {
+    if (node.rentedByTwinId === gridStore.grid.twinId) {
+      const contractInfo = await gridStore.grid.contracts.get({
+        id: node.rentContractId,
+      });
+
+      if (!contractInfo.state.gracePeriod) {
+        rentedNode = node;
+        break;
+      }
+    }
+  }
+
   if (oldSelectedNodeId || rentedNode) {
     const node = rentedNode || nodes.find(n => n.nodeId === oldSelectedNodeId);
 
