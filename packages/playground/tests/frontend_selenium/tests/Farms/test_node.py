@@ -6,7 +6,7 @@ from datetime import datetime
 import random
 import math
 import time
-import pytest
+
 
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
