@@ -13,7 +13,7 @@ async function deploy(client, vms, subdomain, gatewayNode) {
   const gw: GatewayNameModel = {
     name: subdomain,
     node_id: gatewayNode.nodeId,
-    tls_passthrough: false,
+    tls_passthrough: true,
     backends: ["http://[" + vmPlanetary + "]:3000"],
   };
 
@@ -43,7 +43,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newgitea";
+  const name = "ng";
   const grid3 = await getClient(`gitea/${name}`);
   const subdomain = "gt" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
@@ -78,7 +78,7 @@ async function main() {
         node_id: vmNode,
         disks: [
           {
-            name: "gitDisk",
+            name: "gitDisk1",
             size: instanceCapacity.sru,
             mountpoint: "/mnt/data",
           },
@@ -95,13 +95,14 @@ async function main() {
         env: {
           SSH_KEY: config.ssh_key,
           GITEA__HOSTNAME: domain,
-          GITEA__mailer__PROTOCOL: "smtp",
-          GITEA__mailer__ENABLED: "true",
-          GITEA__mailer__HOST: "smtp.example.com",
-          GITEA__mailer__FROM: "admin@example.com",
-          GITEA__mailer__PORT: "587",
-          GITEA__mailer__USER: "admin",
-          GITEA__mailer__PASSWD: "123456",
+          // incase of using smtp mail serever
+          // GITEA__mailer__PROTOCOL: "smtp",
+          // GITEA__mailer__ENABLED: "true",
+          // GITEA__mailer__HOST: "smtp.example.com",
+          // GITEA__mailer__FROM: "admin@example.com",
+          // GITEA__mailer__PORT: "587",
+          // GITEA__mailer__USER: "admin",
+          // GITEA__mailer__PASSWD: "123456",
         },
       },
     ],
@@ -115,7 +116,7 @@ async function main() {
   // Get the deployment
   await getDeployment(grid3, vms, subdomain);
 
-  // Uncomment the line below to cancel the deployment
+  // // Uncomment the line below to cancel the deployment
   // await cancel(grid3, { name }, { name: subdomain });
 
   await grid3.disconnect();
