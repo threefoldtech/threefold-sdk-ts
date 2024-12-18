@@ -8,7 +8,7 @@ async function deploy(client, vms, subdomain, gatewayNode) {
   log(resultVM);
   log("================= Deploying VM =================");
 
-  const VMmyceliumIP = (await client.machines.getObj(vms.name))[0].myceliumIP;
+  const GatewayIP = (await client.machines.getObj(vms.name))[0].publicIP;
 
   // Name Gateway Model
   const gw: GatewayNameModel = {
@@ -87,7 +87,7 @@ async function main() {
           },
         ],
         planetary: true,
-        public_ip: false,
+        public_ip: true,
         public_ip6: false,
         mycelium: true,
         cpu: instanceCapacity.cru,
