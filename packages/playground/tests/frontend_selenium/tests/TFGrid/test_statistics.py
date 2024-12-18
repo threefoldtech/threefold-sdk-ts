@@ -1,4 +1,5 @@
 import math
+import pytest
 from utils.utils import byte_converter,convert_to_scaled_float
 from pages.statistics import StatisticsPage
 from utils.grid_proxy import GridProxy
@@ -11,7 +12,7 @@ def before_test_setup(browser):
     statistics_page.navigate()
     return statistics_page
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3751")
 def test_statistics_details(browser):
     """
       TC1503 - Verify Statistics

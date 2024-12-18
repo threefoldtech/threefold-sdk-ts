@@ -2,6 +2,7 @@ from utils.utils import generate_gateway, generate_inavalid_gateway, generate_in
 from pages.farm import FarmPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
+import pytest
 
 #  Time required for the run (17 cases) is approximately 13 minutes.
 
@@ -16,6 +17,7 @@ def before_test_setup(browser):
     farm_page.navigetor()
     return farm_page, farm_name
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_create_farm(browser):
     """
     Test Case: TC907-Create farm with valid name
@@ -131,6 +133,7 @@ def test_create_farm_invalid_name(browser):
 #     assert id_up == sorted_up
 
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_farmpayout_address(browser):
     """
     Test Case: TC915 - Add farm payout address
@@ -175,6 +178,7 @@ def test_farmpayout_address(browser):
     assert farm_page.farmpayout_address_value()[:-3] in case
 
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_ip(browser):
     """
     Test Case: TC1141 - Enter valid IP
@@ -233,7 +237,7 @@ def test_ip(browser):
     assert farm_page.wait_for('IP is deleted successfully!')
     assert farm_page.get_ip(ip, gateway) == (0,0)
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_gateway(browser):
     """
     Test Case: TC1142 - Enter valid Gateway
@@ -265,6 +269,7 @@ def test_gateway(browser):
     farm_page.close_ip()
 
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_range_ips(browser):
     """
     Test Case: TC1212 - Enter invalid to IP in add range of IPs
@@ -354,6 +359,7 @@ def test_range_ips(browser):
     assert farm_page.get_ip(gateway, 0) == (2,0)
 
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3676")
 def test_farm_details(browser):
     """
     Test Case: TC914 - Farm Details
