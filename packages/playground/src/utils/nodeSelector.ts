@@ -352,7 +352,7 @@ export async function selectValidNode(
   }
 
   if (oldSelectedNodeId || rentedNode) {
-    const node = rentedNode || nodes.find(n => n.nodeId === oldSelectedNodeId);
+    const node = nodes.find(n => n.nodeId === oldSelectedNodeId) || rentedNode;
 
     if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
       if (nodesLock && !locked) {
