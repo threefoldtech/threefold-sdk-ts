@@ -110,7 +110,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: fs.readFileSync("/Users/khaledyoussef/.ssh/id_ed25519.pub", "utf8"), // Public key for SSH
+          SSH_KEY: fs.readFileSync("~/.ssh/id_ed25519.pub", "utf8"), // Public key for SSH
           JENKINS_HOSTNAME: domain,
           JENKINS_ADMIN_USERNAME: "admin",
           JENKINS_ADMIN_PASSWORD: "adminpassword",
@@ -133,7 +133,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   log(result);
 
   // Gateway Backend Configuration
-  const backends = ["http://[" + result[0].planetary + "]:8080"];
+  const backends = ["http://[" + result[0].planetary + "]:80"];
   log(backends);
 
   // Gateway Model
@@ -157,24 +157,9 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   expect(gatewayResult[0].name).toBe(name);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  const host = result[0].planetary;
-  const user = "root";
-
-  // SSH to the Created VM
-  const ssh = await RemoteRun(host, user);
-
-  try {
-    // Allow Jenkins' port through UFW
-    await ssh.execCommand("ufw allow 8080/tcp").then(async function (result) {
-      log(result.stdout);
-    });
-  } finally {
-    // Disconnect from the machine
-    await ssh.dispose();
-  }
-
   // Gateway reachability check
-  const site = "http://" + gatewayResult[0].domain;
+  const site = "http://" + gatewayResult[0].domain + "/login?from=%2F";
+  log(`Testing Gateway URL: ${site}`);
   let reachable = false;
 
   for (let i = 0; i <= 250; i++) {

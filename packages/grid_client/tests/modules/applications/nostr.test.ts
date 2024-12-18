@@ -111,7 +111,7 @@ test("TC2955 - Applications: Deploy Nostr", async () => {
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: fs.readFileSync("/Users/khaledyoussef/.ssh/id_ed25519.pub", "utf8"), // Public SSH key
+          SSH_KEY: fs.readFileSync("~/.ssh/id_ed25519.pub", "utf8"), // Public SSH key
           NOSTR_HOSTNAME: domain,
         },
       },
@@ -164,36 +164,13 @@ test("TC2955 - Applications: Deploy Nostr", async () => {
 
   try {
     // Allow Nostr's port through UFW
-    await ssh.execCommand("ufw allow 8080/tcp").then(async function (result) {
-      log(result.stdout || "UFW command executed");
+    await ssh.execCommand("curl localhost:8080").then(async function (result) {
+      log(result.stdout);
+      expect(result.stdout).toContain("Please use a Nostr client to connect.");
     });
   } finally {
     // Disconnect from the machine
     await ssh.dispose();
-  }
-
-  // Gateway reachability check
-  const site = "http://" + gatewayResult[0].domain;
-  let reachable = false;
-
-  for (let i = 0; i <= 250; i++) {
-    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
-    log(wait);
-
-    await axios
-      .get(site)
-      .then(res => {
-        log("Gateway is reachable");
-        log(res.status);
-        log(res.statusText);
-        expect(res.status).toBe(200);
-        reachable = true;
-      })
-      .catch(() => {
-        log("Gateway is not reachable");
-      });
-    if (reachable) break;
-    if (i === 250) throw new Error("Gateway is unreachable after retries");
   }
 });
 

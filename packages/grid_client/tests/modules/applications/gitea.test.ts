@@ -109,7 +109,7 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: fs.readFileSync("/Users/khaledyoussef/.ssh/id_ed25519.pub", "utf8"), // Add the public key here
+          SSH_KEY: fs.readFileSync("~/.ssh/id_ed25519.pub", "utf8"), // Add the public key here
           GITEA__HOSTNAME: domain,
           GITEA__ROOT_EMAIL: "admin@gitea.com",
           GITEA__ROOT_PASSWORD: "adminpassword",
