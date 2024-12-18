@@ -23,7 +23,7 @@ jobs:
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
       SSH_KEY: ${{ secrets.SSH_KEY }}
-      
+
     steps:
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'dev' }}
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'main' }}
         with:
-          ref: refs/tags/v2.5.2
+          ref: refs/tags/v2.6.3
 
       - name: Set up node 18
         uses: actions/setup-node@v3
