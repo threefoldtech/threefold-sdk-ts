@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/v2.5.2
+          ref: refs/tags/v2.6.3
 
       - name: Set up node 18
         uses: actions/setup-node@v3
