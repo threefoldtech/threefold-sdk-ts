@@ -26,8 +26,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'dev' }}
+      - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'qa' }}
         with:
-          ref: refs/tags/v2.5.2
+          ref: refs/tags/v2.6.3
+      - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'test' }}
+        with:
+          ref: refs/tags/v2.6.3
+      - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'main' }}
+        with:
+          ref: refs/tags/v2.6.3
 
       - name: Set up node 18
         uses: actions/setup-node@v3
