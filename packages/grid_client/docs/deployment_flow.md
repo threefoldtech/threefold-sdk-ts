@@ -1,6 +1,6 @@
 # Deployment Flow
 
-This document outlines the process for determining whether to deploy on a zos3 or zos4 node.
+This document outlines the process for determining whether to deploy on a zos3 or a zos4 node.
 
 ## Machine Model Initialization
 
