@@ -355,17 +355,16 @@
           <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                :label="
-                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
-                    ? 'Your Hex Seed'
-                    : 'Your Mnemonic'
-                "
+                :label="'Your Mnemonic'"
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
                 :disabled="activating || creatingAccount || activatingAccount"
               />
             </PasswordInputWrapper>
+            <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
+              <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
+            </CopyInputWrapper>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />

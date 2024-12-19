@@ -14,6 +14,7 @@ export interface Profile {
   pk: string;
   keypairType: KeypairType | undefined;
   email: string;
+  hexSeed: string;
 }
 
 export interface State {
