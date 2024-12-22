@@ -142,6 +142,11 @@ export default {
         switch (true) {
           case node.status === "down":
             throw `Node ${nodeId} is down`;
+          case node.status === "standby" && node.rentedByTwinId !== gridStore.client.twinId:
+            throw `You must reserve node ${nodeId} in order to be able to deploy on it`;
+
+          case node.status === "standby" && node.rentedByTwinId === gridStore.client.twinId:
+            throw `Please wait until node ${nodeId} status is up`;
 
           case props.filters.certified && node.certificationType.toLowerCase() !== "certified":
             throw `Node ${nodeId} is not Certified`;
