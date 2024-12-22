@@ -13,11 +13,27 @@
           <div>
             To start farming, KYC verification is required. Please complete the verification process to proceed.
           </div>
-          <v-btn text="Verify now" size="small" color="error" @click="kycDialog = true" :loading="kycDialogLoading" />
         </div>
       </VAlert>
+
       <div class="d-flex justify-content-center align-items-center" style="height: 100%; width: 100%">
         <v-img class="d-inline-block mx-auto" :src="baseURL + 'images/kyc.png'" style="max-width: 40%"></v-img>
+      </div>
+      <template>
+        <div class="d-flex justify-center align-center" style="height: 100vh">
+          <VBtn color="primary">Click Me</VBtn>
+        </div>
+      </template>
+
+      <div class="d-flex justify-content-center align-items-center">
+        <v-btn
+          class="d-inline-block mx-auto"
+          text="Verify now"
+          size="small"
+          color="error"
+          @click="kycDialog = true"
+          :loading="kycDialogLoading"
+        />
       </div>
     </template>
     <template v-else>
