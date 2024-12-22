@@ -362,8 +362,12 @@
                 :disabled="activating || creatingAccount || activatingAccount"
               />
             </PasswordInputWrapper>
-            <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
-              <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
+            <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
+              <input-tooltip
+                tooltip="Please use your hex seed to import your wallet in the Threefold mobile application."
+              >
+                <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
+              </input-tooltip>
             </CopyInputWrapper>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
