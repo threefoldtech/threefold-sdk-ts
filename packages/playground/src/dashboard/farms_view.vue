@@ -15,8 +15,7 @@
           </div>
         </div>
       </VAlert>
-
-      <div class="d-flex justify-content-center align-items-center" style="height: 100%; width: 100%">
+      <div class="d-flex justify-content-center align-items-center mt-10" style="height: 100%; width: 100%">
         <v-img class="d-inline-block mx-auto" :src="baseURL + 'images/kyc.png'" style="max-width: 40%"></v-img>
       </div>
       <template>
@@ -25,7 +24,7 @@
         </div>
       </template>
 
-      <div class="d-flex justify-content-center align-items-center">
+      <div class="d-flex justify-content-center align-items-center mb-10">
         <v-btn
           class="d-inline-block mx-auto"
           text="Verify now"
