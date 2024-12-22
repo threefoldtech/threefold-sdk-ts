@@ -10,7 +10,9 @@
           <v-icon icon="mdi-shield-remove"></v-icon>
         </template>
         <div class="d-flex justify-space-between align-baseline">
-          <div>To start farming, KYC verification is required. Please complete the process to proceed.</div>
+          <div>
+            To start farming, KYC verification is required. Please complete the verification process to proceed.
+          </div>
           <v-btn text="Verify now" size="small" color="error" @click="kycDialog = true" :loading="kycDialogLoading" />
         </div>
       </VAlert>
@@ -59,7 +61,6 @@ export default {
     const kyc = useKYC();
     const kycDialog = ref(false);
     const kycDialogLoading = ref(false);
-    console.log("kyc", kyc);
 
     const showKYCError = computed(() => kyc.status !== KycStatus.verified);
     function handleFarmCreated() {
