@@ -639,7 +639,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
   @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
   @Expose() @IsOptional() @IsBoolean() wireguard?: boolean;
-  @Expose() @IsOptional() @IsString() features?: Features[];
+  @Expose() @IsOptional() features?: Features[];
 }
 
 enum CertificationType {
