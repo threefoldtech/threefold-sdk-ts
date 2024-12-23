@@ -364,7 +364,8 @@
             </PasswordInputWrapper>
             <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
               <input-tooltip
-                tooltip="Please use your hex seed to import your wallet in the Threefold mobile application."
+                tooltip=" Please use this hex seed to import your wallet in Threefold Connect"
+                href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
               >
                 <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
               </input-tooltip>
