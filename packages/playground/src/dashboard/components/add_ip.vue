@@ -76,8 +76,13 @@
           </v-card-text>
           <v-dialog v-model="showIPs" max-width="500" attach="#modals">
             <v-card>
-              <v-card-title class="text-h5">IPs range</v-card-title>
-              <v-card-text v-for="(IP, i) in IPs" :key="IP">{{ i + 1 }}- {{ IP }}</v-card-text>
+              <v-card-title class="bg-primary">IPs range</v-card-title>
+              <v-card-text
+                >List of IPs:
+                <ul class="ml-5">
+                  <li v-for="IP in IPs" :key="IP">{{ IP }} <v-icon @click="copy(IP)">mdi-content-copy</v-icon></li>
+                </ul>
+              </v-card-text>
               <v-card-actions> </v-card-actions>
             </v-card>
           </v-dialog>
@@ -148,7 +153,11 @@ export default {
       },
       { deep: true },
     );
+    function copy(text: string) {
+      createCustomToast("Copied!", ToastType.success);
 
+      window.navigator.clipboard.writeText(text);
+    }
     async function ipcheck() {
       if (PrivateIp(publicIP.value.split("/")[0])) {
         return {
@@ -344,7 +353,7 @@ export default {
       publicIP,
       toPublicIP,
       gateway,
-
+      copy,
       showRange,
       addIPs,
       addFarmIp,
