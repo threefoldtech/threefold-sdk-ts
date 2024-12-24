@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
-import type { Farm } from "@threefold/gridproxy_client";
+import { type Farm, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
@@ -140,12 +140,12 @@ export default {
         }
 
         switch (true) {
-          case node.status === "down":
+          case node.status === NodeStatus.Down:
             throw `Node ${nodeId} is down`;
-          case node.status === "standby" && node.rentedByTwinId !== gridStore.client.twinId:
+          case node.status === NodeStatus.Standby && node.rentedByTwinId !== gridStore.client.twinId:
             throw `You must reserve node ${nodeId} in order to be able to deploy on it`;
 
-          case node.status === "standby" && node.rentedByTwinId === gridStore.client.twinId:
+          case node.status === NodeStatus.Standby && node.rentedByTwinId === gridStore.client.twinId:
             throw `Please wait until node ${nodeId} status is up`;
 
           case props.filters.certified && node.certificationType.toLowerCase() !== "certified":
