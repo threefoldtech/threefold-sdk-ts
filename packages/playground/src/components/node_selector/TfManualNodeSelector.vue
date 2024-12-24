@@ -6,7 +6,10 @@
       :key="modelValue?.rentedByTwinId"
       flat
       :node="modelValue || placeholderNode"
-      @update:node="$emit('update:model-value', $event as any)"
+      @update:node="
+        validationTask.run(nodeId);
+        $emit('update:model-value', $event as any);
+      "
       :status="
         validationTask.loading
           ? 'Pending'
@@ -53,7 +56,7 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
-import type { Farm } from "@threefold/gridproxy_client";
+import { type Farm, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
@@ -140,8 +143,17 @@ export default {
         }
 
         switch (true) {
-          case node.status === "down":
+          case node.status === NodeStatus.Down:
             throw `Node ${nodeId} is down`;
+
+          case node.status === NodeStatus.Standby:
+            throw `Node ${nodeId} is standby`;
+
+          case props.filters.dedicated && !node.rented:
+            throw `Node ${nodeId} is Dedicated, but you have to reserve it first.`;
+
+          case node.dedicated && !node.rented:
+            throw `Node ${nodeId} is dedicated node; you have to reserve it first.`;
 
           case props.filters.certified && node.certificationType.toLowerCase() !== "certified":
             throw `Node ${nodeId} is not Certified`;
