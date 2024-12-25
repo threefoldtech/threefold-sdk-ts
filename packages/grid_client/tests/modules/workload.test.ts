@@ -1,6 +1,21 @@
 import { plainToClass } from "class-transformer";
 
-import { DeploymentResult, QuantumSafeFSConfig, ResultStates, Workload, WorkloadTypes, ZdbModes } from "../../src";
+import {
+  DeploymentResult,
+  Encryption,
+  Mycelium,
+  Peer,
+  QuantumCompression,
+  QuantumSafeConfig,
+  QuantumSafeFSConfig,
+  QuantumSafeMeta,
+  ResultStates,
+  Workload,
+  WorkloadTypes,
+  ZdbBackend,
+  ZdbGroup,
+  ZdbModes,
+} from "../../src";
 import {
   ComputeCapacity,
   GatewayFQDNProxy,
@@ -26,9 +41,44 @@ const createDataInstance = (type: WorkloadTypes) => {
   const network = new ZmachineNetwork();
   const computeCapacity = new ComputeCapacity();
   const disks = new Mount();
+  const peer = new Peer();
+  peer.subnet = "10.0.1.0/24";
+  peer.wireguard_public_key = "9I8H7G6F5E4D3C2B1A0J";
+  peer.allowed_ips = ["10.0.1.6"];
+  peer.endpoint = "185.206.122.31:5566";
+  const mycelium = new Mycelium();
+  mycelium.hex_key = "abc123";
 
   const rootfs_size = 2;
   const size = 100 * 1025 ** 2;
+  const qsfsConfig = new QuantumSafeFSConfig();
+  qsfsConfig.minimal_shards = 2;
+  qsfsConfig.expected_shards = 3;
+  qsfsConfig.redundant_groups = 0;
+  qsfsConfig.redundant_nodes = 0;
+  qsfsConfig.max_zdb_data_dir_size = 2;
+  const encryption = new Encryption();
+  (encryption.algorithm = "algorithm"), (encryption.key = "EncryptionKey12345678");
+  qsfsConfig.encryption = encryption;
+  const meta = new QuantumSafeMeta();
+  meta.type = "qsfs";
+  const config = new QuantumSafeConfig();
+  config.prefix = "qsfs";
+  config.encryption = encryption;
+  const backends = new ZdbBackend();
+  backends.address = "localhost";
+  backends.namespace = "http://localhost";
+  backends.password = "password";
+
+  config.backends = [backends];
+  meta.config = config;
+  qsfsConfig.meta = meta;
+  const groups = new ZdbGroup();
+  groups.backends = [backends];
+  qsfsConfig.groups = [groups];
+  const compresion = new QuantumCompression();
+  compresion.algorithm = "algorithm";
+  qsfsConfig.compression = compresion;
 
   const qsfsCache = 262144000; // Fixed cache size
   switch (type) {
@@ -78,17 +128,8 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance.ip_range = "10.0.0.2/32";
       instance.wireguard_private_key = "2BwI0a7lVYxeKsh7jklashakdfjasdf7jksdHf";
       instance.wireguard_listen_port = 5566;
-      instance.peers = [
-        {
-          subnet: "10.0.1.0/24",
-          wireguard_public_key: "9I8H7G6F5E4D3C2B1A0J",
-          allowed_ips: ["10.0.1.6"],
-          endpoint: "185.206.122.31:5566",
-        },
-      ];
-      instance.mycelium = {
-        hex_key: "abc123",
-      };
+      instance.peers = [peer];
+      instance.mycelium = mycelium;
       break;
 
     case WorkloadTypes.zdb:
@@ -111,33 +152,7 @@ const createDataInstance = (type: WorkloadTypes) => {
     case WorkloadTypes.qsfs:
       instance = new QuantumSafeFS();
       instance.cache = qsfsCache;
-      instance.config = {
-        minimal_shards: 2,
-        expected_shards: 3,
-        redundant_groups: 0,
-        redundant_nodes: 0,
-        max_zdb_data_dir_size: 2,
-        encryption: {
-          algorithm: "algorithm",
-          encryption_key: "EncryptionKey12345678",
-        },
-        meta: {
-          type: "qsfs",
-          config: {
-            prefix: "qsfs",
-            encryption: {
-              algorithm: "algorithm",
-              encryption_key: "EncryptionKey12345678",
-            },
-            backends: [{ address: "localhost", namespace: "http://localhost", password: "password" }],
-          },
-        },
-
-        groups: [{ address: "localhost", namespace: "http://localhost", password: "password" }],
-        compression: {
-          algorithm: "algorithm",
-        },
-      };
+      instance.config = qsfsConfig;
       break;
     case WorkloadTypes.zlogs:
       instance = new Zlogs();
@@ -181,9 +196,6 @@ describe.each(Object.values(WorkloadTypes))("Workload Tests for %s", type => {
     workload.result.state = ResultStates.ok;
     workload.result.message = "Deployment successful";
     workload.result.data = workload.data;
-    // if (workload.type === WorkloadTypes.qsfs) {
-    //   console.log("here", workload.data.config);
-    // }
   });
 
   test("should create a valid Workload instance", () => {
