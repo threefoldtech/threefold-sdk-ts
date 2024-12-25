@@ -294,22 +294,29 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
-const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
-// changes theme based on changes in system mode
-themeMatcher.addEventListener("change", updateTheme);
+const themeMatchers = {
+  light: window.matchMedia("(prefers-color-scheme: light)"),
+  dark: window.matchMedia("(prefers-color-scheme: dark)"),
+};
+
+themeMatchers.dark.addEventListener("change", updateTheme);
+themeMatchers.light.addEventListener("change", updateTheme);
+
 function updateTheme() {
-  if (themeMatcher.matches) {
-    theme.global.name.value = AppThemeSelection.dark;
-  } else {
-    theme.global.name.value = AppThemeSelection.light;
-  }
-  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, ThemeSettingsInterface.System);
+  const themeKey = getThemeKey();
+  theme.global.name.value = AppThemeSelection[themeKey];
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, AppThemeSelection[themeKey]);
 }
 
-// sets theme to system mode on application mount
-onMounted(() => {
-  updateTheme();
-});
+function getThemeKey() {
+  if (themeMatchers.dark.matches) {
+    return "dark";
+  } else if (themeMatchers.light.matches) {
+    return "light";
+  }
+  return "system";
+}
+
 watch(
   () => $route.meta,
   meta => {
@@ -416,14 +423,14 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
-        releaseDate: new Date("2024-10-2"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Domains",
         icon: "mdi-web-box",
         route: DashboardRoutes.Deploy.Domains,
         tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
-        releaseDate: new Date("2024-10-2"),
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Your Contracts",
@@ -551,7 +558,6 @@ import type { GridClient } from "@threefold/grid_client";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
-import { ThemeSettingsInterface } from "@/utils/settings";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";

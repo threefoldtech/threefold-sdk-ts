@@ -31,6 +31,7 @@ class GridClientConfig {
   twinId: number;
   seed?: string;
   deploymentTimeoutMinutes: number;
+  kycURL: string;
 }
 class ClientOptions {
   constructor(
@@ -49,6 +50,7 @@ class ClientOptions {
     public activationURL?: string,
     public deploymentTimeoutMinutes?: number,
     public keepReconnectingToChain?: boolean,
+    public KycURL?: string,
   ) {}
 }
 

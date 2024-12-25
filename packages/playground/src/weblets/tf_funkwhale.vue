@@ -20,7 +20,7 @@
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 50 characters.', 50),
+          validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
@@ -94,7 +94,8 @@
         v-model:mycelium="mycelium"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
-        :domain="selectionDetails?.domain"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+        require-domain
       />
 
       <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -162,11 +163,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const mycelium = ref(true);
-const planetary = ref(false);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const selectedSSHKeys = ref("");
@@ -271,7 +268,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

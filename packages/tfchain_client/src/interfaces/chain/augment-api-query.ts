@@ -29,6 +29,7 @@ import type {
   PalletSmartContractContract,
   PalletSmartContractContractBillingInformation,
   PalletSmartContractContractLock,
+  PalletSmartContractContractPaymentState,
   PalletSmartContractContractResources,
   PalletSmartContractServiceContract,
   PalletSmartContractSolutionProvider,
@@ -427,6 +428,12 @@ declare module "@polkadot/api-base/types/storage" {
       contractLock: AugmentedQuery<
         ApiType,
         (arg: u64 | AnyNumber | Uint8Array) => Observable<PalletSmartContractContractLock>,
+        [u64]
+      > &
+        QueryableStorageEntry<ApiType, [u64]>;
+      contractPaymentState: AugmentedQuery<
+        ApiType,
+        (arg: u64 | AnyNumber | Uint8Array) => Observable<Option<PalletSmartContractContractPaymentState>>,
         [u64]
       > &
         QueryableStorageEntry<ApiType, [u64]>;

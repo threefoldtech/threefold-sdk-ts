@@ -29,7 +29,7 @@
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
             (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 50 characters.', 50),
+            validators.maxLength('Name cannot exceed 35 characters.', 35),
           ]"
           #="{ props }"
         >
@@ -45,14 +45,13 @@
           v-model="solution"
         />
 
-        <Network
+        <Networks
           required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
-          ref="network"
         />
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
@@ -182,7 +181,7 @@ import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
@@ -194,14 +193,9 @@ const layout = useLayout();
 const tabs = ref();
 
 const name = ref(generateName({ prefix: "tfr" }));
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
-const wireguard = ref(false);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
-const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);

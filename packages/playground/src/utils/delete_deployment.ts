@@ -10,8 +10,9 @@ export interface DeleteDeploymentOptions {
   deploymentName?: string;
   name: string;
   projectName: ProjectName;
-  ip?: string;
+  ip?: string[];
   k8s?: boolean;
+  isCaprover?: boolean;
 }
 
 export async function deleteDeployment(grid: GridClient, options: DeleteDeploymentOptions) {
@@ -49,8 +50,8 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
     }
     return grid.k8s.delete({ name: options.name });
   }
-
-  if (options.deploymentName) {
+  // if Caprover deployment should handled by machines.delete
+  if (options.deploymentName && !options.isCaprover) {
     return grid.machines.delete_machine({ deployment_name: options.deploymentName, name: options.name });
   }
 
@@ -117,9 +118,9 @@ function isVm(projectName: string) {
   return false;
 }
 
-async function deleteVmGateways(grid: GridClient, ip?: string) {
+async function deleteVmGateways(grid: GridClient, ips?: string[]) {
   const { gateways } = await loadDeploymentGateways(grid, {
-    filter: ip ? gw => gw.backends.some(bk => bk.includes(ip)) : undefined,
+    filter: ips ? gw => gw.backends.some(bk => ips.some(ip => bk.includes(ip))) : undefined,
   });
   for (const gateway of gateways) {
     try {

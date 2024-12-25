@@ -44,8 +44,15 @@
           <TfFilter query-route="ipv6" v-model="filters.ipv6">
             <v-switch color="primary" inset label="IPv6" v-model="filters.ipv6" density="compact" hide-details />
           </TfFilter>
-          <TfFilter query-route="myNodes" v-model="filters.myNodes" v-if="profileManager.profile">
-            <v-switch color="primary" inset label="My Nodes" v-model="filters.myNodes" density="compact" hide-details />
+          <TfFilter query-route="myRentedNodes" v-model="filters.myRentedNodes" v-if="profileManager.profile">
+            <v-switch
+              color="primary"
+              inset
+              label="My Rented Nodes"
+              v-model="filters.myRentedNodes"
+              density="compact"
+              hide-details
+            />
           </TfFilter>
 
           <VTooltip
@@ -63,7 +70,7 @@
                   :items="[
                     { title: 'Up', value: UnifiedNodeStatus.Up },
                     { title: 'Standby', value: UnifiedNodeStatus.Standby },
-                    { title: 'Up & Standby', value: UnifiedNodeStatus.UpStandby },
+                    { title: 'Up or Standby', value: UnifiedNodeStatus.UpStandby },
                     { title: 'Down', value: UnifiedNodeStatus.Down },
                   ]"
                   label="Select Nodes Status"
@@ -537,7 +544,7 @@ export default {
       numGpu: "",
       rentable: false,
       ipv6: false,
-      myNodes: false,
+      myRentedNodes: false,
     });
     const oldNodeStatus = ref();
     watch(
@@ -597,7 +604,7 @@ export default {
             numGpu: +filters.value.numGpu || undefined,
             rentable: filters.value.rentable ? filters.value.rentable : undefined,
             hasIPv6: filters.value.ipv6 ? filters.value.ipv6 : undefined,
-            rentedBy: filters.value.myNodes && profileManager.profile ? profileManager.profile.twinId : undefined,
+            rentedBy: filters.value.myRentedNodes && profileManager.profile ? profileManager.profile.twinId : undefined,
           },
           { loadFarm: true },
         );

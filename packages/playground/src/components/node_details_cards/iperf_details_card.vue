@@ -70,6 +70,10 @@ export default {
           downloadSpeed: format(node.download_speed),
           uploadSpeed: format(node.upload_speed),
         }));
+      if (array.length === 0) {
+        console.error("Empty array returned from the IPerf test");
+        throw new Error("Can't get the test results, please try again later.");
+      }
       IperfDetails.value = array;
       return IperfDetails.value;
     };

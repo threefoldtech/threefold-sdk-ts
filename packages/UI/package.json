@@ -1,6 +1,6 @@
 {
   "name": "@threefold/ui",
-  "version": "2.5.0",
+  "version": "2.6.3",
   "private": false,
   "main": "dist/threefold-ui.umd.js",
   "publishConfig": {
@@ -20,7 +20,7 @@
   "dependencies": {
     "@polkadot/keyring": "^12.4.2",
     "@threefold/extension_api": "^0.0.1-rc6",
-    "axios": "1.7.4",
+    "axios": "1.7.8",
     "buffer": "^6.0.3",
     "crypto-js": "^4.2.0",
     "html-parsed-element": "^0.4.1",

@@ -44,14 +44,16 @@
           v-model="solution"
         />
 
-        <Network
+        <Networks
           required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
-          :domain="selectionDetails?.domain"
+          :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+          require-domain
+          :has-smtp="smtp.enabled"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -98,7 +100,7 @@ import { computed, type Ref, ref, watch } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid, useProfileManager } from "../stores";
@@ -111,11 +113,7 @@ const tabs = ref();
 
 const selectionDetails = ref<SelectionDetails>();
 const name = ref(generateName({ prefix: "gt" }));
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
@@ -125,20 +123,6 @@ const smtp = ref(createSMTPServer());
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 const profileManager = useProfileManager();
-
-watch(
-  () => smtp.value.enabled,
-  newSMTP => {
-    ipv4.value = newSMTP;
-  },
-);
-
-watch(
-  () => ipv4.value,
-  newIPv4 => {
-    smtp.value.enabled = newIPv4;
-  },
-);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();

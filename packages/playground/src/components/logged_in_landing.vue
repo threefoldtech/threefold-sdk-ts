@@ -164,9 +164,11 @@ export default {
 .card-opacity {
   background-color: rgba(125, 227, 200, 0.12);
 }
+
 @media (max-width: 768px) {
   .responsive-div {
-    min-height: 220px !important; /* Adjust height for mobile */
+    min-height: 220px !important;
+    /* Adjust height for mobile */
   }
 }
 
@@ -174,6 +176,7 @@ export default {
   .v-col {
     flex-basis: auto !important;
   }
+
   .v-card-title {
     white-space: normal !important;
   }

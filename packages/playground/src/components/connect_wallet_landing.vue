@@ -22,7 +22,7 @@
 
       <div
         :style="{
-          backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background.png)',
+          backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background2.png)',
           padding: '20px',
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
@@ -95,7 +95,7 @@ export default {
       pageTitle,
       DashboardRoutes,
       stats: computed(() => statsStore.stats),
-      statsUrl: window.env.STATS_URL || "https://stats.grid.tf",
+      statsUrl: window.env.STATS_URL,
       baseUrl,
     };
   },
@@ -107,6 +107,7 @@ export default {
   .v-col {
     flex-basis: auto !important;
   }
+
   .home_text {
     width: auto !important;
   }

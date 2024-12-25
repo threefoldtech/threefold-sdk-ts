@@ -82,6 +82,10 @@ declare module "@polkadot/api-base/types/errors" {
        **/
       NotMember: AugmentedError<ApiType>;
       /**
+       * Prime account is not a member
+       **/
+      PrimeAccountNotMember: AugmentedError<ApiType>;
+      /**
        * Proposal must exist
        **/
       ProposalMissing: AugmentedError<ApiType>;
@@ -245,6 +249,7 @@ declare module "@polkadot/api-base/types/errors" {
       CanOnlyIncreaseFrequency: AugmentedError<ApiType>;
       ContractIsNotUnique: AugmentedError<ApiType>;
       ContractNotExists: AugmentedError<ApiType>;
+      ContractPaymentStateNotExists: AugmentedError<ApiType>;
       ContractWrongBillingLoopIndex: AugmentedError<ApiType>;
       FailedToFreeIPs: AugmentedError<ApiType>;
       FailedToReserveIP: AugmentedError<ApiType>;
@@ -274,6 +279,7 @@ declare module "@polkadot/api-base/types/errors" {
       OffchainSignedTxCannotSign: AugmentedError<ApiType>;
       OffchainSignedTxNoLocalAccountAvailable: AugmentedError<ApiType>;
       PricingPolicyNotExists: AugmentedError<ApiType>;
+      RewardDistributionError: AugmentedError<ApiType>;
       ServiceContractApprovalNotAllowed: AugmentedError<ApiType>;
       ServiceContractBillingNotApprovedByBoth: AugmentedError<ApiType>;
       ServiceContractBillingVariableAmountTooHigh: AugmentedError<ApiType>;

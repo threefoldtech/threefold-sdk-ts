@@ -392,8 +392,13 @@ declare module "@polkadot/api-base/types/events" {
        * Deprecated event
        **/
       ContractDeployed: AugmentedEvent<ApiType, [u64, AccountId32]>;
+      ContractGracePeriodElapsed: AugmentedEvent<
+        ApiType,
+        [contractId: u64, gracePeriod: u64],
+        { contractId: u64; gracePeriod: u64 }
+      >;
       /**
-       * A Contract grace period was ended
+       * A Contract grace period was ended due to overdarfted being settled
        **/
       ContractGracePeriodEnded: AugmentedEvent<
         ApiType,
@@ -401,12 +406,17 @@ declare module "@polkadot/api-base/types/events" {
         { contractId: u64; nodeId: u32; twinId: u32 }
       >;
       /**
-       * A Contract grace period is triggered
+       * A Contract grace period is triggered due to overdarfted
        **/
       ContractGracePeriodStarted: AugmentedEvent<
         ApiType,
         [contractId: u64, nodeId: u32, twinId: u32, blockNumber: u64],
         { contractId: u64; nodeId: u32; twinId: u32; blockNumber: u64 }
+      >;
+      ContractPaymentOverdrawn: AugmentedEvent<
+        ApiType,
+        [contractId: u64, timestamp: u64, partiallyBilledAmount: u128, overdraft: u128],
+        { contractId: u64; timestamp: u64; partiallyBilledAmount: u128; overdraft: u128 }
       >;
       /**
        * A contract was updated
@@ -449,6 +459,12 @@ declare module "@polkadot/api-base/types/events" {
        * a Rent contract is canceled
        **/
       RentContractCanceled: AugmentedEvent<ApiType, [contractId: u64], { contractId: u64 }>;
+      RentWaived: AugmentedEvent<ApiType, [contractId: u64], { contractId: u64 }>;
+      RewardDistributed: AugmentedEvent<
+        ApiType,
+        [contractId: u64, standardRewards: u128, additionalRewards: u128],
+        { contractId: u64; standardRewards: u128; additionalRewards: u128 }
+      >;
       /**
        * A Service contract is approved
        **/
