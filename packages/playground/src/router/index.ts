@@ -569,6 +569,7 @@ function createTFChainRoutes(): RouteRecordRaw[] {
 
         {
           path: DashboardRoutes.TFChain.TFDAO,
+          name: "Dao",
           component: () => import("../dashboard/dao_view.vue"),
           meta: { title: "Dao" },
         },
@@ -609,7 +610,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.Deploy.Domains,
           component: () => import("@/views/domains_view.vue"),
-          meta: { title: "Domains", publicPath: true },
+          meta: { title: "Domains", requireKYC: true },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,
@@ -645,6 +646,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
                   ],
                 },
                 requireSSH: true,
+                requireKYC: true,
               },
             },
             {
@@ -668,6 +670,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
                   ],
                 },
                 requireSSH: true,
+                requireKYC: true,
               },
             },
           ],
@@ -804,6 +807,13 @@ const mainRoutes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes: mainRoutes,
+});
+
+/* Guard to verify monitor is completed */
+const removeMonitorGuard = router.beforeEach(async (_, __, next) => {
+  await window.$$monitorLock;
+  removeMonitorGuard();
+  return next();
 });
 
 export default router;

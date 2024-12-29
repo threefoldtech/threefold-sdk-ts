@@ -147,7 +147,7 @@ export default {
       size: window.env.PAGE_SIZE,
       page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
-      availableFor: gridStore.client.twinId,
+      availableFor: gridStore.client?.twinId,
     }));
     const selectedDomain = ref<NodeInfo | null>(null);
     const loadDomains = () => domainsTask.value.run(gridStore, filters.value);

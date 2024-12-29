@@ -17,8 +17,8 @@ fi
 outputFile="chainMeta.json"
 echo "meta destination file: '$outputFile'"
 
-generateDefs="ts-node --skip-project node_modules/.bin/polkadot-types-from-defs --package @threefold/tfchain_client  --input ./src/interfaces/chain --endpoint ./chainMeta.json"
-generateMeta="ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --endpoint ./chainMeta.json --output ./src/interfaces/chain"
+generateDefs="yarn ts-node --skip-project node_modules/.bin/polkadot-types-from-defs --package @threefold/tfchain_client  --input ./src/interfaces/chain --endpoint ./chainMeta.json"
+generateMeta="yarn ts-node --skip-project node_modules/.bin/polkadot-types-from-chain --endpoint ./chainMeta.json --output ./src/interfaces/chain"
 
 err=$(curl -H "Content-Type: application/json" -d '{"id":"1", "jsonrpc":"2.0", "method": "state_getMetadata", "params":[]}' -o $outputFile $endpoint 2>&1)
 

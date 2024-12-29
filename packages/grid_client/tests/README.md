@@ -42,3 +42,5 @@ yarn test --runInBand
 > `--coverage`: Collect and report coverage.
 > `--colors`: Force colorful output.
 > `--forceExit`: Force the process to exit after tests complete.
+>
+> **Note:** Some tests are using Mycelium for the SSH connection, which is why it is important for Mycelium to be running.

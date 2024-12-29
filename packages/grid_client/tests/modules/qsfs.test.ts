@@ -8,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { GBToBytes, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -199,7 +199,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
         entrypoint: "/sbin/zinit init",
         public_ip: publicIP,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         qsfs_disks: [
           {
             qsfs_zdbs_name: qsfsZdbName,
@@ -250,13 +250,14 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
   expect(result[0].capacity["cpu"]).toBe(cpu);
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
+  expect(result[0].myceliumIP).toBeDefined();
   expect(result[0].publicIP).toBeNull();
   expect(result[0].description).toBe(description);
 
   //QSFS Assertions
   expect(result[0].mounts[0]["name"]).toBe(qsfsName);
   expect(result[0].mounts[0]["mountPoint"]).toBe(qsfsMountPoint);
-  expect(result[0].mounts[0]["cache"]).toBe(bytesToGB(qsfsCache));
+  expect(result[0].mounts[0]["cache"]).toBe(GBToBytes(qsfsCache));
   expect(result[0].mounts[0]["prefix"]).toBe(qsfsPrefix);
   expect(result[0].mounts[0]["qsfs_zdbs_name"]).toBe(qsfsZdbName);
   expect(result[0].mounts[0]["state"]).toBe("ok");
@@ -537,7 +538,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         qsfs_disks: qsfsDisk,
       },
     ],
@@ -552,7 +553,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -575,13 +576,14 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   expect(result.masters[0].nodeId).toBe(masterNodeId);
   expect(result.masters[0].status).toBe("ok");
   expect(result.masters[0].planetary).toBeDefined();
+  expect(result.masters[0].myceliumIP).toBeDefined();
   expect(result.masters[0].publicIP).toBeNull();
   expect(result.masters[0].interfaces[0]["network"]).toBe(networkName);
   expect(result.masters[0].interfaces[0]["ip"]).toContain(splitIP(ipRange));
   expect(result.masters[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result.masters[0].capacity["cpu"]).toBe(masterCpu);
   expect(result.masters[0].capacity["memory"]).toBe(masterMemory);
-  expect(result.masters[0].mounts[0]["size"]).toBe(bytesToGB(masterDiskSize));
+  expect(result.masters[0].mounts[0]["size"]).toBe(GBToBytes(masterDiskSize));
   expect(result.masters[0].mounts[0]["state"]).toBe("ok");
   expect(result.masters[0].env["K3S_NODE_NAME"]).toBe(masterName);
   expect(result.masters[0].description).toBe(description);
@@ -589,7 +591,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   //qsfs assertions
   expect(result.masters[0].mounts[1]["name"]).toBe(qsfsName);
   expect(result.masters[0].mounts[1]["mountPoint"]).toBe(qsfsMountPoint);
-  expect(result.masters[0].mounts[1]["cache"]).toBe(bytesToGB(qsfsCache));
+  expect(result.masters[0].mounts[1]["cache"]).toBe(GBToBytes(qsfsCache));
   expect(result.masters[0].mounts[1]["prefix"]).toBe(qsfsPrefix);
   expect(result.masters[0].mounts[1]["qsfs_zdbs_name"]).toBe(qsfsZdbName);
   expect(result.masters[0].mounts[1]["state"]).toBe("ok");
@@ -599,13 +601,14 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   expect(result.workers[0].nodeId).toBe(workerNodeId);
   expect(result.workers[0].status).toBe("ok");
   expect(result.workers[0].planetary).toBeDefined();
+  expect(result.workers[0].myceliumIP).toBeDefined();
   expect(result.workers[0].publicIP).toBeNull();
   expect(result.workers[0].interfaces[0]["network"]).toBe(networkName);
   expect(result.workers[0].interfaces[0]["ip"]).toContain(splitIP(ipRange));
   expect(result.workers[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result.workers[0].capacity["cpu"]).toBe(workerCpu);
   expect(result.workers[0].capacity["memory"]).toBe(workerMemory);
-  expect(result.workers[0].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
+  expect(result.workers[0].mounts[0]["size"]).toBe(GBToBytes(workerDiskSize));
   expect(result.workers[0].mounts[0]["state"]).toBe("ok");
   expect(result.workers[0].env["K3S_NODE_NAME"]).toBe(workerName);
   expect(result.workers[0].description).toBe(description);
@@ -648,9 +651,9 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
     await masterSSH.execCommand("df -h").then(async function (result) {
       const splittedRes = result.stdout.split("\n");
       log(result.stdout);
-      log(splittedRes[6]);
-      expect(splittedRes[6]).toContain(qsfsName);
-      expect(splittedRes[6]).toContain(qsfsMountPoint);
+      log(splittedRes[5]);
+      expect(splittedRes[5]).toContain(qsfsName);
+      expect(splittedRes[5]).toContain(qsfsMountPoint);
     });
   } finally {
     //Disconnect from the master

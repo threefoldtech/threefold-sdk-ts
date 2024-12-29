@@ -110,7 +110,7 @@
       </template>
 
       <template #[`item.billing`]="{ item }">
-        {{ item.billing }}
+        {{ item.billing || "No Data Available" }}
       </template>
       <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.created) }}
@@ -241,6 +241,7 @@ async function loadDeployments() {
     if (chunk2.count > 0 && migrateGateways) {
       await migrateModule(grid!.gateway);
     }
+
     let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
     if (showAllDeployments.value) {
       chunk3 =
@@ -257,19 +258,8 @@ async function loadDeployments() {
 
     const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
     failedDeployments.value = vms.failedDeployments;
-
     count.value = vms.count;
-    items.value = vms.items
-      .map((vm: any) => {
-        if (props.projectName.toLowerCase() === ProjectName.Caprover.toLowerCase()) {
-          const [leader, ...workers] = vm;
-          leader.workers = workers;
-          return leader;
-        }
-
-        return vm;
-      })
-      .flat();
+    items.value = mergeCaproverDeployments(vms.items);
   } catch (err) {
     errorMessage.value = `Failed to load Deployments: ${err}`;
   } finally {
@@ -296,6 +286,7 @@ const filteredHeaders = computed(() => {
         value(item: any) {
           return item[0].workloads[0].data.backends.join(", ");
         },
+        sortable: false,
       },
       {
         title: "Domain",
@@ -460,6 +451,7 @@ defineExpose({ loadDeployments });
 
 <script lang="ts">
 import toHumanDate from "@/utils/date";
+import { mergeCaproverDeployments } from "@/utils/deploy_helpers";
 
 import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";

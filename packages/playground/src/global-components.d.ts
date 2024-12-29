@@ -39,6 +39,8 @@ declare global {
   interface Window {
     $$appLoader: () => Promise<void>;
     $$showMonitorError: (urls: { [key: string]: string | null }) => void;
+    $$monitorLock: Promise<void>;
+    $$releaseMonitorLock(): void;
     env: {
       GRAPHQL_STACKS: string[];
       GRIDPROXY_STACKS: string[];
@@ -58,6 +60,7 @@ declare global {
       TFT_ASSET_ISSUER: string;
       MINTING_URL: string;
       STATS_URL: string;
+      KYC_URL: string;
       TIMEOUT: number;
       PAGE_SIZE: number;
       MANUAL_URL: string;

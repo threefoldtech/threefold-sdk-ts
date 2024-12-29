@@ -20,7 +20,7 @@
           validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
           (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
-          validators.maxLength('Name cannot exceed 50 characters.', 50),
+          validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
@@ -62,20 +62,16 @@
       />
 
       <Networks
-        ref="network"
         v-model:ipv4="ipv4"
         v-model:mycelium="mycelium"
         v-model:planetary="planetary"
         v-model:ipv6="ipv6"
         v-model:wireguard="wireguard"
-        :domain="selectionDetails?.domain"
+        :has-custom-domain="selectionDetails?.domain?.enabledCustomDomain"
+        require-domain
       />
 
-      <input-tooltip
-        inline
-        tooltip="Click to know more about dedicated machines."
-        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
-      >
+      <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
 
@@ -108,7 +104,9 @@
 
 <script lang="ts" setup>
 import { calculateRootFileSystem, type GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
+
+import { manual } from "@/utils/manual";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -130,11 +128,7 @@ const gitBranch = ref("");
 const root = ref("");
 const domain = ref();
 
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const mycelium = ref(true);
-const planetary = ref(false);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   // Should be upgraded to an oficial Flist
@@ -270,7 +264,7 @@ async function isGithubRepoExist(gitUrl: string) {
 </script>
 
 <script lang="ts">
-import Networks from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";

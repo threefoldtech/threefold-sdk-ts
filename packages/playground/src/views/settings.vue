@@ -7,7 +7,7 @@
     <v-card class="my-5"
       ><v-card-title>Theme</v-card-title> <v-card-text>Pick an application theme!</v-card-text>
 
-      <v-select class="pa-3" :items="themes" v-model="selectedTheme" />
+      <v-select class="pa-3 capitalize" :items="themes" v-model="selectedTheme" />
 
       <v-card-actions class="justify-end mb-3 mx-3">
         <v-btn :disabled="isCurrentTheme()" @click="UpdateTheme" class="justify-end ml-auto"
@@ -115,7 +115,7 @@
             validators.required('Query timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
             validators.min(`Query timeout should be at least 3 second.`, 3),
-            validators.max('Query timeout maximum limit exceeded', 3 * 60),
+            validators.max('Query timeout maximum limit is 180 seconds', 3 * 60),
           ]"
           #="{ props }"
           ref="timeoutQueryInput"
@@ -145,7 +145,7 @@
             validators.required('Deployment timeout is required.'),
             validators.isInt('Timeout must be a valid integer.'),
             validators.min(`Deployment timeout should be at least 3 second.`, 3),
-            validators.max('Deployment timeout maximum limit exceeded', 30 * 60),
+            validators.max('Deployment timeout maximum limit is 1800 seconds', 30 * 60),
           ]"
           #="{ props }"
           ref="timeoutDeploymentInput"
@@ -211,6 +211,15 @@ export default {
       }
     });
 
+    watch(
+      theme.global.name,
+      theme => {
+        selectedTheme.value = currentTheme.value = theme.includes("mode") ? theme : `${theme} mode`;
+        localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, theme);
+      },
+      { immediate: true },
+    );
+
     const deploymentTimeoutdefaultMinutes = gridStore?.client.clientOptions.deploymentTimeoutMinutes;
     const selectedDeploymentTimeout = ref(0);
     const currentDeploymentTimeout = ref(0);
@@ -238,7 +247,6 @@ export default {
         case ThemeInterface.Dark:
           currentTheme.value = ThemeInterface.Dark;
           theme.global.name.value = AppThemeSelection.dark;
-          localStorage.se;
           break;
         case ThemeInterface.Light:
           currentTheme.value = ThemeInterface.Light;

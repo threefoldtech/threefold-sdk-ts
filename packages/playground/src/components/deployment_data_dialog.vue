@@ -9,7 +9,6 @@
               <v-btn> JSON</v-btn>
             </v-btn-toggle>
           </div>
-
           <v-tabs v-model="activeTab" align-tabs="center" class="my-4 mx-auto" v-if="showType === 0">
             <v-tab
               v-for="(item, index) in contracts"
@@ -132,7 +131,7 @@
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
           <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" @click="copy">Copy</v-btn>
+          <v-btn color="secondary" v-if="showType == 1" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -228,7 +227,8 @@ async function getGrafanaUrl() {
   }
   isLoading.value = false;
 }
-getGrafanaUrl();
+
+onMounted(async () => await getGrafanaUrl());
 
 async function getGPUInfo() {
   loadingCard.value = true;
@@ -320,6 +320,7 @@ function getTooltipText(contract: any, index: number) {
 
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
+import { onMounted } from "vue";
 
 import { ContractType } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -339,4 +340,3 @@ export default {
   },
 };
 </script>
-@/utils/get_metrics_url

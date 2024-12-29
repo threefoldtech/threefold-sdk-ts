@@ -8,14 +8,14 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { GBToBytes, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(500000);
 
 let gridClient: GridClient;
 let deploymentName: string;
 
-beforeAll(async () => {
+beforeEach(async () => {
   gridClient = await getClient();
   deploymentName = generateString(15);
   gridClient.clientOptions.projectName = `kubernetes/${deploymentName}`;
@@ -159,7 +159,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     workers: [
@@ -173,7 +173,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -196,13 +196,14 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.masters[0].nodeId).toBe(masterNodeId);
   expect(result.masters[0].status).toBe("ok");
   expect(result.masters[0].planetary).toBeDefined();
+  expect(result.masters[0].myceliumIP).toBeDefined();
   expect(result.masters[0].publicIP).toBeNull();
   expect(result.masters[0].interfaces[0]["network"]).toBe(networkName);
   expect(result.masters[0].interfaces[0]["ip"]).toContain(splitIP(ipRange));
   expect(result.masters[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result.masters[0].capacity["cpu"]).toBe(masterCpu);
   expect(result.masters[0].capacity["memory"]).toBe(masterMemory);
-  expect(result.masters[0].mounts[0]["size"]).toBe(bytesToGB(masterDiskSize));
+  expect(result.masters[0].mounts[0]["size"]).toBe(GBToBytes(masterDiskSize));
   expect(result.masters[0].mounts[0]["state"]).toBe("ok");
   expect(result.masters[0].env["K3S_NODE_NAME"]).toBe(masterName);
   expect(result.masters[0].description).toBe(description);
@@ -211,13 +212,14 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.workers[0].nodeId).toBe(workerNodeId);
   expect(result.workers[0].status).toBe("ok");
   expect(result.workers[0].planetary).toBeDefined();
+  expect(result.workers[0].myceliumIP).toBeDefined();
   expect(result.workers[0].publicIP).toBeNull();
   expect(result.workers[0].interfaces[0]["network"]).toBe(networkName);
   expect(result.workers[0].interfaces[0]["ip"]).toContain(splitIP(ipRange));
   expect(result.workers[0].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(result.workers[0].capacity["cpu"]).toBe(workerCpu);
   expect(result.workers[0].capacity["memory"]).toBe(workerMemory);
-  expect(result.workers[0].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
+  expect(result.workers[0].mounts[0]["size"]).toBe(GBToBytes(workerDiskSize));
   expect(result.workers[0].mounts[0]["state"]).toBe("ok");
   expect(result.workers[0].env["K3S_NODE_NAME"]).toBe(workerName);
   expect(result.workers[0].description).toBe(description);
@@ -425,7 +427,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     workers: [
@@ -439,7 +441,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -459,7 +461,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
     public_ip: workerPublicIp,
     public_ip6: false,
     planetary: true,
-    mycelium: false,
+    mycelium: true,
   };
 
   const res = await gridClient.k8s.deploy(k8s);
@@ -491,13 +493,14 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
   expect(newResult.workers[1].nodeId).toBe(workerNodeId);
   expect(newResult.workers[1].status).toBe("ok");
   expect(newResult.workers[1].planetary).toBeDefined();
+  expect(newResult.workers[1].myceliumIP).toBeDefined();
   expect(newResult.workers[1].publicIP).toBeNull();
   expect(newResult.workers[1].interfaces[0]["network"]).toBe(networkName);
   expect(newResult.workers[1].interfaces[0]["ip"]).toContain(splitIP(ipRange));
   expect(newResult.workers[1].interfaces[0]["ip"]).toMatch(ipRegex);
   expect(newResult.workers[1].capacity["cpu"]).toBe(workerCpu);
   expect(newResult.workers[1].capacity["memory"]).toBe(workerMemory);
-  expect(newResult.workers[1].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
+  expect(newResult.workers[1].mounts[0]["size"]).toBe(GBToBytes(workerDiskSize));
   expect(newResult.workers[1].mounts[0]["state"]).toBe("ok");
   expect(newResult.workers[1].description).toBe(description);
 
@@ -679,7 +682,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     workers: [
@@ -693,7 +696,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
       },
     ],
     metadata: metadata,
@@ -743,8 +746,5 @@ afterEach(async () => {
     expect(res.updated).toHaveLength(0);
     expect(res.deleted).toBeDefined();
   }
-});
-
-afterAll(async () => {
   return await gridClient.disconnect();
 }, 130000);

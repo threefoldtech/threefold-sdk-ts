@@ -90,3 +90,8 @@ function createElement([serviceName, serviceStatus]) {
     serviceStatus !== null ? "reachable" : "unreachable"
   }">${serviceStatus !== null ? "&#10003;" : "&#10007;"}</p></div></li>`;
 }
+
+/** @type { () => void } */
+let _unlockMonitorLock;
+window.$$monitorLock = new Promise(res => (_unlockMonitorLock = res));
+window.$$releaseMonitorLock = () => _unlockMonitorLock();

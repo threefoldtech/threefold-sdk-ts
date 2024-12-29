@@ -21,10 +21,10 @@
           <v-card-text>
             <form-validator v-model="valid">
               <input-validator
-                :value="$props.name"
+                :value="farmName"
                 :rules="[
                   validators.required('Farm name is required.'),
-                  name => validators.isAlpha('Farm name must start with an alphabet char.')(name[0]),
+                  (farmName: string) => validators.isAlpha('Farm name must start with an alphabet char.')(farmName[0]),
                   validators.minLength('Farm name minimum length is 3 chars.', 3),
                   validators.maxLength('Farm name maximum length is 40 chars.', 40),
                   validators.pattern('Farm name should not contain whitespaces.', {
@@ -34,13 +34,7 @@
                 :async-rules="[validateFarmName]"
                 #="{ props }"
               >
-                <v-text-field
-                  :model-value="$props.name"
-                  v-bind:="props"
-                  @update:model-value="$emit('update:name', $event)"
-                  outlined
-                  label="Farm name"
-                ></v-text-field>
+                <v-text-field v-model="farmName" v-bind:="props" outlined label="Farm name"></v-text-field>
               </input-validator>
             </form-validator>
           </v-card-text>
@@ -65,24 +59,22 @@ import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
 export default {
   name: "CreateFarm",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
+  setup(_, context) {
     const showDialogue = ref(false);
     const isCreating = ref(false);
     const gridStore = useGrid();
     const valid = ref(false);
+    const farmName = ref("");
+
     async function createFarm() {
       try {
         isCreating.value = true;
-        await gridStore.grid.farms.create({ name: props.name });
+        await gridStore.grid.farms.create({ name: farmName.value });
         createCustomToast("Farm created successfully.", ToastType.success);
-        notifyDelaying();
         showDialogue.value = false;
+        farmName.value = "";
+        context.emit("farm-created");
+        notifyDelaying();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
@@ -106,6 +98,7 @@ export default {
       showDialogue,
       isCreating,
       valid,
+      farmName,
       createFarm,
       validateFarmName,
     };

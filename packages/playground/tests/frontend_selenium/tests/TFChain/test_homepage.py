@@ -3,6 +3,7 @@ from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
 from utils.utils import generate_string, get_seed, get_email
 from utils.base import Base
+import pytest
 
 #  Time required for the run (12 cases) is approximately 2 minutes.
 
@@ -49,6 +50,7 @@ def test_tft_price(browser):
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1
 
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
 def test_stats(browser):
     """
       Test Case: TC1674 - TFT stats
@@ -61,7 +63,7 @@ def test_stats(browser):
     """
     dashboard_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
-    stats = grid_proxy.get_stats()
+    stats = grid_proxy.get_stats_capicity()
     dashboard_stats = dashboard_page.get_dashboard_stats()
     assert stats == dashboard_stats
 
@@ -116,7 +118,7 @@ def test_create_account(browser):
     dashboard_page.logout_account()
     assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
 def test_account_validation(browser):
     """
       Test Cases: TC1777 - Connect your wallet Validation
@@ -165,7 +167,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Password is required')
     assert dashboard_page.wait_for_button(dashboard_page.login_account('123456')).is_enabled() == True
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
 def test_login_links(browser):
     """
       Test Case: TC1801 - Verify login profile manager links

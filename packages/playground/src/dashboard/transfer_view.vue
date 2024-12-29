@@ -19,8 +19,8 @@
                 :rules="[
                   validators.required('Recipient Twin ID is required'),
                   validators.isNotEmpty('Invalid Twin ID'),
-                  validators.isNumeric('Twin ID should be a number'),
-                  validators.min('Twin ID should be more than 0', 1),
+                  validators.isInt('Twin ID should be a valid integer.'),
+                  validators.min('Twin ID should be greater than zero', 1),
                   isSameTwinID,
                 ]"
                 :async-rules="[isValidTwinID]"
@@ -225,6 +225,7 @@ async function transfer(recipientTwin: Twin) {
   }
 }
 async function submitFormAddress() {
+  isValidAddressTransfer.value = false;
   loadingAddressTransfer.value = true;
   await transfer(recepTwinFromAddress.value!);
   loadingAddressTransfer.value = false;
@@ -233,6 +234,7 @@ function createInvalidTransferToast(message: string) {
   createCustomToast(message, ToastType.danger);
 }
 async function submitFormTwinID() {
+  isValidTwinIDTransfer.value = false;
   if (gridStore) {
     const twinDetails = await gridStore.client.twins.get({
       id: parseInt(recipientTwinId.value.trim()),

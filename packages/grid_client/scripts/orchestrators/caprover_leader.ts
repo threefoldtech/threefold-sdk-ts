@@ -33,6 +33,7 @@ async function main() {
     mru: 4, // GB
     sru: 10,
     farmId: 1,
+    availableFor: grid3.twinId,
   };
 
   const vms: MachinesModel = {

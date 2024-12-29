@@ -50,6 +50,7 @@ export const hruRules = _applyRules([
 export const balanceRules = _applyRules([
   isNumeric("Balance must be a valid number."),
   min("Minimum allowed balance is 0.", 0),
+  max("Maximum allowed balance is 1e15 TFT.", 10 ** 15),
 ]);
 
 export function normalizePrice(price: number) {

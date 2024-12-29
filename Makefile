@@ -2,7 +2,7 @@
 
 
 release:
-	yarn lerna version --force-publish
+	yarn lerna version --force-publish --exact
 
 help:
 	@echo "\n- To build a specific project, you can do that by executing 'make build project=<project_name>'."

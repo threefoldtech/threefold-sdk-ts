@@ -163,10 +163,7 @@ async function getGpuDetails() {
       interval.value = window.setInterval(loadingDots, 500);
 
       gpuError.value = false;
-      const _node: GridNode = await getNode(props.node.nodeId, {
-        loadGpu: true,
-      });
-      console.log(_node);
+      const _node: GridNode = await getNode(props.node.nodeId);
       node.value = _node;
     }
     gpuLoading.value = false;

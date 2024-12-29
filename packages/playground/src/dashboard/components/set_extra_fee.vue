@@ -8,7 +8,7 @@
           size="large"
           :disabled="isAdding"
           :loading="isAdding"
-          @click="showDialogue = true"
+          @click="setupDialog()"
         >
           mdi-currency-usd
         </v-icon>
@@ -26,7 +26,7 @@
           <v-card-text>
             <form-validator v-model="valid">
               <input-validator
-                :value="fee"
+                :value="inputFee"
                 :rules="[
                   validators.required('Fee is required.'),
                   validators.isNumeric('Fee must be a valid number.'),
@@ -37,16 +37,18 @@
               >
                 <input-tooltip tooltip="Fee is in USD/month">
                   <v-text-field
-                    v-model="fee"
+                    v-model="inputFee"
                     v-bind:="props"
                     suffix="USD/month"
                     outlined
                     label="Additional Fees"
-                    :disabled="isSetting"
+                    :disabled="isSetting || loading"
+                    :loading="loading"
                   ></v-text-field>
                 </input-tooltip>
               </input-validator>
             </form-validator>
+
             <v-divider></v-divider>
           </v-card-text>
           <v-card-actions class="justify-end my-1 mr-2">
@@ -68,7 +70,7 @@
 <script lang="ts">
 import { TFChainError } from "@threefold/tfchain_client";
 import { ValidationError } from "@threefold/types";
-import { onMounted, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
@@ -87,40 +89,40 @@ export default {
     const gridStore = useGrid();
     const valid = ref(false);
     const isSetting = ref(false);
-    const fee = ref<number>(0);
-    const isDisabled = ref(false);
-
-    onMounted(async () => {
-      fee.value = (await getExtraFee()) as unknown as number;
+    const inputFee = ref(0);
+    const isDisabled = computed(() => {
+      return currentFee.value === inputFee.value;
     });
+    const currentFee = ref(0);
+    const currentNodeId = ref(0);
+    const loading = ref(false);
 
+    async function setupDialog() {
+      loading.value = true;
+      showDialogue.value = true;
+      currentNodeId.value = props.nodeId;
+      currentFee.value = (await getExtraFee()) ?? 0;
+      inputFee.value = currentFee.value;
+      loading.value = false;
+    }
     async function getExtraFee() {
       try {
-        const extraFee = await gridStore.grid.contracts.getDedicatedNodeExtraFee({ nodeId: props.nodeId });
-        return extraFee;
+        const extraFee = await gridStore.grid.contracts.getDedicatedNodeExtraFee({ nodeId: currentNodeId.value });
+        return extraFee as number;
       } catch (error) {
         console.log(error);
       }
     }
-
-    watch(fee, async (value, _) => {
-      const currentFee = await getExtraFee();
-      if (value == currentFee || value === null) {
-        isDisabled.value = true;
-      } else {
-        isDisabled.value = false;
-      }
-    });
 
     async function setExtraFee() {
       try {
         isSetting.value = true;
         await gridStore.grid.contracts.setDedicatedNodeExtraFee({
           nodeId: props.nodeId,
-          extraFee: +fee.value,
+          extraFee: +inputFee.value,
         });
         createCustomToast("Additional fee is set successfully.", ToastType.success);
-        await getExtraFee();
+        currentFee.value = inputFee.value;
       } catch (e) {
         let msg = "Failed to set additional fees";
         if (e instanceof TFChainError && e.keyError === "NodeHasActiveContracts") msg += ". Node has active contracts.";
@@ -137,10 +139,12 @@ export default {
       showDialogue,
       isAdding,
       valid,
-      fee,
+      inputFee,
       isSetting,
       isDisabled,
       setExtraFee,
+      setupDialog,
+      loading,
     };
   },
 };

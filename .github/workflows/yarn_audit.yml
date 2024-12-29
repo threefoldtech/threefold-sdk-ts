@@ -6,9 +6,11 @@ on:
   push:
     branches: 
       - development
+      - development_2.7
   pull_request:
     branches: 
       - development
+      - development_2.7
 
 jobs:
   audit-and-open-issue:

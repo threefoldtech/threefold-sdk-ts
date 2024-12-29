@@ -9,7 +9,7 @@ import {
   randomChoice,
 } from "../../src";
 import { getClient } from "../client_loader";
-import { bytesToGB, generateInt, log } from "../utils";
+import { GBToBytes, generateInt, log } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -137,9 +137,9 @@ test("TC1243 - Capacity Planner: Filter Nodes", async () => {
   log(res);
 
   for (const node in res) {
-    expect(res[node].total_resources["mru"] - res[node].used_resources["mru"]).toBeGreaterThanOrEqual(bytesToGB(mru));
-    expect(res[node].total_resources["sru"] - res[node].used_resources["sru"]).toBeGreaterThanOrEqual(bytesToGB(sru));
-    expect(res[node].total_resources["hru"] - res[node].used_resources["hru"]).toBeGreaterThanOrEqual(bytesToGB(hru));
+    expect(res[node].total_resources["mru"] - res[node].used_resources["mru"]).toBeGreaterThanOrEqual(GBToBytes(mru));
+    expect(res[node].total_resources["sru"] - res[node].used_resources["sru"]).toBeGreaterThanOrEqual(GBToBytes(sru));
+    expect(res[node].total_resources["hru"] - res[node].used_resources["hru"]).toBeGreaterThanOrEqual(GBToBytes(hru));
     expect(res[node].farmId).toEqual(farmId);
   }
 });

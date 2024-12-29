@@ -190,7 +190,7 @@ export const solutionType: { [key: string]: string } = {
   wordpress: "Wordpress",
   staticwebsite: "Static Website",
   tfrobot: "TFRobot",
-  Gitea: "Gitea",
+  gitea: "Gitea",
   nostr: "Nostr",
   domains: "Domains",
   jitsi: "Jitsi",
@@ -285,13 +285,6 @@ export type NodeDetailsCard = {
   uploadSpeed?: string;
 };
 
-export type GridProxyRequestConfig = {
-  loadFarm?: boolean;
-  loadTwin?: boolean;
-  loadStats?: boolean;
-  loadGpu?: boolean;
-};
-
 export type NodeStatusColor = {
   color: string;
   status: string;
@@ -354,7 +347,7 @@ export const nodeInitializer: GridNode = {
   publicIps: { free: 0, total: 0, used: 0 },
   twin: { twinId: 0, accountId: "", publicKey: "", relay: "" },
   stats: nodeStatsInitializer,
-  cards: [],
+  gpus: [],
   num_gpu: 0,
   healthy: false,
   rentable: false,

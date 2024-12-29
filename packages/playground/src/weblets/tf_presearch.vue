@@ -32,7 +32,7 @@
             validators.IsAlphanumericExpectUnderscore('Name should consist of letters ,numbers and underscores only.'),
             (name: string) => validators.isAlpha('Name must start with an alphabetical character.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
-            validators.maxLength('Name cannot exceed 50 characters.', 50),
+            validators.maxLength('Name cannot exceed 35 characters.', 35),
           ]"
           #="{ props }"
         >
@@ -56,14 +56,13 @@
           </password-input-wrapper>
         </input-validator>
 
-        <Network
+        <Networks
           required
           v-model:ipv4="ipv4"
           v-model:planetary="planetary"
           v-model:mycelium="mycelium"
           v-model:ipv6="ipv6"
           v-model:wireguard="wireguard"
-          ref="network"
         />
 
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
@@ -117,7 +116,7 @@ import { ref } from "vue";
 
 import { manual } from "@/utils/manual";
 
-import Network from "../components/networks.vue";
+import Networks, { useNetworks } from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useGrid } from "../stores";
 import { type Flist, ProjectName } from "../types";
@@ -129,18 +128,13 @@ const layout = useLayout();
 const tabs = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
-const ipv4 = ref(false);
-const ipv6 = ref(false);
-const wireguard = ref(false);
-const planetary = ref(false);
-const mycelium = ref(true);
+const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const cpu = 1;
 const memory = 512;
 const rootFilesystemSize = calculateRootFileSystem({ CPUCores: cpu, RAMInMegaBytes: memory });
 const dockerDiskSize = 10;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
-const network = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
   entryPoint: "/sbin/zinit init",

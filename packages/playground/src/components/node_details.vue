@@ -54,12 +54,7 @@
           <v-col cols="12" md="6" sm="12">
             <country-details-card :node="node" />
             <twin-details-card class="mt-3" :node="node" />
-            <gpu-details-card
-              class="mt-3"
-              v-if="node.cards?.length || node.num_gpu > 0"
-              :node="node"
-              :nodeOptions="nodeOptions"
-            />
+            <gpu-details-card class="mt-3" v-if="node.gpus?.length" :node="node" />
             <i-perf-card class="mt-3" v-if="hasActiveProfile && node.healthy" :node="node" />
           </v-col>
         </v-row>
@@ -69,10 +64,9 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, type NodesExtractOptions, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
 import { computed } from "vue";
-import { useRoute } from "vue-router";
 
 import CountryDetailsCard from "@/components/node_details_cards/country_details_card.vue";
 import cpuBenchmarkCard from "@/components/node_details_cards/cpu_benchmark_card.vue";
@@ -85,7 +79,7 @@ import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.v
 import router from "@/router";
 import { useProfileManager } from "@/stores";
 import type { FilterOptions } from "@/types";
-import { type GridProxyRequestConfig, nodeInitializer } from "@/types";
+import { nodeInitializer } from "@/types";
 import { getNode, getNodeStatusColor } from "@/utils/get_nodes";
 
 import IPerfCard from "./node_details_cards/iperf_details_card.vue";
@@ -127,18 +121,16 @@ export default {
 
     const errorLoadingStatsMessage = ref<string>();
     const errorMessage = ref<string>("");
-    const route = useRoute();
     const profileManager = useProfileManager();
     const hasActiveProfile = computed(() => {
       return !!profileManager.profile;
     });
     const node = ref<GridNode>(nodeInitializer);
 
-    const nodeOptions: GridProxyRequestConfig = {
+    const nodeOptions: NodesExtractOptions = {
       loadTwin: true,
       loadFarm: true,
       loadStats: true,
-      loadGpu: false,
     };
 
     function closeDialog(newValue: boolean) {
@@ -156,9 +148,6 @@ export default {
       if (props.nodeId > 0) {
         try {
           loading.value = true;
-          if (props.filterOptions.gpu) {
-            nodeOptions.loadGpu = true;
-          }
           const _node: GridNode = await getNode(props.nodeId, nodeOptions);
           node.value = _node;
           isLiveStats.value = true;
@@ -169,7 +158,6 @@ export default {
           errorLoadingStatsMessage.value =
             "The node appears like it's up but it is physically down maybe because it's gone to offline mode.";
           nodeOptions.loadStats = false;
-          nodeOptions.loadGpu = false;
           try {
             const _node: GridNode = await getNode(props.nodeId, nodeOptions);
             node.value = _node;

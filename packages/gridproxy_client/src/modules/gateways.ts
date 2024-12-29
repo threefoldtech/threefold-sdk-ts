@@ -46,6 +46,7 @@ export interface GPUCard {
   vendor: string;
   device: string;
   contract: number;
+  updated_at: number;
 }
 
 export interface DMI {
@@ -98,7 +99,6 @@ export interface GridNode {
   publicIps: PublicIps;
   twin: Twin;
   stats: NodeStats;
-  cards: GPUCard[];
   num_gpu: number;
   healthy: boolean;
   rentable: boolean;
@@ -110,6 +110,7 @@ export interface GridNode {
   };
   price_usd: number;
   extraFee: number;
+  gpus: GPUCard[];
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

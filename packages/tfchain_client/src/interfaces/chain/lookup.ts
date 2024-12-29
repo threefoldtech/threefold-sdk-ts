@@ -690,6 +690,24 @@ export default {
         nodeId: "u32",
         extraFee: "u64",
       },
+      RentWaived: {
+        contractId: "u64",
+      },
+      ContractGracePeriodElapsed: {
+        contractId: "u64",
+        gracePeriod: "u64",
+      },
+      ContractPaymentOverdrawn: {
+        contractId: "u64",
+        timestamp: "u64",
+        partiallyBilledAmount: "u128",
+        overdraft: "u128",
+      },
+      RewardDistributed: {
+        contractId: "u64",
+        standardRewards: "u128",
+        additionalRewards: "u128",
+      },
     },
   },
   /**
@@ -2352,10 +2370,21 @@ export default {
    * Lookup265: pallet_smart_contract::types::StorageVersion
    **/
   PalletSmartContractStorageVersion: {
-    _enum: ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11"],
+    _enum: ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12"],
   },
   /**
-   * Lookup266: pallet_smart_contract::pallet::Error<T>
+   * Lookup266: pallet_smart_contract::types::ContractPaymentState<BalanceOf>
+   **/
+  PalletSmartContractContractPaymentState: {
+    standardReserve: "u128",
+    additionalReserve: "u128",
+    standardOverdraft: "u128",
+    additionalOverdraft: "u128",
+    lastUpdatedSeconds: "u64",
+    cycles: "u16",
+  },
+  /**
+   * Lookup267: pallet_smart_contract::pallet::Error<T>
    **/
   PalletSmartContractError: {
     _enum: [
@@ -2411,16 +2440,18 @@ export default {
       "WrongAuthority",
       "UnauthorizedToChangeSolutionProviderId",
       "UnauthorizedToSetExtraFee",
+      "RewardDistributionError",
+      "ContractPaymentStateNotExists",
     ],
   },
   /**
-   * Lookup267: pallet_tft_bridge::types::StorageVersion
+   * Lookup268: pallet_tft_bridge::types::StorageVersion
    **/
   PalletTftBridgeStorageVersion: {
     _enum: ["V1", "V2"],
   },
   /**
-   * Lookup268: pallet_tft_bridge::pallet::Error<T>
+   * Lookup269: pallet_tft_bridge::pallet::Error<T>
    **/
   PalletTftBridgeError: {
     _enum: [
@@ -2448,7 +2479,7 @@ export default {
     ],
   },
   /**
-   * Lookup270: pallet_tft_price::pallet::Error<T>
+   * Lookup271: pallet_tft_price::pallet::Error<T>
    **/
   PalletTftPriceError: {
     _enum: [
@@ -2463,7 +2494,7 @@ export default {
     ],
   },
   /**
-   * Lookup272: pallet_burning::types::Burn<sp_core::crypto::AccountId32, BalanceOf, BlockNumber>
+   * Lookup273: pallet_burning::types::Burn<sp_core::crypto::AccountId32, BalanceOf, BlockNumber>
    **/
   PalletBurningBurn: {
     target: "AccountId32",
@@ -2472,19 +2503,19 @@ export default {
     message: "Bytes",
   },
   /**
-   * Lookup273: pallet_burning::pallet::Error<T>
+   * Lookup274: pallet_burning::pallet::Error<T>
    **/
   PalletBurningError: {
     _enum: ["NotEnoughBalanceToBurn"],
   },
   /**
-   * Lookup275: pallet_kvstore::pallet::Error<T>
+   * Lookup276: pallet_kvstore::pallet::Error<T>
    **/
   PalletKvstoreError: {
     _enum: ["NoValueStored", "KeyIsTooLarge", "ValueIsTooLarge"],
   },
   /**
-   * Lookup277: pallet_collective::Votes<sp_core::crypto::AccountId32, BlockNumber>
+   * Lookup278: pallet_collective::Votes<sp_core::crypto::AccountId32, BlockNumber>
    **/
   PalletCollectiveVotes: {
     index: "u32",
@@ -2494,7 +2525,7 @@ export default {
     end: "u32",
   },
   /**
-   * Lookup278: pallet_collective::pallet::Error<T, I>
+   * Lookup279: pallet_collective::pallet::Error<T, I>
    **/
   PalletCollectiveError: {
     _enum: [
@@ -2508,16 +2539,17 @@ export default {
       "TooManyProposals",
       "WrongProposalWeight",
       "WrongProposalLength",
+      "PrimeAccountNotMember",
     ],
   },
   /**
-   * Lookup280: pallet_membership::pallet::Error<T, I>
+   * Lookup281: pallet_membership::pallet::Error<T, I>
    **/
   PalletMembershipError: {
     _enum: ["AlreadyMember", "NotMember", "TooManyMembers"],
   },
   /**
-   * Lookup281: pallet_dao::proposal::DaoProposal
+   * Lookup282: pallet_dao::proposal::DaoProposal
    **/
   PalletDaoProposalDaoProposal: {
     index: "u32",
@@ -2525,7 +2557,7 @@ export default {
     link: "Bytes",
   },
   /**
-   * Lookup282: pallet_dao::proposal::DaoVotes<BlockNumber, sp_core::crypto::AccountId32>
+   * Lookup283: pallet_dao::proposal::DaoVotes<BlockNumber, sp_core::crypto::AccountId32>
    **/
   PalletDaoProposalDaoVotes: {
     index: "u32",
@@ -2536,14 +2568,14 @@ export default {
     vetos: "Vec<AccountId32>",
   },
   /**
-   * Lookup284: pallet_dao::proposal::VoteWeight
+   * Lookup285: pallet_dao::proposal::VoteWeight
    **/
   PalletDaoProposalVoteWeight: {
     farmId: "u32",
     weight: "u64",
   },
   /**
-   * Lookup285: pallet_dao::pallet::Error<T>
+   * Lookup286: pallet_dao::pallet::Error<T>
    **/
   PalletDaoError: {
     _enum: [
@@ -2568,7 +2600,7 @@ export default {
     ],
   },
   /**
-   * Lookup286: pallet_validator::pallet::Error<T>
+   * Lookup287: pallet_validator::pallet::Error<T>
    **/
   PalletValidatorError: {
     _enum: [
@@ -2587,7 +2619,7 @@ export default {
     ],
   },
   /**
-   * Lookup288: sp_runtime::MultiSignature
+   * Lookup289: sp_runtime::MultiSignature
    **/
   SpRuntimeMultiSignature: {
     _enum: {
@@ -2597,43 +2629,47 @@ export default {
     },
   },
   /**
-   * Lookup289: sp_core::sr25519::Signature
+   * Lookup290: sp_core::sr25519::Signature
    **/
   SpCoreSr25519Signature: "[u8;64]",
   /**
-   * Lookup290: sp_core::ecdsa::Signature
+   * Lookup291: sp_core::ecdsa::Signature
    **/
   SpCoreEcdsaSignature: "[u8;65]",
   /**
-   * Lookup293: frame_system::extensions::check_non_zero_sender::CheckNonZeroSender<T>
+   * Lookup294: frame_system::extensions::check_non_zero_sender::CheckNonZeroSender<T>
    **/
   FrameSystemExtensionsCheckNonZeroSender: "Null",
   /**
-   * Lookup294: frame_system::extensions::check_spec_version::CheckSpecVersion<T>
+   * Lookup295: frame_system::extensions::check_spec_version::CheckSpecVersion<T>
    **/
   FrameSystemExtensionsCheckSpecVersion: "Null",
   /**
-   * Lookup295: frame_system::extensions::check_tx_version::CheckTxVersion<T>
+   * Lookup296: frame_system::extensions::check_tx_version::CheckTxVersion<T>
    **/
   FrameSystemExtensionsCheckTxVersion: "Null",
   /**
-   * Lookup296: frame_system::extensions::check_genesis::CheckGenesis<T>
+   * Lookup297: frame_system::extensions::check_genesis::CheckGenesis<T>
    **/
   FrameSystemExtensionsCheckGenesis: "Null",
   /**
-   * Lookup299: frame_system::extensions::check_nonce::CheckNonce<T>
+   * Lookup300: frame_system::extensions::check_nonce::CheckNonce<T>
    **/
   FrameSystemExtensionsCheckNonce: "Compact<u32>",
   /**
-   * Lookup300: frame_system::extensions::check_weight::CheckWeight<T>
+   * Lookup301: frame_system::extensions::check_weight::CheckWeight<T>
    **/
   FrameSystemExtensionsCheckWeight: "Null",
   /**
-   * Lookup301: pallet_transaction_payment::ChargeTransactionPayment<T>
+   * Lookup302: pallet_transaction_payment::ChargeTransactionPayment<T>
    **/
   PalletTransactionPaymentChargeTransactionPayment: "Compact<u128>",
   /**
-   * Lookup302: tfchain_runtime::Runtime
+   * Lookup303: pallet_smart_contract::types::ContractIdProvides<tfchain_runtime::Runtime>
+   **/
+  PalletSmartContractContractIdProvides: "Null",
+  /**
+   * Lookup304: tfchain_runtime::Runtime
    **/
   TfchainRuntimeRuntime: "Null",
 };

@@ -11,21 +11,21 @@ on:
         required: true
         default: "dev"
         options: 
-        - "dev"
-        - "qa"
-        - "test"
-        - "main"
+          - "dev"
+          - "qa"
+          - "test"
+          - "main"
 jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      NETWORK: ${{ github.event.inputs.network }}
+      NETWORK: ${{ github.event.inputs.network || 'dev' }}
       RMB_PROXY: true
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
     steps:
-      - name: set network for Schedule
-        if: ${{env.NETWORK}} == ""
+      - name: Set network for schedule
+        if: ${{ !env.NETWORK }}
         run: echo "NETWORK=dev" >> $GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Set up node version
@@ -48,6 +48,13 @@ jobs:
           sudo  sed -i -- 's/Peers\: \[\]/Peers: [\n'"$PEERS"']/g' /etc/yggdrasil/yggdrasil.conf
           sudo systemctl stop yggdrasil
           sudo systemctl start yggdrasil
+      - name: Install Mycelium
+        run: |
+          sudo apt-get update
+          wget https://github.com/threefoldtech/mycelium/releases/download/v0.5.6/mycelium-x86_64-unknown-linux-musl.tar.gz
+          tar -xvf mycelium-x86_64-unknown-linux-musl.tar.gz
+          mv mycelium /usr/local/bin
+          sudo mycelium --peers tcp://188.40.132.242:9651 quic://185.69.166.8:9651 --tun-name utun9 &
       - name: Generate SSH Key
         run: |
           ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519

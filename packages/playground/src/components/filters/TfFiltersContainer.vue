@@ -15,20 +15,13 @@
       >
         <span>Filters</span>
         <VSpacer />
-        <VBtn
-          variant="outlined"
-          :disabled="loading || !valid || empty"
-          @click.stop="clear"
-          text="Clear"
-          density="compact"
-        />
+        <VBtn variant="outlined" :disabled="loading || empty" @click.stop="clear" text="Clear" density="compact" />
         <VBtn
           variant="outlined"
           color="secondary"
           density="compact"
-          :disabled="!valid || !changed"
           @click.stop="apply"
-          text="Apply"
+          :text="!valid || !changed ? 'Refresh' : 'Apply'"
           :loading="loading"
           class="mx-2"
         />

@@ -1,6 +1,9 @@
 <template>
-  <weblet-layout ref="layout" title-image="images/icons/domains.png">
-    <template #title>Deploy Domains Instance </template>
+  <weblet-layout ref="layout">
+    <template #title
+      ><span><v-icon class="pr-3">mdi-web-box</v-icon></span
+      >Deploy Domains Instance
+    </template>
 
     <d-tabs :tabs="[{ title: 'Config', value: 'config' }]">
       <template #config>
@@ -13,7 +16,7 @@
               validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
               subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
               validators.minLength('Subdomain must be at least 4 characters.', 4),
-              subdomain => validators.maxLength('Subdomain cannot exceed 50 characters.', 50)(subdomain),
+              subdomain => validators.maxLength('Subdomain cannot exceed 35 characters.', 35)(subdomain),
             ]"
             :async-rules="[validateSubdomain]"
             #="{ props }"
@@ -25,16 +28,6 @@
         <div :style="{ marginTop: '-10px' }">
           <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
         </div>
-
-        <input-tooltip tooltip="The port used to access the machine.">
-          <input-validator
-            :value="port"
-            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
-            #="{ props }"
-          >
-            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
-          </input-validator>
-        </input-tooltip>
 
         <input-tooltip
           tooltip="User's machine's IP: It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
@@ -49,6 +42,16 @@
             #="{ props }"
           >
             <v-text-field label="IP" v-model="ip" v-bind="props" />
+          </input-validator>
+        </input-tooltip>
+
+        <input-tooltip tooltip="The port used to access the machine.">
+          <input-validator
+            :value="port"
+            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
+            #="{ props }"
+          >
+            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
           </input-validator>
         </input-tooltip>
 

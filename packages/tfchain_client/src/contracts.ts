@@ -1,5 +1,8 @@
+import { Decimal } from "decimal.js";
+
 import { Client, QueryClient } from "./client";
 import { TFChainError } from "./errors";
+import { NodeResources } from "./nodes";
 import { ExtrinsicResult, PublicIp } from "./types";
 import { checkConnection, requireCouncil } from "./utils";
 
@@ -23,7 +26,21 @@ export interface ContractLock {
   lockUpdated: number;
   cycles: number;
 }
+export interface ContractPaymentState {
+  standardReserve: Decimal;
+  additionalReserve: Decimal;
+  standardOverdraft: Decimal;
+  additionalOverdraft: Decimal;
+  lastUpdatedSeconds: number;
+  cycles: number;
+}
 
+/** For getting network usage billing info */
+export interface BillingInformation {
+  previousNuReported: number;
+  lastUpdated: number;
+  amountUnbilled: number;
+}
 interface NodeContract {
   nodeId: number;
   deploymentHash: string;
@@ -50,6 +67,10 @@ interface Contract {
   solutionProviderId: number;
 }
 
+export interface NodeContractUsedResources {
+  contractId: number;
+  used: NodeResources;
+}
 enum ServiceState {
   Created = "Created",
   AgreementReady = "AgreementReady",
@@ -113,6 +134,20 @@ class QueryContracts {
     const res = await this.client.api.query.smartContractModule.contracts(options.id);
     return res.toPrimitive() as unknown as Contract;
   }
+  /**
+   * Retrieves the resources used by a node contract.
+   *
+   * This function queries the `smartContractModule` to get the resource usage of a specified node contract
+   * based on the provided contract ID. The result is converted to a primitive form and returned as `NodeContractUsedResources`.
+   *
+   * @param {QueryContractsGetOptions} options - Options object containing the contract ID.
+   * @returns {Promise<NodeContractUsedResources>} - The resources used by the node contract.
+   */
+  @checkConnection
+  async getNodeContractResources(options: QueryContractsGetOptions) {
+    const res = await this.client.api.query.smartContractModule.nodeContractResources(options.id);
+    return res.toPrimitive() as unknown as NodeContractUsedResources;
+  }
 
   /**
    * Retrieves the `contract ID` for the active `rent contract` associated with a specific node.
@@ -173,6 +208,17 @@ class QueryContracts {
     const res = await this.client.api.query.smartContractModule.contractLock(options.id);
     return res.toPrimitive() as unknown as ContractLock;
   }
+  /**
+   * Retrieves the `payment state` of a contract based on the provided `contract ID`.
+   *
+   * @param contractID - The ID for which contract to retrieve its `payment state`.
+   * @returns {Promise<ContractLock>} A Promise that resolves to the `ContractPaymentState` of the specified contract.
+   */
+  @checkConnection
+  async getContractPaymentState(contractID: number) {
+    const res = await this.client.api.query.smartContractModule.contractPaymentState(contractID);
+    return res.toPrimitive() as unknown as ContractPaymentState;
+  }
 
   /**
    * Retrieves the deletion time for a contract based on the provided options.
@@ -223,6 +269,20 @@ class QueryContracts {
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
     const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
     return res.toPrimitive() as number;
+  }
+  /**
+   * Retrieves the billing information for network usage of a specific contract by its ID.
+   *
+   * This asynchronous function queries the smart contract module to fetch the billing details
+   * associated with the network usage of the given contract ID.
+   *
+   * @param {number} contractId - The contract id to get its billing information.
+   * @returns {Promise<any>} A promise that resolves to the billing information of the contract
+   * related to network usage.
+   */
+  async getContractBillingInformationByID(contractId: number): Promise<BillingInformation> {
+    const res = await this.client.api.query.smartContractModule.contractBillingInformationByID(contractId);
+    return res.toPrimitive() as unknown as BillingInformation;
   }
 }
 

@@ -108,14 +108,6 @@
             </v-list>
           </div>
         </div>
-
-        <template v-if="version">
-          <div class="version">
-            <v-chip color="secondary">
-              {{ version }}
-            </v-chip>
-          </div>
-        </template>
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
@@ -273,7 +265,7 @@ const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 const toolbarExtended = ref(false);
-const openProfile = ref(true);
+const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -302,22 +294,29 @@ function setSidebarOnResize() {
 
 window.addEventListener("resize", setSidebarOnResize);
 
-const themeMatcher = window.matchMedia("(prefers-color-scheme: dark)");
-// changes theme based on changes in system mode
-themeMatcher.addEventListener("change", updateTheme);
+const themeMatchers = {
+  light: window.matchMedia("(prefers-color-scheme: light)"),
+  dark: window.matchMedia("(prefers-color-scheme: dark)"),
+};
+
+themeMatchers.dark.addEventListener("change", updateTheme);
+themeMatchers.light.addEventListener("change", updateTheme);
+
 function updateTheme() {
-  if (themeMatcher.matches) {
-    theme.global.name.value = AppThemeSelection.dark;
-  } else {
-    theme.global.name.value = AppThemeSelection.light;
-  }
-  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, ThemeSettingsInterface.System);
+  const themeKey = getThemeKey();
+  theme.global.name.value = AppThemeSelection[themeKey];
+  localStorage.setItem(LocalStorageSettingsKey.THEME_KEY, AppThemeSelection[themeKey]);
 }
 
-// sets theme to system mode on application mount
-onMounted(() => {
-  updateTheme();
-});
+function getThemeKey() {
+  if (themeMatchers.dark.matches) {
+    return "dark";
+  } else if (themeMatchers.light.matches) {
+    return "light";
+  }
+  return "system";
+}
+
 watch(
   () => $route.meta,
   meta => {
@@ -349,12 +348,12 @@ async function setTimeouts() {
   }
 
   const client = gridStore.client as GridClient;
-  const clientOptions = client.clientOptions;
-  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
-  const deploymentTimeoutMinutes = clientOptions.deploymentTimeoutMinutes;
 
-  if (client && clientOptions && deploymentTimeoutMinutes) {
-    if (!localStorageDeploymentTimeout) {
+  const localStorageDeploymentTimeout = localStorage.getItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY);
+
+  if (client && client.clientOptions) {
+    const deploymentTimeoutMinutes = client.clientOptions.deploymentTimeoutMinutes;
+    if (!localStorageDeploymentTimeout && deploymentTimeoutMinutes) {
       localStorage.setItem(LocalStorageSettingsKey.TIMEOUT_DEPLOYMENT_KEY, `${+deploymentTimeoutMinutes * 60}`);
     } else {
       client.clientOptions.deploymentTimeoutMinutes = +localStorageDeploymentTimeout! / 60;
@@ -362,9 +361,7 @@ async function setTimeouts() {
     }
   }
 }
-
 // eslint-disable-next-line no-undef
-const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
@@ -426,12 +423,14 @@ const routes: AppRoute[] = [
         icon: "mdi-lightbulb-on-outline",
         route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Domains",
-        icon: "domains.png",
+        icon: "mdi-web-box",
         route: DashboardRoutes.Deploy.Domains,
         tooltip: "Expose servers hosted on local machines or VMs to the public internet.",
+        releaseDate: new Date("2024-11-13"),
       },
       {
         title: "Your Contracts",
@@ -556,11 +555,9 @@ function clickHandler({ route, url }: AppRouteItem): void {
 
 <script lang="ts">
 import type { GridClient } from "@threefold/grid_client";
-import { nextTick } from "process";
 
 import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
-import { ThemeSettingsInterface } from "@/utils/settings";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";

@@ -2,7 +2,7 @@ import { createClient } from "redis";
 
 import { FilterOptions, generateString, GridClient, ZDBModel, ZdbModes, ZDBSModel } from "../../src";
 import { getClient } from "../client_loader";
-import { bytesToGB, generateInt, getOnlineNode, log } from "../utils";
+import { GBToBytes, generateInt, getOnlineNode, log } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -109,7 +109,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
   //ZDB Assertions
   expect(result[0].nodeId).toBe(nodeId);
   expect(result[0].status).toBe("ok");
-  expect(result[0].size).toBe(bytesToGB(diskSize));
+  expect(result[0].size).toBe(GBToBytes(diskSize));
   expect(result[0].mode).toBe(mode);
   expect(result[0].publicNamespace).toBe(publicNamespace);
   expect(result[0].password).toBe(password);
@@ -152,7 +152,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
     const splittedRes = info.toString().split("\n");
     const diskValue = splittedRes[20].match(/^\d+|\d+\b|\d+(?=\w)/g);
     expect(splittedRes[1]).toContain(namespace);
-    expect(+diskValue[0]).toBe(bytesToGB(diskSize));
+    expect(+diskValue[0]).toBe(GBToBytes(diskSize));
 
     //Select Namespace
     const select = await client.sendCommand(["select", namespace, password]);

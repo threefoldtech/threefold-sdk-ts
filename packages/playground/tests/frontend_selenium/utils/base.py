@@ -6,4 +6,7 @@ class Base:
     port = config['Base']['port']
     net = config['Base']['net']
     base_url = 'http://localhost:' + str(port) + '/'
-    gridproxy_url = 'https://gridproxy.' + str(net) + '.grid.tf/'
+    if str(net) == 'main':
+        gridproxy_url = 'https://gridproxy.grid.tf/'
+    else:
+        gridproxy_url = 'https://gridproxy.' + str(net) + '.grid.tf/'

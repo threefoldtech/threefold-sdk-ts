@@ -30,7 +30,7 @@ function splitIP(ip: string) {
   return formattedString;
 }
 
-function bytesToGB(bytes: number) {
+function GBToBytes(bytes: number) {
   return bytes * Math.pow(1024, 3);
 }
 
@@ -105,4 +105,4 @@ async function getOnlineNode(Nodes) {
   return node.nodeId;
 }
 
-export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait, getOnlineNode };
+export { log, generateHash, generateInt, splitIP, GBToBytes, RemoteRun, returnRelay, k8sWait, getOnlineNode };

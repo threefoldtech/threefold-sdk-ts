@@ -82,12 +82,24 @@
         </v-col>
       </v-row>
       <v-divider class="my-3 w-25 mx-auto" />
-      <div class="text-center mb-12">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
+
+      <div class="mb-12 d-flex justify-center text-subtitle-2">
+        <p>
+          &#169; {{ new Date().getFullYear() }} ThreeFoldTech
+          <span v-if="version !== noAppVersionMessage">
+            <span class="mx-2">|</span>Version
+            <span class="footer_header">
+              {{ version }}
+            </span></span
+          >
+        </p>
+      </div>
     </v-container>
   </v-footer>
 </template>
 
 <script lang="ts" setup>
+import { inject } from "vue";
 import { useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
@@ -96,10 +108,10 @@ import { AppThemeSelection } from "@/utils/app_theme";
 import { manual } from "@/utils/manual";
 
 const theme = useTheme();
-
+const version = process.env.VERSION;
 const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
-
+const noAppVersionMessage = inject("noAppVersion");
 function navigateToHome() {
   return $router.push(DashboardRoutes.Other.HomePage);
 }

@@ -7,6 +7,7 @@
             <v-card
               :height="200"
               class="pa-3 pt-6"
+              style="width: 100%"
               v-bind="props"
               :class="[
                 isHovering ? 'card-opacity' : undefined,

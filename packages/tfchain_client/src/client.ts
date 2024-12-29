@@ -276,29 +276,38 @@ class Client extends QueryClient {
   }
 
   checkInputs(): void {
-    if (!this.url) throw new ValidationError("url should be provided");
+    if (!this.url) {
+      throw new ValidationError("TFChain URL is required.");
+    }
+
     if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
-      throw new ValidationError(
-        `Keypair type ${this.keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`,
-      );
+      const validTypes = SUPPORTED_KEYPAIR_TYPES.join(", ");
+      throw new ValidationError(`Invalid keypair type: "${this.keypairType}". Valid options are: ${validTypes}.`);
     }
 
-    if ((this.mnemonicOrSecret && this.extSigner) || !(this.mnemonicOrSecret || this.extSigner)) {
-      throw new ValidationError("mnemonicOrSecret or extension signer should be provided");
+    if (!this.mnemonicOrSecret || this.mnemonicOrSecret.startsWith("//")) {
+      return;
     }
-    if (this.mnemonicOrSecret) {
-      if (this.mnemonicOrSecret.startsWith("//")) {
-        return;
-      } else if (!validateMnemonic(this.mnemonicOrSecret)) {
-        if (this.mnemonicOrSecret.includes(" "))
-          // seed shouldn't have spaces
-          throw new ValidationError("Invalid mnemonic! Must be bip39 compliant");
 
-        if (!this.mnemonicOrSecret.startsWith("0x"))
-          throw new ValidationError("Invalid secret seed. secret seed should starts with 0x");
-        const secret = this.mnemonicOrSecret.substring(2);
-        if (secret.length !== 64) throw new ValidationError("Invalid secret length. Secret length should be 64");
-        if (!isValidSeed(secret)) throw new ValidationError("Invalid secret seed");
+    if (!this.mnemonicOrSecret && !this.extSigner) {
+      throw new ValidationError("Either 'mnemonicOrSecret' or 'extSigner' must be provided.");
+    }
+
+    if (
+      !validateMnemonic(this.mnemonicOrSecret) &&
+      this.mnemonicOrSecret.length !== 64 &&
+      this.mnemonicOrSecret.length !== 66
+    ) {
+      throw new ValidationError("Invalid mnemonic provided.");
+    }
+
+    if (this.mnemonicOrSecret.startsWith("0x")) {
+      const secret = this.mnemonicOrSecret.substring(2);
+      if (secret.length !== 64) {
+        throw new ValidationError("Secret must be exactly 64 characters long.");
+      }
+      if (!isValidSeed(secret)) {
+        throw new ValidationError("Invalid seed derived from the secret.");
       }
     }
   }

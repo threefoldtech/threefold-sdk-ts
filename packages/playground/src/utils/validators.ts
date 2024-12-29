@@ -6,8 +6,6 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
-import type { RuleReturn } from "@/components/input_validator.vue";
-
 import { SessionStorageSettingsKey } from "./settings";
 
 /**
@@ -114,6 +112,22 @@ export function requiredTrue(msg: string) {
 export function IsAlphanumericExpectUnderscore(msg: string) {
   return (value: string) => {
     if (!/^[a-zA-Z0-9_]*$/.test(value)) {
+      return { message: msg, requiredTrue: true };
+    }
+  };
+}
+
+/**
+ * Returns a validation function that checks if the value only contains alphanumeric characters, dashes, and underscores.
+ *
+ * @param {string} msg - The error message to return if the validation fails.
+ *
+ * @returns {(value: string) => { message: string, requiredTrue: boolean }} - A function that takes a string value as input and returns an object with an error message and a requiredTrue flag if the validation fails.
+ */
+
+export function IsAlphanumericExpectDashAndUnderscore(msg: string) {
+  return (value: string) => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
       return { message: msg, requiredTrue: true };
     }
   };
@@ -777,7 +791,9 @@ export function isValidDecimalNumber(length: number, msg: string) {
     }
   };
 }
-export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
+export async function isValidStellarAddress(
+  target: string,
+): Promise<import("@/components/input_validator.vue").RuleReturn> {
   const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
   try {
     // check if the account provided exists on stellar
