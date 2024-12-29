@@ -202,6 +202,7 @@ export function normalizeNodeFilters(
     hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
     certified: filters.certified || undefined,
+    availableFor: filters.dedicated ? undefined : options.twinId,
     region: options.location.region ? options.location.region : options.location.subregion,
     country: options.location.country,
     gateway: options.gateway,
