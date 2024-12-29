@@ -145,6 +145,9 @@ export default {
           createCustomToast("Transaction Submitted", ToastType.info);
           await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
           createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
+          if (props.node.status === "standby") {
+            createCustomToast(`It might take a while for node ${props.node.nodeId} status to be up`, ToastType.warning);
+          }
           notifyDelaying();
           disableButton.value = true;
           setTimeout(() => {

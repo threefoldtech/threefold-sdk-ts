@@ -195,7 +195,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIP,
         planetary: true,
