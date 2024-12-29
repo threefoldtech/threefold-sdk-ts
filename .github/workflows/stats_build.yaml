@@ -4,11 +4,11 @@ name: Stats Build
 
 on:
   push:
-    branches: [development, development_2.7]
+    branches: [development]
     paths:
       - "packages/stats/**"
   pull_request:
-    branches: [development, development_2.7]
+    branches: [development]
     paths:
       - "packages/stats/**"
 

@@ -4,25 +4,23 @@ name: Full Clients Audit
 
 on:
   push:
-    branches: 
+    branches:
       - development
-      - development_2.7
   pull_request:
-    branches: 
+    branches:
       - development
-      - development_2.7
 
 jobs:
   audit-and-open-issue:
     runs-on: ubuntu-latest
     steps:
-          - uses: actions/checkout@v2
-          - name: Yarn Audit
-            uses: pragatheeswarans/yarn-audit-action@v1.0.0
-            with:
-              token: ${{ github.token }}
-              label: 'audit'
-              title: "${{ github.workflow }}: Critical Security Vulnerability Identified"
-              description: 'High severity issues are identified in the repo.'
-              paths: |
-                .
+      - uses: actions/checkout@v2
+      - name: Yarn Audit
+        uses: pragatheeswarans/yarn-audit-action@v1.0.0
+        with:
+          token: ${{ github.token }}
+          label: "audit"
+          title: "${{ github.workflow }}: Critical Security Vulnerability Identified"
+          description: "High severity issues are identified in the repo."
+          paths: |
+            .

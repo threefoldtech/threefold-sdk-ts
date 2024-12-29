@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - development
-      - development_2.7
     paths:
       - "packages/playground/**"
   workflow_dispatch:
