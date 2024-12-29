@@ -15,12 +15,18 @@
       <ListTable
         :headers="[
           { title: 'PLACEHOLDER', key: 'data-table-select' },
-          { title: 'Contract ID', key: 'contractId' },
           { title: 'Name', key: 'name' },
-          { title: 'Public IPv4', key: 'publicIP.ip' },
-          { title: 'CPU(vCores)', key: 'capacity.cpu' },
-          { title: 'Memory(MB)', key: 'capacity.memory' },
-          { title: 'Disk(GB)', key: 'disk' },
+          {
+            title: 'Networks',
+            key: 'networks',
+            sortable: false,
+            children: [
+              { title: 'Public IPv4', key: 'publicIP.ip', sortable: false },
+              { title: 'Mycelium IP', key: 'myceliumIP', sortable: false },
+            ],
+          },
+          { title: 'Created At', key: 'created' },
+          { title: 'Health', key: 'status', sortable: false },
         ]"
         :items="data"
         :loading="false"
@@ -31,6 +37,27 @@
           {{ data.indexOf(item) + 1 }}
         </template>
 
+        <template #[`item.myceliumIP`]="{ item }">
+          {{ item.myceliumIP || "-" }}
+        </template>
+
+        <template #[`item.created`]="{ item }">
+          {{ toHumanDate(item.created) }}
+        </template>
+
+        <template #[`item.status`]="{ item }">
+          <v-chip :color="getNodeHealthColor(item.status as string).color">
+            <v-tooltip v-if="item.status == NodeHealth.Error" activator="parent" location="top">{{
+              item.message
+            }}</v-tooltip>
+            <v-tooltip v-if="item.status == NodeHealth.Paused" activator="parent" location="top"
+              >The deployment contract is in grace period</v-tooltip
+            >
+            <span class="text-uppercase">
+              {{ getNodeHealthColor(item.status as string).type }}
+            </span>
+          </v-chip>
+        </template>
         <template #[`item.disk`]="{ item }">
           {{ calcDiskSize(item.mounts) }}
         </template>
@@ -80,6 +107,9 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
+
+import toHumanDate from "@/utils/date";
+import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useGrid } from "../stores";
 import { addMachine, deleteMachine, loadVM } from "../utils/deploy_vm";
@@ -135,6 +165,7 @@ async function deploy(layout: any) {
       region: worker.value.selectionDetails!.location?.region,
       planetary: true,
       publicIpv4: true,
+      mycelium: worker.value.mycelium,
       envs: [
         { key: "SWM_NODE_MODE", value: "worker" },
         { key: "PUBLIC_KEY", value: props.master.env.PUBLIC_KEY },
