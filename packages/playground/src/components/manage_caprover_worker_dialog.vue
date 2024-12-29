@@ -15,7 +15,6 @@
       <ListTable
         :headers="[
           { title: 'PLACEHOLDER', key: 'data-table-select' },
-          { title: 'Contract ID', key: 'contractId' },
           { title: 'Name', key: 'name' },
           {
             title: 'Networks',
