@@ -287,7 +287,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   }
 });
 
-test.skip("TC1232 - Kubernetes: Add Worker", async () => {
+test("TC1232 - Kubernetes: Add Worker", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1232 - Kubernetes: Add Worker

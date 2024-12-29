@@ -22,7 +22,7 @@
 
       <div
         :style="{
-          backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background.png)',
+          backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background2.png)',
           padding: '20px',
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
