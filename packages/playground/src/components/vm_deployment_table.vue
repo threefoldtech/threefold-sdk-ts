@@ -110,7 +110,7 @@
       </template>
 
       <template #[`item.billing`]="{ item }">
-        {{ item.billing }}
+        {{ item.billing || "No Data Available" }}
       </template>
       <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.created) }}
@@ -286,6 +286,7 @@ const filteredHeaders = computed(() => {
         value(item: any) {
           return item[0].workloads[0].data.backends.join(", ");
         },
+        sortable: false,
       },
       {
         title: "Domain",

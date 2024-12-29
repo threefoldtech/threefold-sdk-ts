@@ -13,6 +13,10 @@ let URLS = [
 
 async function getStats(r) {
   const cachedData = cache.readCache(cache_path);
+  if (!cachedData.valid || cachedData.error) {
+    await updateStats(r);
+    return;
+  }
 
   r.return(200, JSON.stringify(cachedData.summary));
 }
@@ -24,7 +28,9 @@ async function updateStats(r) {
     return;
   } catch (error) {
     r.error(`Failed to fetch stats: ${error}`);
-    r.return(500, `Failed to fetch stats: ${error}`);
+    r.error(`Returning cached data`);
+    const cachedData = cache.readCache(cache_path);
+    r.return(200, JSON.stringify(cachedData.summary));
     return;
   }
 }
@@ -78,10 +84,10 @@ function mergeStatsData(stats) {
 
   const result = {};
   result.capacity = toTeraOrGiga(res.totalHru + res.totalSru);
+  result.ssd = formatNumberWithCommas(res.totalSru);
   result.nodes = res.nodes;
   result.countries = res.countries;
   result.cores = res.totalCru;
-
   return result;
 }
 
@@ -129,6 +135,26 @@ function toTeraOrGiga(value) {
 
   gb = gb / 1024;
   return gb.toFixed(2) + " PB";
+}
+
+function formatNumberWithCommas(value) {
+  const giga = 1024 ** 3;
+
+  if (!value) return "0 GB";
+
+  const val = +value;
+  if (val === 0 || isNaN(val)) return "0 GB";
+
+  const gb = Math.round(val / giga).toString();
+
+  let res = "";
+  let count = 0;
+  for (let i = gb.length - 1; i >= 0; i--) {
+    res = gb[i] + res;
+    count++;
+    if (count % 3 === 0 && i !== 0) res = "," + res;
+  }
+  return res + " GB";
 }
 
 // Exporting the main function for Nginx

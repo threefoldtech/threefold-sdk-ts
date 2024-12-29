@@ -1,7 +1,7 @@
 import pytest
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service as ChromeService
 from pyvirtualdisplay import Display
 
 """
@@ -19,6 +19,7 @@ def browser():
     options = webdriver.ChromeOptions()
     #options.add_extension('extension.crx')  # For Adding Extension
     driver = webdriver.Chrome(options=options)
+    # driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
     driver.set_window_size(1920, 1080)
 
     # Make its calls wait up to 60 seconds for elements to appear

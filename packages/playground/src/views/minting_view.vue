@@ -9,7 +9,7 @@
       <a
         class="app-link font-weight-medium"
         target="_blank"
-        href="https://www.manual.grid.tf/documentation/faq/faq.html#what-is-the-tft-minting-process-is-it-fully-automated"
+        :href="manual.minting_process"
         >TFT minting process.
       </a>
       <br />
@@ -17,7 +17,7 @@
       <a
         class="app-link font-weight-medium"
         target="_blank"
-        href="https://www.manual.grid.tf/documentation/dashboard/tfchain/tf_minting_reports.html"
+        :href="manual.minting_reports"
         >minting tool.
       </a>
       <br />

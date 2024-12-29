@@ -2,6 +2,7 @@ from utils.utils import get_email, generate_email, generate_string, get_seed
 from pages.twin import TwinPage
 from utils.grid_proxy import GridProxy
 from pages.dashboard import DashboardPage
+import pytest
 
 #  Time required for the run (6 cases) is approximately 3 minutes.
 
@@ -78,7 +79,7 @@ def test_get_tft(browser):
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
     assert twin_page.press_locked_info() == 'https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3751")
 def test_twin_links(browser):
     """
       Test Case: TC1801 - Verify your profile links

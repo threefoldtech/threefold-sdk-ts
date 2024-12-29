@@ -105,13 +105,10 @@ function swapAddressCheck() {
     return;
   }
   const isValid = StrKey.isValidEd25519PublicKey(target.value);
-  const blockedAddresses = [
-    "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC",
-    "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4",
-  ];
-  if (blockedAddresses.includes(target.value)) {
+
+  if (target.value == window.env.BRIDGE_TFT_ADDRESS) {
     return {
-      message: "Blocked Address",
+      message: "Stellar target wallet address cannot be bridge's address.",
     };
   }
   if (!isValid || target.value.match(/\W/)) {

@@ -176,7 +176,7 @@ class Network {
       return network["node_id"] === nodeId;
     });
     const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId == nodeId);
-    if (network && network.mycelium && network.mycelium?.hex_key) {
+    if (network && network.mycelium && network.mycelium?.hex_key && myceliumNetworkSeed?.seed) {
       if (myceliumSeeds && myceliumSeeds.length > 0 && myceliumNetworkSeed?.seed !== network.mycelium.hex_key) {
         throw new ValidationError(`Another mycelium seed is used for this network ${this.name} on this ${nodeId}`);
       }

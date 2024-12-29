@@ -11,21 +11,21 @@ on:
         required: true
         default: "dev"
         options: 
-        - "dev"
-        - "qa"
-        - "test"
-        - "main"
+          - "dev"
+          - "qa"
+          - "test"
+          - "main"
 jobs:
   tests:
     runs-on: ubuntu-latest
     env:
-      NETWORK: ${{ github.event.inputs.network }}
+      NETWORK: ${{ github.event.inputs.network || 'dev' }}
       RMB_PROXY: true
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
     steps:
-      - name: set network for Schedule
-        if: ${{env.NETWORK}} == ""
+      - name: Set network for schedule
+        if: ${{ !env.NETWORK }}
         run: echo "NETWORK=dev" >> $GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Set up node version
