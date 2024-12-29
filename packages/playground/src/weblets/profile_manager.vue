@@ -387,7 +387,7 @@
             </CopyInputWrapper>
           </v-col>
 
-          <v-col cols="12" md="6" lg="6" xl="6">
+          <v-col cols="12" md="6" lg="6" xl="6" class="d-flex justify-center align-center">
             <section class="qr d-flex flex-column align-center">
               <QRPlayStore
                 :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
