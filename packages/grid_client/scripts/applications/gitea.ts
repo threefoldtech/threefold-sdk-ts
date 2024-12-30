@@ -8,14 +8,14 @@ async function deploy(client, vms, subdomain, gatewayNode) {
   log(resultVM);
   log("================= Deploying VM =================");
 
-  const GatewayIP = (await client.machines.getObj(vms.name))[0].publicIP;
+  const vmPlanetary = (await client.machines.getObj(vms.name))[0].planetary;
 
   // Name Gateway Model
   const gw: GatewayNameModel = {
     name: subdomain,
     node_id: gatewayNode.nodeId,
     tls_passthrough: false,
-    backends: [`http://[${VMmyceliumIP}]:3000`],
+    backends: [`http://[${vmPlanetary}]:3000`],
   };
 
   const resultGateway = await client.gateway.deploy_name(gw);
@@ -44,13 +44,13 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = `newgitea${Math.random().toString(36).substring(2, 8)}`;
-  const networkName = `net${Math.random().toString(36).substring(2, 8)}`;
+  const name = "giteainstance";
+  const networkName = "giteanetwork";
   const grid3 = await getClient(`gitea/${name}`);
+  const subdomain = "gt" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
-  const subdomain = `gt${grid3.twinId}${name}${Math.random().toString(36).substring(2, 6)}`;
 
-  // VMNode Selection
+  // VM Node Selection
   const vmQueryOptions: FilterOptions = {
     cru: instanceCapacity.cru,
     mru: instanceCapacity.mru,
@@ -59,7 +59,7 @@ async function main() {
     farmId: 1,
   };
 
-  // GatewayNode Selection
+  // Gateway Node Selection
   const gatewayQueryOptions: FilterOptions = {
     gateway: true,
     availableFor: grid3.twinId,
@@ -73,33 +73,33 @@ async function main() {
     name,
     network: {
       name: networkName,
-      ip_range: "10.253.0.0/16",
+      ip_range: "10.249.0.0/16",
     },
     machines: [
       {
-        name: `vm${Math.random().toString(36).substring(2, 8)}`,
+        name: "giteavm",
         node_id: vmNode,
         disks: [
           {
-            name: `disk${Math.random().toString(36).substring(2, 8)}`,
+            name: "giteadisk",
             size: instanceCapacity.sru,
             mountpoint: "/mnt/data",
           },
         ],
         planetary: true,
-        public_ip: true,
+        public_ip: false,
         public_ip6: false,
         mycelium: true,
         cpu: instanceCapacity.cru,
         memory: 1024 * instanceCapacity.mru,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/gitea-mycelium.flist",
+        flist: "https://hub.grid.tf/petep.3bot/threefolddev-gitea-latest.flist",
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
           GITEA__HOSTNAME: domain,
-          // GITEA__mailer__PROTOCOL: "smtp", // Optional: SMTP Configuration
-          // GITEA__mailer__ENABLED: "false", // Set to true if enabling mail server
+          // GITEA__mailer__PROTOCOL: "smtp",
+          // GITEA__mailer__ENABLED: "true",
           // GITEA__mailer__HOST: "smtp.example.com",
           // GITEA__mailer__FROM: "admin@example.com",
           // GITEA__mailer__PORT: "587",
@@ -118,7 +118,7 @@ async function main() {
   // Get the deployment
   await getDeployment(grid3, vms, subdomain);
 
-  // Uncomment to cancel the deployment
+  // Uncomment the line below to cancel the deployment
   // await cancel(grid3, { name }, { name: subdomain });
 
   await grid3.disconnect();
