@@ -159,6 +159,8 @@ async function deploy(layout: any) {
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
   } catch (e) {
     layout.setStatus("failed", normalizeError(e, "Failed to deploy a caprover worker."));
+  } finally {
+    worker.value = createWorker();
   }
 }
 
