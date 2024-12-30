@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import {
   FarmFilterOptions,
   FilterOptions,
@@ -11,6 +13,25 @@ import {
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
+
+// Define output file paths
+const logDir = "./logs";
+const onlineNodesFile = path.join(logDir, "online_nodes.log");
+const offlineNodesFile = path.join(logDir, "offline_nodes.log");
+const deploymentSuccessFile = path.join(logDir, "deployments_success.log");
+const deploymentErrorFile = path.join(logDir, "deployments_error.log");
+const generalErrorFile = path.join(logDir, "general_errors.log");
+const metricsFile = path.join(logDir, "deployments_metrics.prom");
+
+// Ensure log directory exists
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+
+// Function to write to a log file
+function writeToFile(filePath: string, data: string) {
+  fs.appendFileSync(filePath, `${data}\n`, "utf8");
+}
 
 async function pingNodes(
   grid3: GridClient,
@@ -32,6 +53,22 @@ async function pingNodes(
   return result;
 }
 
+async function countDeployments(filePath: string, keyword: string) {
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const lines = data.split("\n").filter(line => line.includes(keyword));
+    return lines.length;
+  } catch (err) {
+    console.error(`Error reading the file ${filePath}:`, err);
+    return 0;
+  }
+}
+
+async function writeMetricsFile(successCount: number, failedCount: number) {
+  const metricsData = `Total_Successful_Deployments ${successCount}\nTotal_Failed_Deployments ${failedCount}`;
+  fs.writeFileSync(metricsFile, metricsData, "utf8");
+}
+
 async function main() {
   const grid3 = await getClient();
 
@@ -47,24 +84,20 @@ async function main() {
   const totalVMs = 250;
   const batches = totalVMs / batchSize;
 
-  // resources
-  const cru = 1;
-  const mru = 256;
-  const rootFs = 1;
-  const publicIp = false;
-
   console.time("Farms Time");
   const farms = await grid3.capacity.filterFarms({
-    nodeMRU: mru / 1024,
-    nodeSRU: rootFs,
-    publicIp: publicIp,
+    nodeMRU: 256 / 1024,
+    nodeSRU: 1,
+    publicIp: false,
     availableFor: await grid3.twins.get_my_twin_id(),
     randomize: true,
   } as FarmFilterOptions);
   console.timeEnd("Farms Time");
 
   if (farms.length < 1) {
-    throw new Error("No farms found");
+    const errorMsg = "No farms found";
+    writeToFile(generalErrorFile, errorMsg);
+    throw new Error(errorMsg);
   }
 
   console.time("Total Deployment Time");
@@ -74,9 +107,9 @@ async function main() {
 
     const farmIds = farms.map(farm => farm.farmId);
     const nodes = await grid3.capacity.filterNodes({
-      cru: cru,
-      mru: mru / 1024,
-      sru: rootFs,
+      cru: 1,
+      mru: 256 / 1024,
+      sru: 1,
       availableFor: await grid3.twins.get_my_twin_id(),
       farmIds: farmIds,
       randomize: true,
@@ -89,120 +122,100 @@ async function main() {
     // Check nodes results
     results.forEach(({ node, res, error }) => {
       if (res) {
-        console.log(`Node ${node.nodeId} is online`);
+        writeToFile(onlineNodesFile, `Node ${node.nodeId} is online`);
       } else {
         offlineNodes.push(node.nodeId);
-        console.log(`Node ${node.nodeId} is offline`);
+        writeToFile(offlineNodesFile, `Node ${node.nodeId} is offline`);
         if (error) {
-          console.error("Error:", error);
+          writeToFile(generalErrorFile, `Node ${node.nodeId} Error: ${error}`);
         }
       }
     });
 
     const onlineNodes = nodes.filter(node => !offlineNodes.includes(node.nodeId));
 
-    // Batch Deployment
     const batchVMs: MachinesModel[] = [];
     for (let i = 0; i < batchSize; i++) {
-      const vmName = "vm" + generateString(8);
-
       if (onlineNodes.length <= 0) {
-        errors.push("No online nodes available for deployment");
+        const errorMsg = "No online nodes available for deployment";
+        errors.push(errorMsg);
+        writeToFile(generalErrorFile, errorMsg);
         continue;
       }
-      const selectedNode = onlineNodes.pop();
 
-      // create vm node Object
+      const selectedNode = onlineNodes.pop();
+      const vmName = "vm" + generateString(8);
+
       const vm = new MachineModel();
       vm.name = vmName;
       vm.node_id = selectedNode.nodeId;
       vm.disks = [];
-      vm.public_ip = publicIp;
+      vm.public_ip = false;
       vm.planetary = true;
       vm.mycelium = false;
-      vm.cpu = cru;
-      vm.memory = mru;
-      vm.rootfs_size = rootFs;
+      vm.cpu = 1;
+      vm.memory = 256;
+      vm.rootfs_size = 1;
       vm.flist = "https://hub.grid.tf/tf-official-apps/base:latest.flist";
       vm.entrypoint = "/sbin/zinit init";
       vm.env = {
         SSH_KEY: config.ssh_key,
       };
 
-      // create network model for each vm
       const n = new NetworkModel();
       n.name = "nw" + generateString(5);
       n.ip_range = "10.238.0.0/16";
       n.addAccess = true;
 
-      // create VMs Object for each vm
       const vms = new MachinesModel();
       vms.name = "batch" + (batch + 1);
       vms.network = n;
       vms.machines = [vm];
       vms.metadata = "";
-      vms.description = "Test deploying vm with name " + vm.name + " via ts grid3 client - Batch " + (batch + 1);
+      vms.description = `Test deploying vm ${vm.name} - Batch ${batch + 1}`;
 
       batchVMs.push(vms);
     }
 
-    const allTwinDeployments: TwinDeployment[] = [];
-
-    const deploymentPromises = batchVMs.map(async (vms, index) => {
+    const deploymentPromises = batchVMs.map(async vms => {
       try {
         const [twinDeployments, _, __] = await grid3.machines._createDeployment(vms);
-        return { twinDeployments, batchIndex: index };
+        return { twinDeployments };
       } catch (error) {
-        log(`Error creating deployment for batch ${batch + 1}: ${error}`);
-        return { twinDeployments: null, batchIndex: index };
+        const errorMsg = `Deployment Error: ${error}`;
+        writeToFile(deploymentErrorFile, errorMsg);
+        return { twinDeployments: null };
       }
     });
-    console.time("Preparing Batch " + (batch + 1));
-    const deploymentResults = await Promise.allSettled(deploymentPromises).then(results =>
-      results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
-    );
-    console.timeEnd("Preparing Batch " + (batch + 1));
 
-    for (const { twinDeployments } of deploymentResults) {
-      if (twinDeployments) {
-        allTwinDeployments.push(...twinDeployments);
+    const deploymentResults = await Promise.allSettled(deploymentPromises);
+
+    deploymentResults.forEach(result => {
+      if (result.status === "fulfilled" && result.value.twinDeployments) {
+        writeToFile(deploymentSuccessFile, `Batch ${batch + 1} deployed successfully`);
+      } else {
+        failedCount += 1;
       }
-    }
-
-    try {
-      await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
-      log(`Successfully handled and saved contracts for some twin deployments`);
-    } catch (error) {
-      errors.push(error);
-      failedCount += batchSize;
-      log(`Error handling contracts for twin deployments: ${error}`);
-    }
-
-    successCount = totalVMs - failedCount;
+    });
 
     console.timeEnd("Batch " + (batch + 1));
   }
 
   console.timeEnd("Total Deployment Time");
 
-  log("Successful Deployments: " + successCount);
-  log("Failed Deployments: " + failedCount);
+  successCount = await countDeployments(deploymentSuccessFile, "deployed successfully");
+  failedCount = await countDeployments(deploymentErrorFile, "Deployment Error");
 
-  // List of failed deployments' errors
-  log("Failed deployments errors: ");
-  for (let i = 0; i < errors.length; i++) {
-    log(errors[i]);
-    log("---------------------------------------------");
-  }
+  writeToFile(generalErrorFile, `Total Failed Deployments: ${failedCount}`);
+  writeToFile(deploymentSuccessFile, `Total Successful Deployments: ${successCount}`);
 
-  // List of offline nodes
-  log("Failed Nodes: ");
-  for (let i = 0; i < offlineNodes.length; i++) {
-    log(offlineNodes[i]);
-    log("---------------------------------------------");
-  }
+  console.log("Total Successful Deployments:", successCount);
+  console.log("Total Failed Deployments:", failedCount);
+
+  await writeMetricsFile(successCount, failedCount);
 
   await grid3.disconnect();
 }
 
 main();
+
