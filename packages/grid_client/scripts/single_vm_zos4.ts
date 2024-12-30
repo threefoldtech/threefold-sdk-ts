@@ -34,7 +34,6 @@ async function main() {
     mru: instanceCapacity.mru,
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
-    farmId: 1,
     features: [Features.zmachinelight, Features.networklight, Features.mycelium],
     nodeExclude: [259],
   };

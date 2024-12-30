@@ -56,7 +56,7 @@ const vms: MachinesModel = {
   - Takes the `MachinesModel` object as a parameter
   - Checks if a machine with the same name already exists and if so throws an error
   - If not, then it calls the `_createDeployment` function along some othe functions
-  - Finally it returns the created contracts and the wireguard configuration, in case of zos4 node the wireguard configuration is returned empty
+  - Finally, the function returns the created contracts. If the deployment is on a zos3 node, then the wireguard configuration is returned as well.
 
 ```ts
 await client.machines.deploy(vms);
@@ -81,7 +81,7 @@ await this._createDeployment(options);
   - Configures the VM with networking, storage, and environment variables.
   - Generates a Mycelium seed if not provided.
   - Generate the deployments
-  - Returns the deployments and wiregaurd configurations and in case of zos4 node the wiregaurd configuration is returned empty
+  - Finally, the function returns the created contracts. If the deployment is on a zos3 node, then the wireguard configuration is returned as well.
 
 ```ts
 await this.vm.create(
