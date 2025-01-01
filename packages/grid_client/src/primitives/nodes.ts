@@ -163,7 +163,7 @@ class Nodes {
       .then(contract => {
         if (contract.contractType.nameContract)
           throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's a name contract.`);
-        return contract.contractType.nodeContract.nodeId;
+        return contract.contractType?.nodeContract?.nodeId || contract.contractType?.rentContract?.nodeId;
       })
       .catch(err => {
         //TODO add error handling in QueryClient/contracts
