@@ -161,8 +161,8 @@ class Nodes {
     return tfclient.contracts
       .get({ id: contractId })
       .then(contract => {
-        if (!contract.contractType.nodeContract)
-          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's not a node contract.`);
+        if (contract.contractType.nameContract)
+          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's a name contract.`);
         return contract.contractType.nodeContract.nodeId;
       })
       .catch(err => {
