@@ -98,6 +98,7 @@ async function main() {
         env: {
           SSH_KEY: config.ssh_key,
           GITEA__HOSTNAME: domain,
+          //Uncomment incase of using smtp server
           // GITEA__mailer__PROTOCOL: "smtp",
           // GITEA__mailer__ENABLED: "true",
           // GITEA__mailer__HOST: "smtp.example.com",
