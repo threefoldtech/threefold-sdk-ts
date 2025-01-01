@@ -18,6 +18,7 @@
             if (status === 'Init' && node) {
               $emit('node:select', (node as NodeInfo));
             }
+            if(node?.dedicated && node.rentContractId === 0) return false
             await validateRentContract(gridStore, node as NodeInfo);
           }
         : undefined,

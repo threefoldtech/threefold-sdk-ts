@@ -224,6 +224,9 @@ export async function validateRentContract(
   }
 
   try {
+    if (node.dedicated || node.rentedByTwinId === 0) {
+      throw `Node ${node.nodeId} is not rented`;
+    }
     if (node.rentContractId !== 0) {
       const contractInfo = await gridStore.grid.contracts.get({
         id: node.rentContractId,
