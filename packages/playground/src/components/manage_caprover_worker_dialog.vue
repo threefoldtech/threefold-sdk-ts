@@ -160,7 +160,8 @@ async function deploy(layout: any) {
   } catch (e) {
     layout.setStatus("failed", normalizeError(e, "Failed to deploy a caprover worker."));
   } finally {
-    worker.value = createWorker();
+    const { name } = createWorker();
+    worker.value.name = name;
   }
 }
 
