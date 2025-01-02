@@ -1,6 +1,7 @@
 <template>
   <div>
-    <v-alert type="info" variant="tonal">
+    <v-alert color="warning" variant="tonal"
+      ><v-icon size="24" class="pb-1">mdi-alert-circle</v-icon>
       Connect your TFChain
       <a class="app-link" @click="$emit('openProfile')">Wallet</a>
       to view {{ pageTitle }}
