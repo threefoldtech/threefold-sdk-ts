@@ -26,7 +26,7 @@
                     class="mx-auto"
                     :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
                   />
-                  <v-card-text>
+                  <v-card-text class="card_stats">
                     <p class="text-center tf-header font-weight-regular mb-2">
                       {{ s.value }}
                     </p>
@@ -158,7 +158,11 @@ export default {
 
 <style scoped>
 .tf-header {
-  font-size: 1rem;
+  font-size: 0.9rem;
+}
+
+.card_stats {
+  padding: 1rem 0.4rem;
 }
 
 .card-opacity {
@@ -170,11 +174,18 @@ export default {
     min-height: 220px !important;
     /* Adjust height for mobile */
   }
+  .tf-header {
+    font-size: 1rem;
+  }
 }
 
 @media only screen and (max-width: 600px) {
   .v-col {
     flex-basis: auto !important;
+  }
+
+  .tf-header {
+    font-size: 1rem;
   }
 
   .v-card-title {
