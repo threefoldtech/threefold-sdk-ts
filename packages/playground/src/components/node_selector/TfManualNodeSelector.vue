@@ -142,7 +142,8 @@ export default {
         switch (true) {
           case node.status === "down":
             throw `Node ${nodeId} is down`;
-
+          case !(node as any)?.features.includes("zmachine"):
+            throw `Node ${nodeId} is not supported`;
           case props.filters.certified && node.certificationType.toLowerCase() !== "certified":
             throw `Node ${nodeId} is not Certified`;
 
