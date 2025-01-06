@@ -33,10 +33,10 @@
     />
 
     <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
+      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" hide-details />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" />
+      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" hide-details />
     </input-tooltip>
 
     <TfSelectionDetails
