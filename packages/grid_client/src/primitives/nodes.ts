@@ -423,6 +423,8 @@ class Nodes {
       healthy: options.healthy,
       sort_by: SortBy.FreeCRU,
       sort_order: SortOrder.Desc,
+      // TODO remove this line after zos4 support
+      features: ["zmachine"],
     };
 
     if (options.gateway) {
