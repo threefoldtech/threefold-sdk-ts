@@ -142,8 +142,9 @@ export default {
         switch (true) {
           case node.status === "down":
             throw `Node ${nodeId} is down`;
+          //TODO this should be removed once zos4 is supported on dashboard
           case !(node as any)?.features.includes("zmachine"):
-            throw `Node ${nodeId} is not supported`;
+            throw `Node ${nodeId} version is temporarily not supported. Please select another node.`;
           case props.filters.certified && node.certificationType.toLowerCase() !== "certified":
             throw `Node ${nodeId} is not Certified`;
 
