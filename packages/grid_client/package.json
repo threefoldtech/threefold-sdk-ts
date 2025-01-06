@@ -1,7 +1,7 @@
 {
   "name": "@threefold/grid_client",
   "author": "Ahmed Hanafy",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "license": "ISC",
   "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/tree/development/packages/grid_client/README.md",
   "repository": {
@@ -14,11 +14,11 @@
   "dependencies": {
     "@jimber/pkid": "1.0.4",
     "@noble/secp256k1": "^1.7.1",
-    "@threefold/gridproxy_client": "2.6.3",
-    "@threefold/monitoring": "2.6.3",
-    "@threefold/rmb_direct_client": "2.6.3",
-    "@threefold/tfchain_client": "2.6.3",
-    "@threefold/types": "2.6.3",
+    "@threefold/gridproxy_client": "2.6.4",
+    "@threefold/monitoring": "2.6.4",
+    "@threefold/rmb_direct_client": "2.6.4",
+    "@threefold/tfchain_client": "2.6.4",
+    "@threefold/types": "2.6.4",
     "algosdk": "^1.19.0",
     "appdata-path": "^1.0.0",
     "await-lock": "^2.2.2",
