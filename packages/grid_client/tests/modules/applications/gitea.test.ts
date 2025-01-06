@@ -103,13 +103,13 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/gitea-mycelium.flist",
+        flist: "https://hub.grid.tf/petep.3bot/threefolddev-gitea-latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIp,
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: fs.readFileSync("~/.ssh/id_ed25519.pub", "utf8"), // Add the public key here
+          SSH_KEY: config.ssh_key,
           GITEA__HOSTNAME: domain,
           GITEA__ROOT_EMAIL: "admin@gitea.com",
           GITEA__ROOT_PASSWORD: "adminpassword",

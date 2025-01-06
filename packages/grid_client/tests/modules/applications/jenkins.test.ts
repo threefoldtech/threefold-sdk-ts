@@ -110,7 +110,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: fs.readFileSync("~/.ssh/id_ed25519.pub", "utf8"), // Public key for SSH
+          SSH_KEY: config.ssh_key,
           JENKINS_HOSTNAME: domain,
           JENKINS_ADMIN_USERNAME: "admin",
           JENKINS_ADMIN_PASSWORD: "adminpassword",

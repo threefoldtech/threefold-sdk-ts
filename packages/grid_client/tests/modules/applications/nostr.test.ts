@@ -111,7 +111,7 @@ test("TC2955 - Applications: Deploy Nostr", async () => {
         planetary: true,
         mycelium: true,
         env: {
-          SSH_KEY: fs.readFileSync("~/.ssh/id_ed25519.pub", "utf8"), // Public SSH key
+          SSH_KEY: config.ssh_key,
           NOSTR_HOSTNAME: domain,
         },
       },
