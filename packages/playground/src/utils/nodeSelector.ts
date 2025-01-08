@@ -327,6 +327,7 @@ export function isNodeValid(
 }
 
 export async function selectValidNode(
+  gridStore: ReturnType<typeof useGrid>,
   getFarm: GetFarmFn,
   nodes: NodeInfo[],
   selectedMachines: SelectedMachine[],
@@ -334,14 +335,27 @@ export async function selectValidNode(
   oldSelectedNodeId?: number,
   nodesLock?: AwaitLock,
 ): Promise<NodeInfo | void> {
-  let locked = true;
-  if (nodesLock && !nodesLock.acquired) {
-    locked = false;
-    await nodesLock.acquireAsync();
+  const locked = true;
+
+  const rentedNodes = nodes.filter(n => {
+    return n.rentedByTwinId === gridStore.grid.twinId;
+  });
+  let rentedNode;
+  for (const node of rentedNodes) {
+    if (node.rentedByTwinId === gridStore.grid.twinId) {
+      const contractInfo = await gridStore.grid.contracts.get({
+        id: node.rentContractId,
+      });
+
+      if (!contractInfo.state.gracePeriod) {
+        rentedNode = node;
+        break;
+      }
+    }
   }
 
-  if (oldSelectedNodeId) {
-    const node = nodes.find(n => n.nodeId === oldSelectedNodeId);
+  if (oldSelectedNodeId || rentedNode) {
+    const node = nodes.find(n => n.nodeId === oldSelectedNodeId) || rentedNode;
 
     if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
       if (nodesLock && !locked) {

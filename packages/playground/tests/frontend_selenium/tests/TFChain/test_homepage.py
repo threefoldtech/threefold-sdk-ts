@@ -5,7 +5,7 @@ from utils.utils import generate_string, get_seed, get_email
 from utils.base import Base
 import pytest
 
-#  Time required for the run (12 cases) is approximately 2 minutes.
+#  Time required for the run (8 cases) is approximately 03:40 minutes.
 
 
 def before_test_setup(browser):
@@ -50,7 +50,6 @@ def test_tft_price(browser):
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1
 
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
 def test_stats(browser):
     """
       Test Case: TC1674 - TFT stats
@@ -118,7 +117,7 @@ def test_create_account(browser):
     dashboard_page.logout_account()
     assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
+
 def test_account_validation(browser):
     """
       Test Cases: TC1777 - Connect your wallet Validation
@@ -153,7 +152,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), '123456'))
     dashboard_page.open_profile()
-    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
+    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
     assert dashboard_page.get_mnemonic() == get_seed()
     assert dashboard_page.get_email() == get_email()
     assert grid_proxy.get_twin_address(dashboard_page.get_id()) == dashboard_page.get_address()
@@ -167,7 +166,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('Password is required')
     assert dashboard_page.wait_for_button(dashboard_page.login_account('123456')).is_enabled() == True
 
-@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3753")
+
 def test_login_links(browser):
     """
       Test Case: TC1801 - Verify login profile manager links
@@ -183,6 +182,7 @@ def test_login_links(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(get_email(), password))
     dashboard_page.open_profile()
+    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
     assert dashboard_page.connect_manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
     assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
     assert dashboard_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'
