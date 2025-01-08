@@ -164,12 +164,23 @@ export default {
       loadedDomains.value = [];
       return loadDomains();
     };
-
     useWatchDeep(filters, reloadDomains, {
       immediate: true,
       deep: true,
       ignoreFields: ["page"],
     });
+    // let previousFilters = JSON.stringify(filters.value);
+    // useWatchDeep(
+    //   filters,
+    //   newFilters => {
+    //     const currentFilters = JSON.stringify(newFilters);
+    //     if (currentFilters !== previousFilters) {
+    //       reloadDomains();
+    //       previousFilters = currentFilters;
+    //     }
+    //   },
+    //   { immediate: true, deep: true, ignoreFields: ["page"] },
+    // );
     const customDomain = ref("");
 
     const domainNameValid = ref<boolean | null>(null);

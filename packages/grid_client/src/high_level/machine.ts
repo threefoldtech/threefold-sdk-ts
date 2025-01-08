@@ -1,6 +1,7 @@
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
+import { Features } from "../helpers";
 import { events } from "../helpers/events";
 import { calculateRootFileSystem } from "../helpers/root_fs";
 import { randomChoice, zeroPadding } from "../helpers/utils";
@@ -63,8 +64,7 @@ class VMHL extends HighLevelBase {
       });
     }
     const nodeInfo = await this.nodes.getNode(nodeId);
-    // Checks if the node is a zos4 node
-    const isZOS4 = nodeInfo.features.some(item => item.includes("zmachine-light") || item.includes("network-light"));
+    const nodeFeatures = (await this.nodes.getNode(nodeId)).features;
     const deployments: TwinDeployment[] = [];
     const workloads: Workload[] = [];
     let totalDisksSize = rootfs_size;
@@ -157,8 +157,8 @@ class VMHL extends HighLevelBase {
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
-      if (isZOS4) {
-        throw new GridClientErrors.Farms.InvalidResourcesError(`Zmachine Light doesn't support public ips.`);
+      if (nodeFeatures.includes(Features.ip)) {
+        throw new GridClientErrors.Farms.InvalidResourcesError(`Node ${nodeId} doesn't support public ips.`);
       }
       const ip = new PublicIPPrimitive();
       ipName = `${name}_pubip`;
@@ -208,14 +208,14 @@ class VMHL extends HighLevelBase {
     if (ip) {
       userIPsubnet = network.ValidateFreeSubnet(Addr(ip).mask(24).toString());
 
-      // If the node is not a zos4 node get accessNodeSubnet
-      if (!isZOS4) {
+      // If the node supports wireguard feature get accessNodeSubnet
+      if (nodeFeatures.includes(Features.wireguard)) {
         accessNodeSubnet = network.getFreeSubnet();
       }
     }
     // Set networkContractMetadata based on node's zos version
     let networkContractMetadata;
-    if (!isZOS4) {
+    if (nodeFeatures.includes(Features.network)) {
       networkContractMetadata = JSON.stringify({
         version: 3,
         type: "network",
@@ -237,7 +237,7 @@ class VMHL extends HighLevelBase {
     let wgConfig = "";
     let hasAccessNode = false;
     let accessNodes: Record<string, unknown> = {};
-    if (!isZOS4 && network instanceof Network) {
+    if (nodeFeatures.includes(Features.wireguard) && network instanceof Network) {
       if (addAccess) {
         accessNodes = await this.nodes.getAccessNodes(this.config.twinId);
         for (const accessNode of Object.keys(accessNodes)) {
@@ -251,7 +251,7 @@ class VMHL extends HighLevelBase {
         (!Object.keys(accessNodes).includes(nodeId.toString()) || nodeId !== accessNodeId) &&
         !hasAccessNode &&
         addAccess &&
-        !isZOS4
+        nodeFeatures.includes(Features.wireguard)
       ) {
         const filteredAccessNodes: number[] = [];
         for (const accessNodeId of Object.keys(accessNodes)) {
@@ -340,7 +340,7 @@ class VMHL extends HighLevelBase {
         ),
       );
     }
-    if (access_net_workload && !isZOS4) {
+    if (access_net_workload && nodeFeatures.includes(Features.wireguard)) {
       // network is not exist, and the node provide is not an access node
       const accessNodeId = access_net_workload.data["node_id"];
       access_net_workload["data"] = network.getUpdatedNetwork(access_net_workload.data);
@@ -361,7 +361,7 @@ class VMHL extends HighLevelBase {
     // vm
     // Initalize vm based on node's zos version
     let vm;
-    if (!isZOS4) {
+    if (nodeFeatures.includes(Features.zmachine)) {
       vm = new VMPrimitive();
     } else {
       vm = new VMLightPrimitive();

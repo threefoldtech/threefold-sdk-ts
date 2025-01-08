@@ -65,7 +65,9 @@ class HighLevelBase {
           const toRemoveZlogs = deployment.workloads.filter(item => {
             const zlog = item.type === WorkloadTypes.zlogs;
             const workloadtypename =
-              (item.data as any)[type === WorkloadTypes.zmachine ? "zmachine" : "zmachine-light"] === workload.name;
+              (item.data as any)[
+                type === WorkloadTypes.zmachine ? WorkloadTypes.zmachine : WorkloadTypes.zmachinelight
+              ] === workload.name;
             return zlog && workloadtypename;
           });
 
