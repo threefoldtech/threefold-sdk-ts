@@ -92,7 +92,7 @@ const deleting = ref(false);
 const deployedDialog = ref(false);
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
-
+const solution = { cpu: 1, memory: 2, disk: 50 };
 const worker = ref(createWorker());
 
 function calcDiskSize(disks: { size: number }[]) {
@@ -160,8 +160,8 @@ async function deploy(layout: any) {
   } catch (e) {
     layout.setStatus("failed", normalizeError(e, "Failed to deploy a caprover worker."));
   } finally {
-    const { name } = createWorker();
-    worker.value.name = name;
+    worker.value = createWorker();
+    worker.value.solution = solution;
   }
 }
 
