@@ -353,7 +353,10 @@
       <template v-if="profileManager.profile">
         <v-row>
           <v-col cols="12" md="6" lg="6" xl="6">
-            <PasswordInputWrapper #="{ props }">
+            <PasswordInputWrapper
+              #="{ props }"
+              v-if="profileManager.profile.mnemonic !== profileManager.profile.hexSeed"
+            >
               <VTextField
                 :label="'Your Mnemonic'"
                 readonly
