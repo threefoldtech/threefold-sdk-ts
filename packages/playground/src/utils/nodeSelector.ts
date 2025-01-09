@@ -224,7 +224,7 @@ export async function validateRentContract(
   }
 
   try {
-    if (node.dedicated || node.rentedByTwinId === 0) {
+    if (node.dedicated && node.rentedByTwinId === 0) {
       throw `Node ${node.nodeId} is not rented`;
     }
     if (node.rentContractId !== 0) {
