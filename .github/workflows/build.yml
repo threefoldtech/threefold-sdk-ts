@@ -33,5 +33,7 @@ jobs:
 
       - name: Install
         run: yarn
+      - name: list workspace
+        run: npx lerna list
       - name: Build
-        run: lerna run build --no-private
+        run: yarn lerna run build --no-private
