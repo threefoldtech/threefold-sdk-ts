@@ -7,14 +7,16 @@ async function deploy(client, vms, subdomain, gatewayNode) {
   log("================= Deploying VM =================");
   log(resultVM);
   log("================= Deploying VM =================");
-
-  const vmPlanetary = (await client.machines.getObj(vms.name))[0].planetary;
+  const machine = await client.machines.getObj(vms.name);
+  console.log(machine);
+  const wgIP = (await client.machines.getObj(vms.name))[0].interfaces[0]["ip"];
+  console.log(wgIP, "khaled");
 
   const gw: GatewayNameModel = {
     name: subdomain,
     node_id: gatewayNode.nodeId,
     tls_passthrough: false,
-    backends: ["http://[" + vmPlanetary + "]:8080"],
+    backends: ["http://" + wgIP + ":8080"],
   };
 
   const resultGateway = await client.gateway.deploy_name(gw);
@@ -43,9 +45,9 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newnostr";
+  const name = "newnostr1";
   const grid3 = await getClient(`nostr/${name}`);
-  const subdomain = "nt" + grid3.twinId + name;
+  const subdomain = "ntt" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
 
   const vmQueryOptions: FilterOptions = {
@@ -71,6 +73,8 @@ async function main() {
     network: {
       name: "nostrnet",
       ip_range: "10.252.0.0/16",
+      addAccess: true,
+      accessNodeId: gatewayNode.nodeId,
     },
     machines: [
       {
