@@ -1,6 +1,7 @@
 <template>
   <div>
-    <v-alert type="info" variant="tonal">
+    <v-alert color="warning" variant="tonal"
+      ><v-icon size="24" class="pb-1">mdi-alert-circle</v-icon>
       Connect your TFChain
       <a class="app-link" @click="$emit('openProfile')">Wallet</a>
       to view {{ pageTitle }}
@@ -43,8 +44,8 @@
                     class="mx-auto"
                     :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
                   />
-                  <v-card-text>
-                    <p class="text-center tf-header text-h6 font-weight-regular mb-2">
+                  <v-card-text class="card_stats">
+                    <p class="text-center tf-header font-weight-regular mb-2">
                       {{ s.value }}
                     </p>
                     <p class="text-center text-subtitle-1 font-weight-light sub-header">
@@ -103,6 +104,13 @@ export default {
 </script>
 
 <style scoped>
+.tf-header {
+  font-size: 1rem;
+}
+.card_stats {
+  padding: 1rem 0.4rem;
+}
+
 @media only screen and (max-width: 600px) {
   .v-col {
     flex-basis: auto !important;

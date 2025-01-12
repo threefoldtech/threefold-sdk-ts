@@ -8,13 +8,16 @@
     eager
   >
     <template #activator="{ props }">
-      <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
-        <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" width="2" />
-        <VIcon icon="mdi-account" size="x-large" class="mr-2" v-else />
+      <VCard v-bind="props" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
         <div>
-          <p v-if="!profileManager.profile">
-            <strong>Connect your TFChain Wallet</strong>
-          </p>
+          <v-btn v-if="!profileManager.profile" variant="elevated"
+            ><VProgressCircular v-if="activating" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
+              size="20"
+              class="pr-2"
+              >mdi-wallet-outline</v-icon
+            >
+            Connect your TFChain Wallet
+          </v-btn>
           <p v-else-if="loadingBalance">
             <strong>Loading...</strong>
           </p>

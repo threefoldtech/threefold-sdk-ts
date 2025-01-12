@@ -221,6 +221,7 @@ export default {
 
     async function _setValidNode(oldNodeId?: number) {
       const node = await selectValidNode(
+        gridStore,
         props.getFarm,
         _loadedNodes.value,
         props.selectedMachines,
