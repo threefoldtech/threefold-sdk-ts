@@ -32,7 +32,8 @@ export class FarmsClient extends AbstractClient<FarmsBuilder, FarmsQuery> {
 
   public async list(queries: Partial<FarmsQuery> = {}) {
     const res = await this.builder(queries).build("/farms");
-    return resolvePaginator<Farm[]>(res);
+    const farms = resolvePaginator<Farm[]>(res);
+    return farms;
   }
 
   public async listAll(queries: Partial<FarmsQuery> = {}) {
