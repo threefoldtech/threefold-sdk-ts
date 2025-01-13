@@ -1,7 +1,15 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../src";
 import { config, getClient } from "../client_loader";
 import { generateInt, getOnlineNode, log, splitIP } from "../utils";
 
@@ -115,6 +123,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     gateway: true,
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
+    features: [Features.gatewayfqdnproxy, Features.gatewaynameproxy],
   } as FilterOptions);
   const gatewayNodeId = await getOnlineNode(gatewayNodes);
   if (gatewayNodeId == -1) throw new Error("no nodes available to complete this test");
@@ -167,7 +176,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
         entrypoint: "/usr/bin/python3 -m http.server --bind ::",
         public_ip: true,
         public_ip6: true,

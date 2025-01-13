@@ -1,4 +1,5 @@
 import {
+  Features,
   FilterOptions,
   generateString,
   GridClient,
@@ -81,6 +82,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       sru: qsfsCache,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
@@ -111,6 +113,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       sru: qsfsCache,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
@@ -138,6 +141,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       sru: rootfsSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -156,6 +160,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       sru: rootfsSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -195,7 +200,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIP,
         planetary: true,
@@ -366,6 +371,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       sru: qsfsCache,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
@@ -396,6 +402,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       sru: qsfsCache,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
@@ -423,6 +430,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -442,6 +450,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
   }
 
@@ -454,6 +463,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       sru: workerRootfsSize + workerDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -473,6 +483,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       sru: workerRootfsSize + workerDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.qsfs],
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);

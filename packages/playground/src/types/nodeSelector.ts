@@ -24,6 +24,9 @@ export interface SelectionDetailsFilters {
   dedicated?: boolean;
   exclusiveFor?: string;
   rentable_or_rented_by?: number;
+  planetary?: boolean;
+  mycelium?: boolean;
+  wireguard?: boolean;
 }
 
 export interface NumericValidator {

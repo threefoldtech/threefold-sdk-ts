@@ -1,6 +1,6 @@
 import { createClient } from "redis";
 
-import { FilterOptions, generateString, GridClient, ZDBModel, ZdbModes, ZDBSModel } from "../../src";
+import { Features, FilterOptions, generateString, GridClient, ZDBModel, ZdbModes, ZDBSModel } from "../../src";
 import { getClient } from "../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log } from "../utils";
 
@@ -58,6 +58,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
       hru: diskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.zdb],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -72,6 +73,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
       hru: diskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.zdb],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);

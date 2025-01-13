@@ -97,6 +97,7 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
     pk: (await grid.twins.get({ id: grid!.twinId })).pk,
     keypairType: grid.clientOptions!.keypairType,
     email: await readEmail(grid),
+    hexSeed: grid.clientOptions!.mnemonic,
   };
 }
 

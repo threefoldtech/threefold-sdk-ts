@@ -184,12 +184,12 @@ export function normalizeNodeOptions(
 
 export function normalizeNodeFilters(
   filters: SelectionDetailsFilters,
-  options: NormalizeNodeFiltersOptions,
+  options?: NormalizeNodeFiltersOptions,
 ): FilterOptions {
   return {
-    page: Math.max(1, options.page),
-    size: options.size,
-    farmId: options.farm?.farmId,
+    page: Math.max(1, options?.page || 1),
+    size: options?.size,
+    farmId: options?.farm?.farmId,
     cru: filters.cpu,
     mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     hru: (filters.hddDisks || []).reduce((t, d) => t + d, 0) || undefined,
@@ -208,6 +208,9 @@ export function normalizeNodeFilters(
     gateway: options.gateway,
     healthy: true,
     rentableOrRentedBy: filters.dedicated ? options.twinId : undefined,
+    planetary: filters.planetary,
+    mycelium: filters.mycelium,
+    wireguard: filters.wireguard,
   };
 }
 
@@ -327,6 +330,7 @@ export function isNodeValid(
 }
 
 export async function selectValidNode(
+  gridStore: ReturnType<typeof useGrid>,
   getFarm: GetFarmFn,
   nodes: NodeInfo[],
   selectedMachines: SelectedMachine[],
@@ -334,14 +338,27 @@ export async function selectValidNode(
   oldSelectedNodeId?: number,
   nodesLock?: AwaitLock,
 ): Promise<NodeInfo | void> {
-  let locked = true;
-  if (nodesLock && !nodesLock.acquired) {
-    locked = false;
-    await nodesLock.acquireAsync();
+  const locked = true;
+
+  const rentedNodes = nodes.filter(n => {
+    return n.rentedByTwinId === gridStore.grid.twinId;
+  });
+  let rentedNode;
+  for (const node of rentedNodes) {
+    if (node.rentedByTwinId === gridStore.grid.twinId) {
+      const contractInfo = await gridStore.grid.contracts.get({
+        id: node.rentContractId,
+      });
+
+      if (!contractInfo.state.gracePeriod) {
+        rentedNode = node;
+        break;
+      }
+    }
   }
 
-  if (oldSelectedNodeId) {
-    const node = nodes.find(n => n.nodeId === oldSelectedNodeId);
+  if (oldSelectedNodeId || rentedNode) {
+    const node = nodes.find(n => n.nodeId === oldSelectedNodeId) || rentedNode;
 
     if (node && isNodeValid(getFarm, node, selectedMachines, filters)) {
       if (nodesLock && !locked) {

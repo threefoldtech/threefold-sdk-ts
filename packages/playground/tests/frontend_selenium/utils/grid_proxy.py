@@ -69,7 +69,7 @@ class GridProxy:
             stats_url = 'https://stats.' + Base.net + '.grid.tf/api/stats-summary'
         r = requests.post(stats_url, timeout=10)
         stats_json = r.json()
-        return list(stats_json.values())
+        return list(stats_json.values())[1::] #Avoid selecting HDD capacity; as its not shown in the dashboard anymore.
 
     def get_stats(self):
         up = requests.get(Base.gridproxy_url + 'stats?status=up', timeout=10).json()

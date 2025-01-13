@@ -1,4 +1,12 @@
-import { FilterOptions, generateString, GridClient, MachineModel, MachinesModel, randomChoice } from "../../src";
+import {
+  Features,
+  FilterOptions,
+  generateString,
+  GridClient,
+  MachineModel,
+  MachinesModel,
+  randomChoice,
+} from "../../src";
 import { config, getClient } from "../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../utils";
 
@@ -60,6 +68,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       sru: rootfsSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -78,6 +87,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       sru: rootfsSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -223,6 +233,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
       sru: rootfsSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -241,6 +252,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
       sru: rootfsSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -261,7 +273,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
         memory: memory,
         rootfs_size: rootfsSize,
         disks: disks,
-        flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIP,
         planetary: true,
@@ -390,6 +402,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       sru: rootfsSize + diskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -409,6 +422,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       sru: rootfsSize + diskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -435,7 +449,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIP,
         planetary: true,
@@ -537,6 +551,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
       sru: vmRootfs[0],
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -555,6 +570,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
       sru: vmRootfs[0],
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
 
@@ -567,6 +583,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
       sru: vmRootfs[1],
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -585,6 +602,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
       sru: vmRootfs[1],
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
 
@@ -608,7 +626,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     memory: vmMemory[0],
     rootfs_size: vmRootfs[0],
     disks: vmDisks,
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
     entrypoint: "/sbin/zinit init",
     public_ip: vmPublicIP,
     planetary: true,
@@ -626,7 +644,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     memory: vmMemory[1],
     rootfs_size: vmRootfs[1],
     disks: vmDisks,
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
     entrypoint: "/sbin/zinit init",
     public_ip: vmPublicIP,
     planetary: true,

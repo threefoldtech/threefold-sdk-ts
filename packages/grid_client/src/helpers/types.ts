@@ -1,4 +1,4 @@
-import { PublicIPResult, ResultStates } from "../zos";
+import { PublicIPResult, ResultStates, WorkloadTypes } from "../zos";
 
 interface NetworkInterface {
   /** The network identifier */
@@ -44,10 +44,29 @@ interface ExtendedMountData extends Partial<BaseMountData> {
 
 // Union type for the mount data
 type MountData = BaseMountData | ExtendedMountData;
-
+enum Features {
+  ipv4 = "ipv4",
+  ip = "ip",
+  mycelium = "mycelium",
+  wireguard = "wireguard",
+  yggdrasil = "yggdrasil",
+  gatewayfqdnproxy = "gateway-fqdn-proxy",
+  gatewaynameproxy = "gateway-name-proxy",
+  zmachine = "zmachine",
+  zmount = "zmount",
+  volume = "volume",
+  network = "network",
+  zdb = "zdb",
+  qsfs = "qsfs",
+  zlogs = "zlogs",
+  networklight = "network-light",
+  zmachinelight = "zmachine-light",
+}
 interface ZmachineData {
   /** The version of the workload */
   version: number;
+  /** The type of the workload */
+  type: WorkloadTypes;
   /** The contract ID associated with the workload */
   contractId: number;
   /** The node ID where the workload is deployed */
@@ -112,4 +131,4 @@ interface GatewayDeploymentData {
   description: string;
 }
 
-export { ZmachineData, VM, ExtendedMountData, GatewayDeploymentData };
+export { ZmachineData, VM, ExtendedMountData, GatewayDeploymentData, Features };

@@ -7,6 +7,7 @@ import { events } from "../helpers/events";
 import { Operations, TwinDeployment } from "../high_level/models";
 import { DeploymentFactory } from "../primitives/deployment";
 import { Network } from "../primitives/network";
+import { ZNetworkLight } from "../primitives/networklight";
 import { Nodes } from "../primitives/nodes";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -27,6 +28,7 @@ class HighLevelBase {
       WorkloadTypes.ip,
       WorkloadTypes.ipv4, // TODO: remove deprecated
       WorkloadTypes.zmachine,
+      WorkloadTypes.zmachinelight,
       WorkloadTypes.zmount,
       WorkloadTypes.volume,
       WorkloadTypes.zdb,
@@ -38,35 +40,50 @@ class HighLevelBase {
   ): [Workload[], Workload[]] {
     let deletedMachineWorkloads: Workload[] = [];
     if (names.length === 0) {
-      deletedMachineWorkloads = deployment.workloads.filter(item => item.type === WorkloadTypes.zmachine);
+      deletedMachineWorkloads = deployment.workloads.filter(
+        item => item.type === WorkloadTypes.zmachine || item.type === WorkloadTypes.zmachinelight,
+      );
     }
 
-    if (names.length !== 0 && types.includes(WorkloadTypes.zmachine)) {
-      const Workloads = deployment.workloads.filter(item => item.type === WorkloadTypes.zmachine);
-      for (const workload of Workloads) {
-        if (!names.includes(workload.name)) {
-          continue;
+    if (names.length !== 0 && (types.includes(WorkloadTypes.zmachine) || types.includes(WorkloadTypes.zmachinelight))) {
+      const workloadTypes = [WorkloadTypes.zmachine, WorkloadTypes.zmachinelight];
+
+      for (const type of workloadTypes) {
+        if (!types.includes(type)) continue;
+
+        const Workloads = deployment.workloads.filter(item => item.type === type);
+
+        for (const workload of Workloads) {
+          if (!names.includes(workload.name)) {
+            continue;
+          }
+
+          for (const mount of workload.data["mounts"]) {
+            names.push(mount.name);
+          }
+
+          const toRemoveZlogs = deployment.workloads.filter(item => {
+            const zlog = item.type === WorkloadTypes.zlogs;
+            const workloadtypename =
+              (item.data as any)[
+                type === WorkloadTypes.zmachine ? WorkloadTypes.zmachine : WorkloadTypes.zmachinelight
+              ] === workload.name;
+            return zlog && workloadtypename;
+          });
+
+          names.push(...toRemoveZlogs.map(zlog => zlog.name));
+
+          if (type === WorkloadTypes.zmachine) {
+            names.push(workload.data["network"].public_ip);
+          }
+
+          deletedMachineWorkloads.push(workload);
         }
-        for (const mount of workload.data["mounts"]) {
-          names.push(mount.name);
-        }
-
-        const toRemoveZlogs = deployment.workloads.filter(item => {
-          const x = item.type === WorkloadTypes.zlogs;
-          const y = (item.data as any)["zmachine"] === workload.name;
-          return x && y;
-        });
-
-        names.push(...toRemoveZlogs.map(x => x.name));
-
-        names.push(workload.data["network"].public_ip);
-        deletedMachineWorkloads.push(workload);
       }
     }
-
     const remainingWorkloads: Workload[] = [];
     for (const workload of deployment.workloads) {
-      if (workload.type === WorkloadTypes.network) {
+      if (workload.type === WorkloadTypes.network || workload.type === WorkloadTypes.networklight) {
         remainingWorkloads.push(workload);
         continue;
       }
@@ -86,17 +103,23 @@ class HighLevelBase {
     remainingWorkloads: Workload[],
     deletedMachineWorkloads: Workload[],
     node_id: number,
-  ): Promise<[TwinDeployment[], Workload[], number[], string[], Network | null]> {
+  ): Promise<[TwinDeployment[], Workload[], number[], string[], Network | ZNetworkLight | null]> {
     const twinDeployments: TwinDeployment[] = [];
     const deletedNodes: number[] = [];
     const deletedIps: string[] = [];
     const deploymentFactory = new DeploymentFactory(this.config);
-    let network: Network | null = null;
+    let network: Network | ZNetworkLight | null = null;
+    let network_contract_id;
+
     for (const workload of deletedMachineWorkloads) {
       if (!network) {
         const networkName = workload.data["network"].interfaces[0].network;
         const networkIpRange = Addr(workload.data["network"].interfaces[0].ip).mask(16).toString();
-        network = new Network(networkName, networkIpRange, this.config);
+        if (workload.type === WorkloadTypes.zmachinelight) {
+          network = new ZNetworkLight(networkName, networkIpRange, this.config);
+        } else {
+          network = new Network(networkName, networkIpRange, this.config);
+        }
         await network.load();
       }
       const machineIp = workload.data["network"].interfaces[0].ip;
@@ -111,17 +134,19 @@ class HighLevelBase {
         deletedIps.push(deletedIp);
         continue;
       }
-      const hasAccessPoint = network.hasAccessPoint(node_id);
-      if (hasAccessPoint && network.nodes.length !== 1) {
-        console.log(
-          `network ${network.name} still has access point:${hasAccessPoint} and number of nodes ${network.nodes.length}`,
-        );
-        deletedIps.push(deletedIp);
-        continue;
+      if (network instanceof Network) {
+        const hasAccessPoint = network.hasAccessPoint(node_id);
+        if (hasAccessPoint && network.nodes.length !== 1) {
+          console.log(
+            `network ${network.name} still has access point:${hasAccessPoint} and number of nodes ${network.nodes.length}`,
+          );
+          deletedIps.push(deletedIp);
+          continue;
+        }
       }
+      network_contract_id = await network.deleteNode(node_id);
 
-      const contract_id = await network.deleteNode(node_id);
-      if (contract_id === deployment.contract_id) {
+      if (network_contract_id === deployment.contract_id) {
         if (remainingWorkloads.length === 1) {
           twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
           remainingWorkloads = [];
@@ -134,7 +159,7 @@ class HighLevelBase {
         // check that the deployment doesn't have another workloads
         for (let d of network.deployments) {
           d = await deploymentFactory.fromObj(d);
-          if (d.contract_id !== contract_id) {
+          if (d.contract_id !== network_contract_id) {
             continue;
           }
           if (d.workloads.length === 1) {
@@ -146,7 +171,11 @@ class HighLevelBase {
         }
       }
       // in case of the network got more accesspoints on different nodes this won't be valid
-      if (network.nodes.length === 1 && network.getNodeReservedIps(network.nodes[0].node_id).length === 0) {
+      if (
+        network instanceof Network &&
+        network.nodes.length === 1 &&
+        network.getNodeReservedIps(network.nodes[0].node_id).length === 0
+      ) {
         const contract_id = await network.deleteNode(network.nodes[0].node_id);
         for (let d of network.deployments) {
           d = await deploymentFactory.fromObj(d);
@@ -172,6 +201,7 @@ class HighLevelBase {
       WorkloadTypes.ip,
       WorkloadTypes.ipv4, // TODO: remove deprecated
       WorkloadTypes.zmachine,
+      WorkloadTypes.zmachinelight,
       WorkloadTypes.zmount,
       WorkloadTypes.volume,
       WorkloadTypes.zdb,
@@ -181,7 +211,7 @@ class HighLevelBase {
       WorkloadTypes.zlogs,
     ],
   ): Promise<TwinDeployment[]> {
-    if (types.includes(WorkloadTypes.network)) {
+    if (types.includes(WorkloadTypes.network) || types.includes(WorkloadTypes.networklight)) {
       throw new GridClientErrors.Workloads.WorkloadDeleteError("Network workload can't be deleted.");
     }
     let twinDeployments: TwinDeployment[] = [];
@@ -201,7 +231,11 @@ class HighLevelBase {
       await this._deleteMachineNetwork(deployment, remainingWorkloads, deletedMachineWorkloads, node_id);
     twinDeployments = twinDeployments.concat(newTwinDeployments);
     remainingWorkloads = newRemainingWorkloads;
-    if (remainingWorkloads.length !== 0 && remainingWorkloads.length < numberOfWorkloads) {
+    if (
+      network instanceof Network &&
+      remainingWorkloads.length !== 0 &&
+      remainingWorkloads.length < numberOfWorkloads
+    ) {
       for (const deleteNode of deletedNodes) {
         await network!.deleteNode(deleteNode);
       }

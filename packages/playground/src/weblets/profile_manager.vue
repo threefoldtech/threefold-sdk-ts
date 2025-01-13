@@ -8,13 +8,16 @@
     eager
   >
     <template #activator="{ props }">
-      <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
-        <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" width="2" />
-        <VIcon icon="mdi-account" size="x-large" class="mr-2" v-else />
+      <VCard v-bind="props" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
         <div>
-          <p v-if="!profileManager.profile">
-            <strong>Connect your TFChain Wallet</strong>
-          </p>
+          <v-btn v-if="!profileManager.profile" variant="elevated"
+            ><VProgressCircular v-if="activating" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
+              size="20"
+              class="pr-2"
+              >mdi-wallet-outline</v-icon
+            >
+            Connect your TFChain Wallet
+          </v-btn>
           <p v-else-if="loadingBalance">
             <strong>Loading...</strong>
           </p>
@@ -353,19 +356,23 @@
       <template v-if="profileManager.profile">
         <v-row>
           <v-col cols="12" md="6" lg="6" xl="6">
-            <PasswordInputWrapper #="{ props }">
+            <PasswordInputWrapper
+              #="{ props }"
+              v-if="profileManager.profile.mnemonic !== profileManager.profile.hexSeed"
+            >
               <VTextField
-                :label="
-                  profileManager.profile.mnemonic.startsWith('0x') || profileManager.profile.mnemonic.length === 64
-                    ? 'Your Hex Seed'
-                    : 'Your Mnemonic'
-                "
+                :label="'Your Mnemonic'"
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
                 :disabled="activating || creatingAccount || activatingAccount"
               />
             </PasswordInputWrapper>
+            <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
+              <input-tooltip tooltip=" Please use this hex seed to import your wallet in Threefold Connect">
+                <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
+              </input-tooltip>
+            </CopyInputWrapper>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
@@ -383,7 +390,7 @@
             </CopyInputWrapper>
           </v-col>
 
-          <v-col cols="12" md="6" lg="6" xl="6">
+          <v-col cols="12" md="6" lg="6" xl="6" class="d-flex justify-center align-center">
             <section class="qr d-flex flex-column align-center">
               <QRPlayStore
                 :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
