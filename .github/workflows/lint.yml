@@ -5,11 +5,11 @@ name: Full Clients Lint
 
 on:
   push:
-    branches:
+    branches: 
       - development
       - development_2.7
   pull_request:
-    branches:
+    branches: 
       - development
       - development_2.7
 
