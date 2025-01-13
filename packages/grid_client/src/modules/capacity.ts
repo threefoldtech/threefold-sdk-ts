@@ -159,6 +159,15 @@ class Capacity {
     return nodes;
   }
 
+  @expose
+  @validateInput
+  getFeaturesFromFilters(options?: FilterOptions): string[] {
+    let features: string[] = [];
+
+    features = this.nodes.getFeaturesFromFilters(options);
+    return features;
+  }
+
   /**
    * Retrieves a list of farms based on the provided options.
    *

@@ -52,11 +52,11 @@
 </template>
 
 <script lang="ts">
-import type { NodeInfo } from "@threefold/grid_client";
+import type { Features, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { type Farm, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import type AwaitLock from "await-lock";
 import isInt from "validator/lib/isInt";
-import { onUnmounted, type PropType, ref, watch } from "vue";
+import { computed, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "../../clients";
 import { useAsync, useWatchDeep } from "../../hooks";
@@ -64,7 +64,13 @@ import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectedMachine, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
-import { checkNodeCapacityPool, release, resolveAsync, validateRentContract } from "../../utils/nodeSelector";
+import {
+  checkNodeCapacityPool,
+  normalizeNodeFilters,
+  release,
+  resolveAsync,
+  validateRentContract,
+} from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 const _defaultError =
@@ -99,11 +105,15 @@ export default {
 
     // reset node to mark form as invalid
     const placeholderNode = ref<NodeInfo>();
+    const filters = computed(() => normalizeNodeFilters(props.filters));
 
     watch(nodeId, () => {
       bindModelValue();
       placeholderNode.value = undefined;
     });
+    function getFeatures(gridStore: ReturnType<typeof useGrid>, filters: FilterOptions) {
+      return gridStore.client.capacity.getFeaturesFromFilters(filters);
+    }
 
     const validationTask = useAsync<true | string, string, [id: number | undefined]>(
       async nodeId => {
@@ -125,7 +135,8 @@ export default {
         }
 
         placeholderNode.value = node;
-
+        const features = getFeatures(gridStore, filters.value);
+        const missingFeatures = features.filter(value => !node.features.includes(value as Features));
         if (node === undefined || node === null) {
           throw `Node ${nodeId} is not on the grid`;
         }
@@ -165,6 +176,8 @@ export default {
 
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
+          case missingFeatures.length > 0:
+            throw `Node ${nodeId} doesn't support [ ${missingFeatures} ] features`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;

@@ -116,6 +116,9 @@
           solutionDisk: solution?.disk,
           memory: solution?.memory,
           rootFilesystemSize,
+          planetary,
+          mycelium,
+          wireguard,
         }"
         require-domain
         v-model="selectionDetails"

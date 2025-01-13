@@ -96,6 +96,9 @@
           solutionDisk: type === 'indexer' ? 50 : undefined,
           memory,
           rootFilesystemSize,
+          planetary,
+          mycelium,
+          wireguard,
         }"
         v-model="selectionDetails"
       />

@@ -83,6 +83,9 @@
             memory,
             rootFilesystemSize,
             exclusiveFor: 'research',
+            planetary,
+            mycelium,
+            wireguard,
           }"
           v-model="selectionDetails"
         />

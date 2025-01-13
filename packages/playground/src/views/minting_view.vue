@@ -6,20 +6,10 @@
     </v-card>
     <v-alert class="mb-4 text-subtitle-2 font-weight-regular" type="info" variant="tonal">
       For more information about minting check
-      <a
-        class="app-link font-weight-medium"
-        target="_blank"
-        :href="manual.minting_process"
-        >TFT minting process.
-      </a>
+      <a class="app-link font-weight-medium" target="_blank" :href="manual.minting_process">TFT minting process. </a>
       <br />
       The user can verify the 3Nodes' payments on Stellar Blockchain through the Threefold's
-      <a
-        class="app-link font-weight-medium"
-        target="_blank"
-        :href="manual.minting_reports"
-        >minting tool.
-      </a>
+      <a class="app-link font-weight-medium" target="_blank" :href="manual.minting_reports">minting tool. </a>
       <br />
       TFT minting address on Stellar Chain:
       <a

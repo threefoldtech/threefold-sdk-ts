@@ -156,6 +156,8 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
     availableFor: grid.twinId,
     hasGPU: options.hasGPU,
     rentedBy: options.hasGPU ? grid.twinId : undefined,
+    planetary: options.planetary,
+    mycelium: options.mycelium,
   };
 
   const machine = new AddMachineModel();

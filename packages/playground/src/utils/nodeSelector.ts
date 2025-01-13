@@ -184,12 +184,12 @@ export function normalizeNodeOptions(
 
 export function normalizeNodeFilters(
   filters: SelectionDetailsFilters,
-  options: NormalizeNodeFiltersOptions,
+  options?: NormalizeNodeFiltersOptions,
 ): FilterOptions {
   return {
-    page: Math.max(1, options.page),
-    size: options.size,
-    farmId: options.farm?.farmId,
+    page: Math.max(1, options?.page || 1),
+    size: options?.size,
+    farmId: options?.farm?.farmId,
     cru: filters.cpu,
     mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     hru: (filters.hddDisks || []).reduce((t, d) => t + d, 0) || undefined,
@@ -201,13 +201,16 @@ export function normalizeNodeFilters(
     publicIPs: filters.ipv4 || undefined,
     hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
-    rentedBy: filters.dedicated ? options.twinId : undefined,
+    rentedBy: filters.dedicated ? options?.twinId : undefined,
     certified: filters.certified || undefined,
-    availableFor: options.twinId,
-    region: options.location.region ? options.location.region : options.location.subregion,
-    country: options.location.country,
-    gateway: options.gateway,
+    availableFor: options?.twinId,
+    region: options?.location.region ? options?.location.region : options?.location.subregion,
+    country: options?.location.country,
+    gateway: options?.gateway,
     healthy: true,
+    planetary: filters.planetary,
+    mycelium: filters.mycelium,
+    wireguard: filters.wireguard,
   };
 }
 
