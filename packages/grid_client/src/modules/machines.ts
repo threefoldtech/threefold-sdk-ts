@@ -9,6 +9,8 @@ import { validateInput } from "../helpers/validator";
 import { VMHL } from "../high_level/machine";
 import { DeploymentResultContracts, TwinDeployment } from "../high_level/models";
 import { Network } from "../primitives/network";
+import { ZNetworkLight } from "../primitives/networklight";
+import { Nodes } from "../primitives/nodes";
 import { Deployment } from "../zos";
 import { WorkloadTypes } from "../zos/workload";
 import { BaseModule } from "./base";
@@ -25,8 +27,10 @@ class MachinesModule extends BaseModule {
     WorkloadTypes.ip,
     WorkloadTypes.ipv4,
     WorkloadTypes.zlogs,
+    WorkloadTypes.zmachinelight,
   ]; // TODO: remove deprecated
   vm: VMHL;
+  capacity: Nodes;
   /**
    * The MachinesModule class is responsible for managing virtual machine deployments.
    * It extends the BaseModule class and provides methods to deploy, list, get, update, add, and delete machines.
@@ -38,6 +42,7 @@ class MachinesModule extends BaseModule {
   constructor(public config: GridClientConfig) {
     super(config);
     this.vm = new VMHL(config);
+    this.capacity = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
   }
 
   /**
@@ -47,17 +52,35 @@ class MachinesModule extends BaseModule {
    * @returns {Promise<[TwinDeployment[], Network, string]>} - A promise that resolves to an array of twin deployments, the network, and the WireGuard configuration string.
    */
   async _createDeployment(options: MachinesModel): Promise<[TwinDeployment[], Network, string]> {
-    const network = new Network(options.network.name, options.network.ip_range, this.config);
-    await network.load();
-
+    let network;
+    let contractMetadata;
+    for (const machine of options.machines) {
+      if (network) break;
+      // Sets the network and contractMetadata based on the node's zos version
+      const nodeTwinId = await this.capacity.getNodeTwinId(machine.node_id);
+      const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
+      if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
+        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+        await network.load();
+        contractMetadata = JSON.stringify({
+          version: 4,
+          type: "vm",
+          name: options.name,
+          projectName: this.config.projectName || `vm/${options.name}`,
+        });
+      } else {
+        network = new Network(options.network.name, options.network.ip_range, this.config);
+        await network.load();
+        contractMetadata = JSON.stringify({
+          version: 3,
+          type: "vm",
+          name: options.name,
+          projectName: this.config.projectName || `vm/${options.name}`,
+        });
+      }
+    }
     let twinDeployments: TwinDeployment[] = [];
     let wireguardConfig = "";
-    const contractMetadata = JSON.stringify({
-      version: 3,
-      type: "vm",
-      name: options.name,
-      projectName: this.config.projectName || `vm/${options.name}`,
-    });
 
     const machines_names: string[] = [];
 
@@ -65,7 +88,6 @@ class MachinesModule extends BaseModule {
       if (machines_names.includes(machine.name))
         throw new ValidationError(`Another machine with the same name ${machine.name} already exists.`);
       machines_names.push(machine.name);
-
       const [TDeployments, wgConfig] = await this.vm.create(
         machine.name,
         machine.node_id,
@@ -180,7 +202,10 @@ class MachinesModule extends BaseModule {
    */
   async getObj(deploymentName: string): Promise<ZmachineData[]> {
     const deployments = await this._get(deploymentName);
-    const workloads = await this._getWorkloadsByTypes(deploymentName, deployments, [WorkloadTypes.zmachine]);
+    const workloads = await this._getWorkloadsByTypes(deploymentName, deployments, [
+      WorkloadTypes.zmachine,
+      WorkloadTypes.zmachinelight,
+    ]);
     const promises = workloads.map(
       async workload => await this._getZmachineData(deploymentName, deployments, workload),
     );

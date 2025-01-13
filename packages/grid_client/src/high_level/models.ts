@@ -1,6 +1,7 @@
 import { Contract } from "@threefold/tfchain_client";
 
 import { Network } from "../primitives/network";
+import { ZNetworkLight } from "../primitives/networklight";
 import { Deployment } from "../zos/deployment";
 
 enum Operations {
@@ -16,7 +17,7 @@ class TwinDeployment {
     public publicIps: number,
     public nodeId: number,
     public metadata: string,
-    public network: Network | null = null,
+    public network: Network | null | ZNetworkLight = null,
     public solutionProviderId: number | null = null,
     public returnNetworkContracts = false,
   ) {}

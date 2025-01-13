@@ -21,7 +21,7 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { IsAlphanumericExpectUnderscore } from "../helpers";
+import { Features, IsAlphanumericExpectUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
@@ -635,6 +635,10 @@ class FilterOptions {
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
   @Expose() @IsOptional() @IsString() region?: string;
   @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
+  @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
+  @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
+  @Expose() @IsOptional() @IsBoolean() wireguard?: boolean;
+  @Expose() @IsOptional() features?: Features[];
 }
 
 enum CertificationType {

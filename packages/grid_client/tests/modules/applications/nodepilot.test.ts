@@ -1,7 +1,7 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
+import { Features, FilterOptions, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -67,6 +67,7 @@ test.skip("TC2701 - Applications: Deploy Nodepilot", async () => {
     farmId: 1,
     publicIPs: publicIp,
     availableFor: await gridClient.twins.get_my_twin_id(),
+    features: [Features.ip, Features.ipv4, Features.wireguard],
     status: "up",
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);

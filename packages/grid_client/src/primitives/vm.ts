@@ -1,6 +1,7 @@
 import { ComputeCapacity } from "../zos/computecapacity";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Mount, Zmachine, ZmachineNetwork, ZNetworkInterface } from "../zos/zmachine";
+import { MachineInterface, ZmachineLight, ZmachineLightNetwork } from "../zos/zmachine_light";
 
 class VMPrimitive {
   _createComputeCapacity(cpu: number, memory: number): ComputeCapacity {
@@ -79,4 +80,76 @@ class VMPrimitive {
   }
 }
 
-export { VMPrimitive };
+class VMLightPrimitive {
+  _createComputeCapacity(cpu: number, memory: number): ComputeCapacity {
+    const compute_capacity = new ComputeCapacity();
+    compute_capacity.cpu = cpu;
+    compute_capacity.memory = memory * 1024 ** 2;
+    return compute_capacity;
+  }
+  _createNetworkInterface(networkName: string, ip: string): MachineInterface {
+    const zlightnetwork_interface = new MachineInterface();
+    zlightnetwork_interface.network = networkName;
+    zlightnetwork_interface.ip = ip;
+    return zlightnetwork_interface;
+  }
+  _createMachineLightNetwork(
+    networkName: string,
+    ip: string,
+    mycelium: boolean,
+    myceliumSeed: string,
+  ): ZmachineLightNetwork {
+    const zmachine_lightnetwork = new ZmachineLightNetwork();
+    zmachine_lightnetwork.interfaces = [this._createNetworkInterface(networkName, ip)];
+
+    if (mycelium) {
+      zmachine_lightnetwork.mycelium = {
+        hex_seed: myceliumSeed,
+        network: networkName,
+      };
+    }
+    return zmachine_lightnetwork;
+  }
+  create(
+    name: string,
+    flist: string,
+    cpu: number,
+    memory: number,
+    rootfs_size: number,
+    disks: Mount[],
+    networkName: string,
+    ip: string,
+    planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
+    public_ip: string,
+    entrypoint: string,
+    env: Record<string, string>,
+    metadata = "",
+    description = "",
+    version = 0,
+    corex = false,
+    gpus: string[] = [],
+  ): Workload {
+    const zmachine_light = new ZmachineLight();
+    zmachine_light.flist = flist;
+    zmachine_light.network = this._createMachineLightNetwork(networkName, ip, mycelium, myceliumSeed);
+    zmachine_light.size = rootfs_size * 1024 ** 3;
+    zmachine_light.mounts = disks;
+    zmachine_light.entrypoint = entrypoint;
+    zmachine_light.compute_capacity = this._createComputeCapacity(cpu, memory);
+    zmachine_light.env = env;
+    zmachine_light.corex = corex;
+    zmachine_light.gpu = gpus;
+
+    const zmachine_light_workload = new Workload();
+    zmachine_light_workload.version = version || 0;
+    zmachine_light_workload.name = name;
+    zmachine_light_workload.type = WorkloadTypes.zmachinelight;
+    zmachine_light_workload.data = zmachine_light;
+    zmachine_light_workload.metadata = metadata;
+    zmachine_light_workload.description = description;
+    return zmachine_light_workload;
+  }
+}
+export { VMPrimitive, VMLightPrimitive };

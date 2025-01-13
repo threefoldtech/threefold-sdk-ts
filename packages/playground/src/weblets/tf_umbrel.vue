@@ -104,6 +104,9 @@
           ssdDisks: [10],
           memory: solution?.memory,
           rootFilesystemSize,
+          planetary,
+          mycelium,
+          wireguard,
         }"
         v-model="selectionDetails"
       />
@@ -112,7 +115,12 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn
+        variant="elevated"
+        class="text-primery px-10 py-3 h-auto text-subtitle-1"
+        @click="validateBeforeDeploy(deploy)"
+        text="Deploy"
+      />
     </template>
   </weblet-layout>
 </template>

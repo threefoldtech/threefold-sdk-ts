@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -47,6 +47,8 @@ async function main() {
   const grid3 = await getClient(`mattermost/${name}`);
   const subdomain = "mm" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
+  // Change to true if smtp is configured
+  const smtp = false;
 
   //VMNode Selection
   const vmQueryOptions: FilterOptions = {
@@ -55,6 +57,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: smtp ? [Features.ip, Features.ipv4, Features.wireguard] : [],
   };
   //GatewayNode Selection
   const gatewayQueryOptions: FilterOptions = {
