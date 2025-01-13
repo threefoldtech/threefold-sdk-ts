@@ -1,56 +1,69 @@
-import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { GatewayNameModel, GridClient, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
-async function deploy(client, vms, subdomain, gatewayNode) {
+async function deploy(client: GridClient, vms: MachinesModel, subdomain: string, gatewayNode: any) {
+  // Deploy VM
   const resultVM = await client.machines.deploy(vms);
   log("================= Deploying VM =================");
   log(resultVM);
   log("================= Deploying VM =================");
-  const machine = await client.machines.getObj(vms.name);
-  console.log(machine);
-  const wgIP = (await client.machines.getObj(vms.name))[0].interfaces[0]["ip"];
-  console.log(wgIP, "khaled");
 
-  const gw: GatewayNameModel = {
+  // Get WG interface details
+  const wgnet = (await client.machines.getObj(vms.name))[0].interfaces[0];
+
+  // Deploy Gateway
+  const gateway: GatewayNameModel = {
     name: subdomain,
+    network: wgnet.network,
     node_id: gatewayNode.nodeId,
     tls_passthrough: false,
-    backends: ["http://" + wgIP + ":8080"],
+    backends: [`http://${wgnet.ip}:8080`],
   };
 
-  const resultGateway = await client.gateway.deploy_name(gw);
-  log("================= Deploying name gateway =================");
+  const resultGateway = await client.gateway.deploy_name(gateway);
+  log("================= Deploying Gateway =================");
   log(resultGateway);
-  log("================= Deploying name gateway =================");
+  log("================= Deploying Gateway =================");
 }
 
-async function getDeployment(client, vms, gw) {
-  const resultVM = await client.machines.getObj(vms.name);
-  const resultGateway = await client.gateway.getObj(gw);
-  log("================= Getting deployment information =================");
+async function getDeployment(client: GridClient, name: string, subdomain: string) {
+  // Get VM deployment
+  const resultVM = await client.machines.getObj(name);
+  log("================= Getting VM Deployment =================");
   log(resultVM);
+  log("================= Getting VM Deployment =================");
+
+  // Get Gateway deployment
+  const resultGateway = await client.gateway.getObj(subdomain);
+  log("================= Getting Gateway Deployment =================");
   log(resultGateway);
-  log("https://" + resultGateway[0].domain);
-  log("================= Getting deployment information =================");
+  log(`https://${resultGateway[0].domain}`);
+  log("================= Getting Gateway Deployment =================");
 }
 
-async function cancel(client, vms, gw) {
-  const resultVM = await client.machines.delete(vms);
-  const resultGateway = await client.gateway.delete_name(gw);
-  log("================= Canceling the deployment =================");
+async function cancel(client: GridClient, name: string, subdomain: string) {
+  // Cancel VM deployment
+  const resultVM = await client.machines.delete({ name });
+  log("================= Canceling VM Deployment =================");
   log(resultVM);
+  log("================= Canceling VM Deployment =================");
+
+  // Cancel Gateway deployment
+  const resultGateway = await client.gateway.delete_name({ name: subdomain });
+  log("================= Canceling Gateway Deployment =================");
   log(resultGateway);
-  log("================= Canceling the deployment =================");
+  log("================= Canceling Gateway Deployment =================");
 }
 
 async function main() {
   const name = "newnostr1";
   const grid3 = await getClient(`nostr/${name}`);
-  const subdomain = "ntt" + grid3.twinId + name;
+  const subdomain = `ntt${grid3.twinId}${name}`;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
 
-  const vmQueryOptions: FilterOptions = {
+  // VM Query Options
+  const vmQueryOptions = {
     cru: instanceCapacity.cru,
     mru: instanceCapacity.mru,
     sru: instanceCapacity.sru,
@@ -58,7 +71,8 @@ async function main() {
     farmId: 1,
   };
 
-  const gatewayQueryOptions: FilterOptions = {
+  // Gateway Query Options
+  const gatewayQueryOptions = {
     gateway: true,
     availableFor: grid3.twinId,
   };
@@ -66,7 +80,7 @@ async function main() {
   const gatewayNode = (await grid3.capacity.filterNodes(gatewayQueryOptions))[0];
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);
-  const domain = subdomain + "." + gatewayNode.publicConfig.domain;
+  const domain = `${subdomain}.${gatewayNode.publicConfig.domain}`;
 
   const vms: MachinesModel = {
     name,
@@ -106,14 +120,14 @@ async function main() {
     description: "Deploying Nostr instance via TS Grid3 client",
   };
 
-  // Deploy VMs
+  // Deploy VM and Gateway
   await deploy(grid3, vms, subdomain, gatewayNode);
 
-  // Get the deployment
-  await getDeployment(grid3, vms, subdomain);
+  // Get the deployment details
+  await getDeployment(grid3, name, subdomain);
 
   // Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name }, { name: subdomain });
+  // await cancel(grid3, name, subdomain);
 
   await grid3.disconnect();
 }
