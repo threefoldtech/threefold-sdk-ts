@@ -63,6 +63,9 @@
           memory: solution?.memory,
           solutionDisk: solution?.disk,
           rootFilesystemSize,
+          planetary,
+          mycelium,
+          wireguard,
         }"
         v-model="selectionDetails"
         require-domain
@@ -72,7 +75,12 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn
+        variant="elevated"
+        class="text-primery px-10 py-3 h-auto text-subtitle-1"
+        @click="validateBeforeDeploy(deploy)"
+        text="Deploy"
+      />
     </template>
   </weblet-layout>
 </template>

@@ -2,6 +2,7 @@ import { events } from "../helpers/events";
 import { VMHL } from "../high_level//machine";
 import { MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { Network } from "../primitives/network";
+import { ZNetworkLight } from "../primitives/networklight";
 import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
@@ -22,7 +23,7 @@ class KubernetesHL extends HighLevelBase {
     planetary: boolean,
     mycelium: boolean,
     myceliumSeed: string,
-    network: Network,
+    network: Network | ZNetworkLight,
     myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     sshKey: string,
     contractMetadata: string,
@@ -100,7 +101,7 @@ class KubernetesHL extends HighLevelBase {
     planetary: boolean,
     mycelium: boolean,
     myceliumSeed: string,
-    network: Network,
+    network: Network | ZNetworkLight,
     myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     sshKey: string,
     contractMetadata,
@@ -168,6 +169,7 @@ class KubernetesHL extends HighLevelBase {
   async delete(deployment: Deployment, names: string[]) {
     return await this._delete(deployment, names, [
       WorkloadTypes.zmachine,
+      WorkloadTypes.zmachinelight,
       WorkloadTypes.zmount,
       WorkloadTypes.volume,
       WorkloadTypes.ip,
