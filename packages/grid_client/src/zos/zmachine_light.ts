@@ -24,7 +24,6 @@ class MachineInterface {
 }
 
 class ZmachineLightNetwork {
-  //what is ValidateNested
   @Expose() @Type(() => MachineInterface) @ValidateNested({ each: true }) interfaces: MachineInterface[];
   @Expose() @Type(() => MyceliumIP) @ValidateNested() mycelium: MyceliumIP;
 
