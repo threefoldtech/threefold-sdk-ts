@@ -9,7 +9,9 @@ import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { KubernetesHL } from "../high_level/kubernetes";
 import { DeploymentResultContracts, TwinDeployment } from "../high_level/models";
+import { Nodes } from "../primitives";
 import { Network } from "../primitives/network";
+import { ZNetworkLight } from "../primitives/networklight";
 import { Deployment } from "../zos";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { BaseModule } from "./base";
@@ -28,6 +30,7 @@ class K8sModule extends BaseModule {
     WorkloadTypes.zlogs,
   ]; // TODO: remove deprecated
   kubernetes: KubernetesHL;
+  capacity: Nodes;
 
   /**
    * Class representing a Kubernetes Module.
@@ -36,10 +39,12 @@ class K8sModule extends BaseModule {
    * This class provides methods for managing Kubernetes deployments, including creating, updating, listing, and deleting deployments.
    * @class K8sModule
    * @param {GridClientConfig} config - The configuration object for initializing the client.
+   * @param {Nodes} capacity - Used to get node features
    */
   constructor(public config: GridClientConfig) {
     super(config);
     this.kubernetes = new KubernetesHL(config);
+    this.capacity = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
   }
 
   /**
@@ -126,17 +131,11 @@ class K8sModule extends BaseModule {
    * @returns {Promise<[TwinDeployment[], Network, string]>} A tuple containing the created deployments, network configuration, and Wireguard configuration.
    */
   async _createDeployment(options: K8SModel, masterIps: string[] = []): Promise<[TwinDeployment[], Network, string]> {
-    const network = new Network(options.network.name, options.network.ip_range, this.config);
-    await network.load();
+    let network;
+    let contractMetadata;
 
     let deployments: TwinDeployment[] = [];
     let wireguardConfig = "";
-    const contractMetadata = JSON.stringify({
-      version: 3,
-      type: "kubernetes",
-      name: options.name,
-      projectName: this.config.projectName || `kubernetes/${options.name}`,
-    });
     const masters_names: string[] = [];
     const workers_names: string[] = [];
     for (const master of options.masters) {
@@ -144,6 +143,29 @@ class K8sModule extends BaseModule {
         throw new ValidationError(`Another master with the same name ${master.name} already exists.`);
       masters_names.push(master.name);
 
+      if (network) break;
+      // Sets the network and contractMetadata based on the node's zos version
+      const nodeTwinId = await this.capacity.getNodeTwinId(master.node_id);
+      const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
+      if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
+        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+        await network.load();
+        contractMetadata = JSON.stringify({
+          version: 4,
+          type: "kubernetes",
+          name: options.name,
+          projectName: this.config.projectName || `kubernetes/${options.name}`,
+        });
+      } else {
+        network = new Network(options.network.name, options.network.ip_range, this.config);
+        await network.load();
+        contractMetadata = JSON.stringify({
+          version: 3,
+          type: "kubernetes",
+          name: options.name,
+          projectName: this.config.projectName || `kubernetes/${options.name}`,
+        });
+      }
       const [twinDeployments, wgConfig] = await this.kubernetes.add_master(
         master.name,
         master.node_id,
@@ -197,6 +219,28 @@ class K8sModule extends BaseModule {
         throw new ValidationError(`Another worker with the same name ${worker.name} already exists.`);
       workers_names.push(worker.name);
 
+      if (network) break;
+      const nodeTwinId = await this.capacity.getNodeTwinId(worker.node_id);
+      const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
+      if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
+        network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
+        await network.load();
+        contractMetadata = JSON.stringify({
+          version: 4,
+          type: "kubernetes",
+          name: options.name,
+          projectName: this.config.projectName || `kubernetes/${options.name}`,
+        });
+      } else {
+        network = new Network(options.network.name, options.network.ip_range, this.config);
+        await network.load();
+        contractMetadata = JSON.stringify({
+          version: 3,
+          type: "kubernetes",
+          name: options.name,
+          projectName: this.config.projectName || `kubernetes/${options.name}`,
+        });
+      }
       const [twinDeployments] = await this.kubernetes.add_worker(
         worker.name,
         worker.node_id,

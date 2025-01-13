@@ -4,6 +4,7 @@ import { IsDefined, IsEnum, IsInt, IsNotEmpty, IsString, Min, ValidateNested } f
 import { ValidateMembers } from "../helpers";
 import { GatewayFQDNProxy, GatewayNameProxy, GatewayResult } from "./gateway";
 import { PublicIPv4, PublicIPv4Result } from "./ipv4"; // TODO: remove deprecated
+import { NetworkLight } from "./network_light";
 import { PublicIP, PublicIPResult } from "./public_ip";
 import { QuantumSafeFS, QuantumSafeFSResult } from "./qsfs";
 import { Volume, VolumeResult } from "./volume";
@@ -11,6 +12,7 @@ import { WorkloadData, WorkloadDataResult } from "./workload_base";
 import { Zdb, ZdbResult } from "./zdb";
 import { Zlogs, ZlogsResult } from "./zlogs";
 import { Zmachine, ZmachineResult } from "./zmachine";
+import { ZmachineLight, ZmachineLightResult } from "./zmachine_light";
 import { Zmount, ZmountResult } from "./zmount";
 import { Znet } from "./znet";
 
@@ -32,6 +34,8 @@ enum WorkloadTypes {
   gatewaynameproxy = "gateway-name-proxy",
   qsfs = "qsfs",
   zlogs = "zlogs",
+  networklight = "network-light",
+  zmachinelight = "zmachine-light",
 }
 
 class DeploymentResult {
@@ -54,6 +58,8 @@ class DeploymentResult {
         { value: WorkloadDataResult, name: WorkloadTypes.gatewaynameproxy },
         { value: QuantumSafeFSResult, name: WorkloadTypes.qsfs },
         { value: ZlogsResult, name: WorkloadTypes.zlogs },
+        { value: WorkloadDataResult, name: WorkloadTypes.networklight },
+        { value: ZmachineLightResult, name: WorkloadTypes.zmachinelight },
       ],
     },
   })
@@ -67,7 +73,8 @@ class DeploymentResult {
     | QuantumSafeFSResult
     | WorkloadDataResult
     | GatewayResult
-    | ZlogsResult;
+    | ZlogsResult
+    | ZmachineLightResult;
 }
 
 @ValidateMembers()
@@ -95,6 +102,8 @@ class Workload {
         { value: GatewayNameProxy, name: WorkloadTypes.gatewaynameproxy },
         { value: QuantumSafeFS, name: WorkloadTypes.qsfs },
         { value: Zlogs, name: WorkloadTypes.zlogs },
+        { value: NetworkLight, name: WorkloadTypes.networklight },
+        { value: ZmachineLight, name: WorkloadTypes.zmachinelight },
       ],
     },
   })
@@ -110,7 +119,9 @@ class Workload {
     | GatewayFQDNProxy
     | GatewayNameProxy
     | QuantumSafeFS
-    | Zlogs;
+    | Zlogs
+    | NetworkLight
+    | ZmachineLight;
 
   @Expose() @IsString() @IsDefined() metadata: string;
   @Expose() @IsString() @IsDefined() description: string;

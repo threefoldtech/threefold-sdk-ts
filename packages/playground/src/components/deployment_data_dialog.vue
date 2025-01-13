@@ -68,7 +68,11 @@
                 :label="getDiskLabel(contract, disk)"
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
-              <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
+              <CopyReadonlyInput
+                v-if="contract.type !== 'zmachine-light'"
+                label="WireGuard IP"
+                :data="contract.interfaces[0].ip"
+              />
               <CopyReadonlyInput
                 label="WireGuard Config"
                 textarea
