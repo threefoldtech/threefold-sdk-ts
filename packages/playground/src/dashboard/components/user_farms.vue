@@ -1,12 +1,6 @@
 <template v-if="farms">
   <div class="my-6">
-    <v-text-field
-      class="mb-6"
-      v-model="search"
-      label="Search farm by ID or farm name"
-      single-line
-      hide-details
-    ></v-text-field>
+    <v-text-field class="mb-6" v-model="search" label="Search farm by name" single-line hide-details></v-text-field>
     <v-alert type="warning" variant="tonal" v-if="farmsCount == 0" class="my-8">
       Can't see any of your farms? Try changing your key type in your TFChain Wallet above.
     </v-alert>
@@ -225,12 +219,6 @@ export default {
     const refreshPublicIPs = ref(false);
     const sortBy = ref(SortBy.FarmId);
     const sortOrder = ref(SortOrder.Asc);
-    const farmId = computed(() => {
-      if (typeof search.value === "string" && !isNaN(Number(search.value))) {
-        return Number(search.value);
-      }
-      return undefined;
-    });
     const reloadFarms = debounce(getUserFarms, 20000);
     async function getUserFarms() {
       loading.value = true;
@@ -239,7 +227,6 @@ export default {
           retCount: true,
           twinId,
           page: page.value,
-          farmId: farmId.value,
           size: pageSize.value,
           nameContains: search.value,
           sortBy: sortBy.value,
