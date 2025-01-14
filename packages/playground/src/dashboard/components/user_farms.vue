@@ -133,7 +133,7 @@ import { type Farm, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/components/node_details_cards/card_details.vue";
@@ -223,6 +223,10 @@ export default {
     async function getUserFarms() {
       loading.value = true;
       try {
+        if (typeof search.value === "string" && !isNaN(Number(search.value))) {
+          farmId.value = Number(search.value);
+        }
+        console.log(farmId.value);
         const { data, count } = await gridProxyClient.farms.list({
           retCount: true,
           twinId,
