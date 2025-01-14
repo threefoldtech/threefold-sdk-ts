@@ -38,7 +38,7 @@
       <template #[`item.consumption`]="{ item }">
         <div
           v-if="item?.consumption !== 0 && item?.consumption !== undefined"
-          class="d-flex justify-center align-center flex-lg-row flex-md-column flex-sm-column"
+          class="d-flex justify-center align-center"
         >
           <p class="mr-2" cols="8">{{ item.consumption.toFixed(3) }} TFT/hour</p>
 
