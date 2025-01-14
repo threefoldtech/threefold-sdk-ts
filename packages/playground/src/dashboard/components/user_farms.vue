@@ -223,10 +223,6 @@ export default {
     async function getUserFarms() {
       loading.value = true;
       try {
-        if (typeof search.value === "string" && !isNaN(Number(search.value))) {
-          farmId.value = Number(search.value);
-        }
-        console.log(farmId.value);
         const { data, count } = await gridProxyClient.farms.list({
           retCount: true,
           twinId,
@@ -237,8 +233,7 @@ export default {
           sortOrder: sortOrder.value,
         });
 
-        farms.value = data as unknown as Farm[];
-
+        farms.value = data as Farm[];
         farmsCount.value = count || farms.value.length;
       } catch (error) {
         console.log(error);
