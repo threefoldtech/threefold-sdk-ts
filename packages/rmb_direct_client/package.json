@@ -1,6 +1,6 @@
 {
   "name": "@threefold/rmb_direct_client",
-  "version": "2.6.3",
+  "version": "2.7.0-rc1",
   "repository": {
     "type": "git",
     "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
@@ -23,8 +23,8 @@
   "dependencies": {
     "@noble/secp256k1": "^1.7.1",
     "@polkadot/api": "^8.9.1",
-    "@threefold/tfchain_client": "2.6.3",
-    "@threefold/types": "2.6.3",
+    "@threefold/tfchain_client": "2.7.0-rc1",
+    "@threefold/types": "2.7.0-rc1",
     "base64url": "^3.0.1",
     "bip39": "^3.1.0",
     "buffer": "^6.0.3",
