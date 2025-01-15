@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: refs/tags/v2.6.4
+          ref: refs/tags/v2.7.0-rc1
       - name: Set up node 18
         uses: actions/setup-node@v3
         with:
@@ -34,7 +34,6 @@ jobs:
       - name: Install
         run: |
           yarn
-          yarn add lerna@8.0.0 -W  # TODO Remove this line when the lerna fix reaches the main net
           lerna run build --no-private
 
       - name: Run test mass deployments
