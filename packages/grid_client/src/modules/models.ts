@@ -82,7 +82,7 @@ class QSFSDiskModel {
 }
 
 class NetworkModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
