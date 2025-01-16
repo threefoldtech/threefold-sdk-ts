@@ -1,4 +1,12 @@
-import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel, NodeInfo } from "../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  NodeInfo,
+} from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -43,7 +51,7 @@ async function cancel(client: GridClient, vms: string, gw: string) {
 }
 
 async function main() {
-  const name = "newstaticwebsite";
+  const name = "sw" + generateString(8);
   const grid3 = await getClient(`staticwebsite/${name}`);
   const subdomain = "sw" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 50 }; // Update the instance capacity values according to your requirements.

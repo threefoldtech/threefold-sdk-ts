@@ -1,4 +1,4 @@
-import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -43,7 +43,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newtaiga";
+  const name = "tg" + generateString(8);
   const grid3 = await getClient(`taiga/${name}`);
   const subdomain = "tg" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 }; // Update the instance capacity values according to your requirements.

@@ -1,4 +1,4 @@
-import { Features, FilterOptions, GridClient, K8SModel, QSFSZDBSModel } from "../../src";
+import { Features, FilterOptions, generateString, GridClient, K8SModel, QSFSZDBSModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -38,7 +38,7 @@ async function deleteQsfs(client: GridClient, qsfs: string) {
 }
 
 async function main() {
-  const name = "testk8sqsfs";
+  const name = "k8s" + generateString(8);
   const grid3 = await getClient(`kubernetes/${name}`);
 
   const qsfs_name = "testQsfsK8sq1";

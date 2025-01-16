@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
 
-import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -51,7 +51,7 @@ function generatePubKey(): string {
 }
 
 async function main() {
-  const name = "newdiscourse";
+  const name = "dc" + generateString(8);
   const grid3 = await getClient(`discourse/${name}`);
   const subdomain = "dc" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.

@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel } from "../../src";
+import { FilterOptions, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -24,7 +24,7 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "newalgorand";
+  const name = "algo" + generateString(8);
   const grid3 = await getClient(`algorand/${name}`);
   const instanceCapacity = { cru: 2, mru: 4, sru: 100 }; // Update the instance capacity values according to your requirements.
 

@@ -1,4 +1,12 @@
-import { Features, FilterOptions, generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
+import {
+  Features,
+  FilterOptions,
+  generateRandomHexSeed,
+  generateString,
+  GridClient,
+  MachinesDeleteModel,
+  MachinesModel,
+} from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -24,7 +32,7 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "vm";
+  const name = "vm" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
   const instanceCapacity = { cru: 2, mru: 4, sru: 100 }; // Update the instance capacity values according to your requirements.
 

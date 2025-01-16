@@ -1,4 +1,4 @@
-import { AddWorkerModel, Features, FilterOptions } from "../../src";
+import { AddWorkerModel, Features, FilterOptions, generateString } from "../../src";
 import { getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -26,7 +26,7 @@ async function deleteWorker(client, worker) {
 }
 
 async function main() {
-  const name = "testk8s";
+  const name = "k8s" + generateString(8);
   const grid3 = await getClient(`kubernetes/${name}`);
 
   const workerQueryOptions: FilterOptions = {

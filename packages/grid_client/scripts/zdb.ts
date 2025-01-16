@@ -1,4 +1,4 @@
-import { FilterOptions, ZdbModes, ZDBSModel } from "../src";
+import { FilterOptions, generateString, ZdbModes, ZDBSModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -24,7 +24,7 @@ async function cancel(client, zdb) {
 }
 
 async function main() {
-  const name = "tttzdbs";
+  const name = "zdb" + generateString(8);
   const grid3 = await getClient(`zdb/${name}`);
 
   const zdbQueryOptions: FilterOptions = {

@@ -1,4 +1,4 @@
-import { generateRandomHexSeed, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
+import { generateRandomHexSeed, generateString, GridClient, MachinesDeleteModel, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -24,7 +24,7 @@ async function cancel(client: GridClient, options: MachinesDeleteModel) {
 }
 
 async function main() {
-  const name = "newMY";
+  const name = "vm" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
 
   const vms: MachinesModel = {

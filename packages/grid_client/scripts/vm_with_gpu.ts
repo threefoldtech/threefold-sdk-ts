@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel } from "../src";
+import { FilterOptions, generateString, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -24,7 +24,7 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "vmgpu";
+  const name = "vm" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
