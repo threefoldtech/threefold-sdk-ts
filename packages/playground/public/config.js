@@ -1,4 +1,5 @@
 window.env = {
+  WALLET_KEY: "wallet.v1",
   NETWORK: "dev",
   GRAPHQL_STACKS: ["https://graphql.dev.grid.tf/graphql", "https://graphql.02.dev.grid.tf/graphql"],
   GRIDPROXY_STACKS: ["https://gridproxy.dev.grid.tf", "https://gridproxy.02.dev.grid.tf"],

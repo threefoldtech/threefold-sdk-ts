@@ -11,8 +11,7 @@ export interface Credentials {
   emailHash?: string;
 }
 
-const version = 1;
-const WALLET_KEY = "wallet.v" + version;
+const WALLET_KEY = window.env.WALLET_KEY;
 export function getCredentials() {
   const getCredentials = localStorage.getItem(WALLET_KEY);
   let credentials: Credentials = {};
