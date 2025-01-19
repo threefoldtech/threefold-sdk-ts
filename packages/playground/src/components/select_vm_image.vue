@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed,type PropType, ref, watch } from "vue";
+import { computed, type PropType, ref, watch } from "vue";
 
 import type { Flist } from "../types";
 
