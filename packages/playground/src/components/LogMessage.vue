@@ -80,16 +80,7 @@ export default {
     const props = toRef(_props);
 
     const collapsable = computed(() => props.value.log.data.message?.length > 200);
-    const collapsed = ref(true);
-
-    watch(
-      () => props.value.log.id,
-      () => {
-        if (!collapsed.value) {
-          collapsed.value = true;
-        }
-      },
-    );
+    const collapsed = computed(() => !!props.value.log?.id);
 
     return { collapsable, collapsed, copyLog };
   },
