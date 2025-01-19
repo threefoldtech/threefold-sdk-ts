@@ -115,7 +115,6 @@ export default {
 
   setup(props, { emit }) {
     const loading = ref<boolean>(false);
-    const dialog = ref<boolean>(false);
     const isError = ref<boolean>(false);
     const isLiveStats = ref<boolean>(false);
 
@@ -174,13 +173,7 @@ export default {
     }
 
     watch(() => props.nodeId, requestNode);
-
-    watch(
-      () => props.openDialog,
-      newValue => {
-        dialog.value = newValue as boolean;
-      },
-    );
+    const dialog = computed(() => props.openDialog);
 
     return {
       NodeStatus,
