@@ -268,7 +268,7 @@ class TFContracts extends Contracts {
     const gqlClient = new Graphql(options.graphqlURL);
 
     const body = `query getConsumption($contractId: BigInt!){
-            contractBillReports(where: {contractID_eq: $contractId} ) {
+            contractBillReports(where: {contractID_eq: $contractId} , orderBy: timestamp_DESC) {
                 discountReceived
 
             }
