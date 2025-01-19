@@ -40,11 +40,11 @@
           v-if="item?.consumption !== 0 && item?.consumption !== undefined"
           class="d-flex justify-center align-center"
         >
-          <p class="mr-2" cols="8">{{ item.consumption.toFixed(3) }} TFT/hour</p>
+          <p class="mr-2 text-no-wrap" cols="8">{{ item.consumption.toFixed(3) }} TFT/hour</p>
 
           <v-tooltip bottom color="primary" close-delay="100" v-if="item.discountPackage" cols="2">
             <template v-slot:activator="{ props }">
-              <v-icon class="scale_beat mr-2" color="warning" v-bind="props">mdi-brightness-percent</v-icon>
+              <v-icon class="scale_beat" color="warning" v-bind="props">mdi-brightness-percent</v-icon>
             </template>
 
             <span>
