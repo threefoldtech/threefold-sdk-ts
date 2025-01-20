@@ -10,6 +10,7 @@
       ]"
       #="{ props: validationProps }"
       ref="passwordInput"
+      @update:status="setStatus($event)"
     >
       <v-tooltip
         id="wallet-password__tooltip"
@@ -35,9 +36,11 @@
 
 <script lang="ts" setup>
 import md5 from "md5";
+import { ref } from "vue";
 
+import { ValidatorStatus } from "@/hooks/form_validator";
 import { getCredentials } from "@/utils/credentials";
-defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "update:isValid"]);
 const props = defineProps({
   modelValue: {
     required: true,
@@ -48,18 +51,30 @@ const props = defineProps({
     type: String as () => "Login" | "Create",
     default: "Create",
   },
+  isValid: {
+    required: false,
+    type: Boolean,
+    default: false,
+  },
 });
-
+const passwordInput = ref(null);
 function validatePassword(value: string) {
   if (!localStorage.getItem(window.env.WALLET_KEY)) {
     return {
       message: "We couldn't find a matching wallet for this password. Please connect your wallet first.",
     };
   }
-  if (getCredentials().passwordHash !== md5(props.modelValue)) {
+  if (getCredentials().passwordHash !== md5(value)) {
     return {
       message: "We couldn't find a matching wallet for this password. Please connect your wallet first.",
     };
+  }
+}
+function setStatus(status: ValidatorStatus) {
+  if (status === ValidatorStatus.Valid) {
+    emit("update:isValid", true);
+  } else {
+    emit("update:isValid", false);
   }
 }
 </script>
