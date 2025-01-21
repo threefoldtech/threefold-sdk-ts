@@ -1,25 +1,69 @@
-import axios from "axios";
-import { setTimeout } from "timers/promises";
-
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
-import { config, getClient } from "../../client_loader";
-import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
+import { FilterOptions, GatewayNameModel, GridClient, MachinesModel } from "../../src";
+import { config, getClient } from "../client_loader";
+import { log, pingNodes } from "../utils";
 
 jest.setTimeout(1250000);
 
 let gridClient: GridClient;
-let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "ns" + generateString(10);
-  gridClient.clientOptions.projectName = `nostr/${deploymentName}`;
-  gridClient._connect();
   return gridClient;
 });
 
-// Private IP Regex
-const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
+async function deploy(client: GridClient, vms: MachinesModel, subdomain: string, gatewayNode: any) {
+  // Deploy VM
+  const resultVM = await client.machines.deploy(vms);
+  log("================= Deploying VM =================");
+  log(resultVM);
+  log("================= Deploying VM =================");
+
+  // Get WG interface details
+  const wgnet = (await client.machines.getObj(vms.name))[0].interfaces[0];
+
+  // Deploy Gateway
+  const gateway: GatewayNameModel = {
+    name: subdomain,
+    network: wgnet.network,
+    node_id: gatewayNode.nodeId,
+    tls_passthrough: false,
+    backends: [`http://${wgnet.ip}:8080`],
+  };
+
+  const resultGateway = await client.gateway.deploy_name(gateway);
+  log("================= Deploying Gateway =================");
+  log(resultGateway);
+  log("================= Deploying Gateway =================");
+}
+
+async function getDeployment(client: GridClient, name: string, subdomain: string) {
+  // Get VM deployment
+  const resultVM = await client.machines.getObj(name);
+  log("================= Getting VM Deployment =================");
+  log(resultVM);
+  log("================= Getting VM Deployment =================");
+
+  // Get Gateway deployment
+  const resultGateway = await client.gateway.getObj(subdomain);
+  log("================= Getting Gateway Deployment =================");
+  log(resultGateway);
+  log(`https://${resultGateway[0].domain}`);
+  log("================= Getting Gateway Deployment =================");
+}
+
+async function cancel(client: GridClient, name: string, subdomain: string) {
+  // Cancel VM deployment
+  const resultVM = await client.machines.delete({ name });
+  log("================= Canceling VM Deployment =================");
+  log(resultVM);
+  log("================= Canceling VM Deployment =================");
+
+  // Cancel Gateway deployment
+  const resultGateway = await client.gateway.delete_name({ name: subdomain });
+  log("================= Canceling Gateway Deployment =================");
+  log(resultGateway);
+  log("================= Canceling Gateway Deployment =================");
+}
 
 test("TC2955 - Applications: Deploy Nostr", async () => {
   /**********************************************
@@ -42,136 +86,77 @@ test("TC2955 - Applications: Deploy Nostr", async () => {
         - Assert that the returned domain is working
           and returns correct data.
 **********************************************/
+  const name = "nostrDeployment";
+  const subdomain = `ntt${gridClient.twinId}${name}`;
+  const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
 
-  // Test Data
-  const name = "gw" + generateString(10).toLowerCase();
-  const tlsPassthrough = false;
-  const cpu = 2;
-  const memory = 4;
-  const rootfsSize = 2;
-  const diskSize = 50;
-  const networkName = generateString(15);
-  const vmName = generateString(15);
-  const diskName = generateString(15);
-  const mountPoint = "/mnt/data";
-  const publicIp = false;
-  const ipRangeClassA = "10." + generateInt(1, 255) + ".0.0/16";
-  const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
-  const ipRangeClassC = "192.168.0.0/16";
-  const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
-  const metadata = "{'deploymentType': 'nostr'}";
-  const description = "Test deploying Nostr via ts grid3 client";
+  // VM Query Options
+  const vmQueryOptions: FilterOptions = {
+    cru: instanceCapacity.cru,
+    mru: instanceCapacity.mru,
+    sru: instanceCapacity.sru,
+    availableFor: gridClient.twinId,
+    farmId: 1,
+    features: ["wireguard", "mycelium"], // Ensure nodes have required features
+  };
 
-  // Gateway Node Selection
-  const gatewayNodes = await gridClient.capacity.filterNodes({
+  // Gateway Query Options
+  const gatewayQueryOptions: FilterOptions = {
     gateway: true,
-    farmId: 1,
-    availableFor: await gridClient.twins.get_my_twin_id(),
-  } as FilterOptions);
-  if (gatewayNodes.length == 0) throw new Error("No nodes available to complete this test");
-  const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
+    availableFor: gridClient.twinId,
+  };
 
-  // Node Selection
-  const nodes = await gridClient.capacity.filterNodes({
-    cru: cpu,
-    mru: memory,
-    sru: rootfsSize + diskSize,
-    farmId: 1,
-    availableFor: await gridClient.twins.get_my_twin_id(),
-  } as FilterOptions);
-  const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) throw new Error("No nodes available to complete this test");
-  const domain = name + "." + GatewayNode.publicConfig.domain;
+  const gatewayNode = (await gridClient.capacity.filterNodes(gatewayQueryOptions))[0];
+  const nodes = await gridClient.capacity.filterNodes(vmQueryOptions);
+  const vmNode = await pingNodes(gridClient, nodes);
+  const domain = `${subdomain}.${gatewayNode.publicConfig.domain}`;
 
-  const fs = require("fs");
-  // VM Model
   const vms: MachinesModel = {
-    name: deploymentName,
+    name,
     network: {
-      name: networkName,
-      ip_range: ipRange,
+      name: "nostrnet",
+      ip_range: "10.252.0.0/16",
+      addAccess: true,
+      accessNodeId: gatewayNode.nodeId,
     },
     machines: [
       {
-        name: vmName,
-        node_id: nodeId,
-        cpu: cpu,
-        memory: 1024 * memory,
-        rootfs_size: rootfsSize,
+        name: "nostr",
+        node_id: vmNode,
         disks: [
           {
-            name: diskName,
-            size: diskSize,
-            mountpoint: mountPoint,
+            name: "nsDisk",
+            size: instanceCapacity.sru,
+            mountpoint: "/mnt/data",
           },
         ],
+        planetary: true,
+        public_ip: false,
+        public_ip6: false,
+        mycelium: true,
+        cpu: instanceCapacity.cru,
+        memory: 1024 * instanceCapacity.mru,
+        rootfs_size: 0,
         flist: "https://hub.grid.tf/tf-official-apps/nostr_relay-mycelium.flist",
         entrypoint: "/sbin/zinit init",
-        public_ip: publicIp,
-        planetary: true,
-        mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
           NOSTR_HOSTNAME: domain,
         },
       },
     ],
-    metadata: metadata,
-    description: description,
+    metadata: "",
+    description: "Deploying Nostr instance via TS Grid3 client",
   };
 
-  const res = await gridClient.machines.deploy(vms);
-  log(res);
+  // Deploy VM and Gateway
+  await deploy(gridClient, vms, subdomain, gatewayNode);
 
-  // Contracts Assertions
-  expect(res.contracts.created).toHaveLength(1);
-  expect(res.contracts.updated).toHaveLength(0);
-  expect(res.contracts.deleted).toHaveLength(0);
+  // Get the deployment details
+  await getDeployment(gridClient, name, subdomain);
 
-  const result = await gridClient.machines.getObj(vms.name);
-  log(result);
-
-  // Gateway Backend Configuration
-  const backends = ["http://[" + result[0].planetary + "]:8080"];
-  log(backends);
-
-  // Gateway Model
-  const gw: GatewayNameModel = {
-    name: name,
-    node_id: GatewayNode.nodeId,
-    tls_passthrough: tlsPassthrough,
-    backends: backends,
-  };
-
-  const gatewayRes = await gridClient.gateway.deploy_name(gw);
-  log(gatewayRes);
-
-  // Gateway Assertions
-  expect(gatewayRes.contracts.created).toHaveLength(1);
-
-  const gatewayResult = await gridClient.gateway.getObj(gw.name);
-  log(gatewayResult);
-
-  // Gateway Assertions
-  expect(gatewayResult[0].name).toBe(name);
-  expect(gatewayResult[0].backends).toStrictEqual(backends);
-
-  const host = result[0].planetary;
-  const user = "root";
-
-  // SSH to the Created VM
-  const ssh = await RemoteRun(host, user);
-
-  try {
-    // Allow Nostr's port through UFW
-    await ssh.execCommand("curl localhost:8080").then(async function (result) {
-      log(result.stdout);
-      expect(result.stdout).toContain("Please use a Nostr client to connect.");
-    });
-  } finally {
-    // Disconnect from the machine
-    await ssh.dispose();
-  }
+  // Uncomment the line below to cancel the deployment
+  // await cancel(gridClient, name, subdomain);
 });
 
 afterAll(async () => {

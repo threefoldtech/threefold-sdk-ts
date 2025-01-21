@@ -1,9 +1,17 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
+import { generateInt, getOnlineNode, log } from "../../utils";
 
 jest.setTimeout(1250000);
 
@@ -17,9 +25,6 @@ beforeAll(async () => {
   gridClient._connect();
   return gridClient;
 });
-
-// Private IP Regex
-const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
 test("TC2954 - Applications: Deploy Gitea", async () => {
   /**********************************************
@@ -62,6 +67,7 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
 
   // Gateway Node Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
     gateway: true,
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
@@ -81,7 +87,6 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
   if (nodeId === -1) throw new Error("No nodes available to complete this test");
   const domain = name + "." + GatewayNode.publicConfig.domain;
 
-  const fs = require("fs");
   // VM Model
   const vms: MachinesModel = {
     name: deploymentName,
@@ -159,21 +164,6 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
   const site = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  const host = result[0].planetary;
-  const user = "root";
-
-  //SSH to the Created VM
-  const ssh = await RemoteRun(host, user);
-
-  try {
-    //Verify that the added env var was successfully passed to the VM.
-    await ssh.execCommand("ufw allow 3000/tcp").then(async function (result) {
-      log(result.stdout);
-    });
-  } finally {
-    //Disconnect from the machine
-    await ssh.dispose();
-  }
   for (let i = 0; i <= 250; i++) {
     const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);

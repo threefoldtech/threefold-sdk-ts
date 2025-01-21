@@ -1,9 +1,17 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../../src";
 import { config, getClient } from "../../client_loader";
-import { GBToBytes, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../../utils";
+import { generateInt, getOnlineNode, log } from "../../utils";
 
 jest.setTimeout(1250000);
 
@@ -17,9 +25,6 @@ beforeAll(async () => {
   gridClient._connect();
   return gridClient;
 });
-
-// Private IP Regex
-const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
 test("TC2953 - Applications: Deploy Jenkins", async () => {
   /**********************************************
@@ -63,6 +68,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
 
   // GatewayNode Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
     gateway: true,
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
@@ -82,7 +88,6 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
   if (nodeId == -1) throw new Error("No nodes available to complete this test");
   const domain = name + "." + GatewayNode.publicConfig.domain;
 
-  const fs = require("fs");
   // VM Model
   const vms: MachinesModel = {
     name: deploymentName,
