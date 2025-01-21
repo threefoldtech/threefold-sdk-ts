@@ -510,11 +510,6 @@ async function onDelete(k8s = false) {
   try {
     const projectNameLower = props.projectName?.toLowerCase();
     const allSelectedItems = [...selectedItems.value];
-    selectedItems.value.forEach(item => {
-      if (item.projectName?.toLowerCase().includes(ProjectName.Caprover.toLowerCase()) && item.workers) {
-        allSelectedItems.push(...item.workers);
-      }
-    });
 
     await allSelectedItems.reduce(async (acc, item) => {
       await acc;
@@ -531,6 +526,7 @@ async function onDelete(k8s = false) {
             projectName: item.projectName,
             ip: getDeploymentIps(item),
             k8s,
+            isCaprover: item.projectName?.toLowerCase().includes(ProjectName.Caprover.toLowerCase()),
           });
         }
       } catch (e: any) {

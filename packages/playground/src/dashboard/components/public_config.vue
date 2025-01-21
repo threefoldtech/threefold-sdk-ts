@@ -97,10 +97,7 @@
               <!-- Domain -->
               <input-validator
                 :value="config.domain"
-                :rules="[
-                  validators.required('Domain is required.'),
-                  validators.isFQDN('Please provide a valid domain.'),
-                ]"
+                :rules="[validators.isFQDN('Please provide a valid domain.')]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">

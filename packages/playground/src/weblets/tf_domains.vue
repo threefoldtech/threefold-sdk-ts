@@ -29,16 +29,6 @@
           <TfSelectionDetails disable-node-selection require-domain use-fqdn v-model="selectionDetails" />
         </div>
 
-        <input-tooltip tooltip="The port used to access the machine.">
-          <input-validator
-            :value="port"
-            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
-            #="{ props }"
-          >
-            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
-          </input-validator>
-        </input-tooltip>
-
         <input-tooltip
           tooltip="User's machine's IP: It could be Mycelium IP, Yggdrasil IP, or a public IP (IPv4 or IPv6)."
         >
@@ -55,6 +45,16 @@
           </input-validator>
         </input-tooltip>
 
+        <input-tooltip tooltip="The port used to access the machine.">
+          <input-validator
+            :value="port"
+            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
+            #="{ props }"
+          >
+            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
+          </input-validator>
+        </input-tooltip>
+
         <input-tooltip
           tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
           inline
@@ -65,7 +65,12 @@
     </d-tabs>
 
     <template #footer-actions="{ validateBeforeDeploy }">
-      <v-btn color="secondary" @click="validateBeforeDeploy(deploy)" text="Deploy" />
+      <v-btn
+        variant="elevated"
+        class="text-primery px-10 py-3 h-auto text-subtitle-1"
+        @click="validateBeforeDeploy(deploy)"
+        text="Deploy"
+      />
     </template>
   </weblet-layout>
 </template>

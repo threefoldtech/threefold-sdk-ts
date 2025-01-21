@@ -76,6 +76,9 @@
           memory: solution?.memory,
           rootFilesystemSize,
           ssdDisks: disks.map(d => d.size),
+          planetary,
+          mycelium,
+          wireguard,
         }"
         require-domain
         v-model="selectionDetails"

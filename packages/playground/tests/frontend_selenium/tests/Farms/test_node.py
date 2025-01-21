@@ -7,6 +7,7 @@ import random
 import math
 import time
 
+
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
 def before_test_setup(browser):
@@ -179,9 +180,8 @@ def test_config_validation(browser):
     cases = [generate_inavalid_ip(), generate_inavalid_gateway(), generate_string(), generate_leters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
     for case in cases:
         node_page.add_config_input( 0, 0, 0, 0, case)
-        assert node_page.wait_for('Wrong domain format.')
+        assert node_page.wait_for('Please provide a valid domain.')
         assert node_page.get_save_button().is_enabled()==False
-
 
 def test_add_config(browser):
     """
@@ -211,7 +211,6 @@ def test_add_config(browser):
             time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == new_ipv4
 
-
 def test_remove_config(browser):
     """
       Test Case: TC1222 - Remove a public config
@@ -238,7 +237,6 @@ def test_remove_config(browser):
         if(counter==30):
             time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == ''
-
 
 def test_additional_fee(browser):
     """

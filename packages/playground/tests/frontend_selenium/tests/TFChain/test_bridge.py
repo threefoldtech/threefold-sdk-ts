@@ -2,6 +2,7 @@ from utils.utils import generate_leters, generate_string, get_email, get_seed, g
 from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
+import pytest
 
 #  Time required for the run (11 cases) is approximately 3 minutes.
 
@@ -115,6 +116,7 @@ def test_check_deposit(browser):
     assert grid_proxy.get_twin_address(twin_id[twin_id.find('_')+1:]) == user_address
 
 
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3752")
 def test_check_withdraw_stellar(browser):
     """
       Test Case: TC1118 check withdraw stellar
@@ -156,7 +158,7 @@ def test_check_withdraw_invalid_stellar(browser):
     assert bridge_page.check_withdraw_invalid_stellar('') == False
     assert bridge_page.wait_for('This field is required')
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3752")
 def test_check_withdraw_tft_amount(browser):
     """
       Test Case: TC1131 check withdraw tft amount
@@ -204,7 +206,7 @@ def test_check_withdraw_invalid_tft_amount(browser):
     assert bridge_page.check_withdraw_invalid_tft_amount('') == False
     assert bridge_page.wait_for('This field is required')
 
-
+@pytest.mark.skip(reason="https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3752")
 def test_check_withdraw(browser):
     """
       Test Case: TC1132 check withdraw 

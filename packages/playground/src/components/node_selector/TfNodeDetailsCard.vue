@@ -103,7 +103,7 @@
           </VTooltip>
 
           <VTooltip
-            v-if="rentable || rented"
+            v-if="(rentable || rented) && node.status !== 'down'"
             location="top"
             :text="
               rentable ? 'You can rent it exclusively for your workloads' : 'Rented as full node for a single user'
@@ -311,6 +311,7 @@ import formatResourceSize from "../../utils/format_resource_size";
 import { toGigaBytes } from "../../utils/helpers";
 import { validateRentContract } from "../../utils/nodeSelector";
 import { normalizePrice } from "../../utils/pricing_calculator";
+import { useProfileManagerController } from "../profile_manager_controller.vue";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
@@ -328,6 +329,7 @@ export default {
     "update:node": (node: NodeInfo | GridNode) => true || node,
   },
   setup(props, ctx) {
+    const profileManagerController = useProfileManagerController();
     const profileManager = useProfileManager();
     const gridStore = useGrid();
     const grid = gridStore.client as unknown as GridClient;
@@ -370,7 +372,7 @@ export default {
     }
 
     watch(
-      () => profileManager.profile,
+      () => [profileManager.profile, profileManagerController.balance],
       async () => {
         await refreshStakingDiscount();
       },
