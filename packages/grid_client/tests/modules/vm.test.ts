@@ -69,6 +69,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
