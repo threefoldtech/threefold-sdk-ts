@@ -68,7 +68,11 @@
                 :label="getDiskLabel(contract, disk)"
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
-              <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
+              <CopyReadonlyInput
+                v-if="contract.type !== 'zmachine-light'"
+                label="WireGuard IP"
+                :data="contract.interfaces[0].ip"
+              />
               <CopyReadonlyInput
                 label="WireGuard Config"
                 textarea
@@ -131,7 +135,7 @@
         </v-card-text>
         <v-card-actions class="justify-end my-1 mr-2">
           <v-btn color="anchor" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" @click="copy">Copy</v-btn>
+          <v-btn color="secondary" v-if="showType == 1" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

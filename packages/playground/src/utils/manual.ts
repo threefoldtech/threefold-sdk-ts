@@ -17,4 +17,6 @@ export const manual = {
   discount_levels: urlJoin(BASE, "/knowledge_base/cloud/pricing/pricing.html#staking-discount"),
   tfchain_stellar_bridge: urlJoin(BASE, "/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html"),
   minting_receipts: urlJoin(BASE, "/documentation/farmers/3node_building/minting_receipts.html"),
+  minting_process: urlJoin(BASE, "/documentation/farmers/farming_optimization/minting_process.html"),
+  minting_reports: urlJoin(BASE, "/documentation/dashboard/tfchain/tf_minting_reports.html"),
 };

@@ -11,3 +11,5 @@ export * from "./znet";
 export * from "./gateway";
 export * from "./qsfs";
 export * from "./zlogs";
+export * from "./zmachine_light";
+export * from "./network_light";

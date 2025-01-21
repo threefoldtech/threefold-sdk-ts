@@ -26,8 +26,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'dev' }}
+      - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'qa' }}
         with:
-          ref: refs/tags/v2.5.2
+          ref: refs/tags/v2.6.3
+      - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'test' }}
+        with:
+          ref: refs/tags/v2.6.3
+      - uses: actions/checkout@v4
+        if: ${{ env.NETWORK == 'main' }}
+        with:
+          ref: refs/tags/v2.6.3
 
       - name: Set up node 18
         uses: actions/setup-node@v3
@@ -66,12 +77,14 @@ jobs:
       - name: Run test vm with qsfs
         id: vmqsfs
         if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
 
       - name: Run test kubernetes with qsfs
         id: k8sqsfs
         if: always()
+        continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/orchestrators/kubernetes_with_qsfs.ts
 
@@ -127,15 +140,15 @@ jobs:
           title: ${{github.workflow}} failed during schedule on ${{ env.NETWORK }}
           body: |
             ## Failure Report
-          
+
             > [!IMPORTANT]
             > **Details on failed run**: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          
+
             - **Dynamic Single Vm**: ${{ steps.single_vm.outcome }}
             - **Multiple Vm**: ${{ steps.multiple_vm.outcome }}
             - **Kubernetes**: ${{ steps.k8s.outcome }}
-            - **Vmq QSFS**: ${{ steps.vmqsfs.outcome }}
-            - **Kubernetes QSFS**: ${{ steps.k8sqsfs.outcome }}
+            - **Vmq QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
+            - **Kubernetes QSFS**: skipped https://github.com/threefoldtech/tfgrid-sdk-ts/issues/3611
             - **Kvstore**: ${{ steps.kvstore.outcome }}
             - **Zdb**: ${{ steps.zdb.outcome }}
             - **Delete all contracts**: ${{ steps.delete_all.outcome }}

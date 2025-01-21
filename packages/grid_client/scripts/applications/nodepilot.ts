@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel } from "../../src";
+import { Features, FilterOptions, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -35,6 +35,7 @@ async function main() {
     sru: instanceCapacity.sru,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: [Features.ip, Features.ipv4, Features.wireguard],
   };
   const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
   const vmNode = await pingNodes(grid3, nodes);

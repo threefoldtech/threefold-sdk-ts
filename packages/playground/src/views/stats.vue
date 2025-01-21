@@ -29,13 +29,7 @@
           </v-col>
           <v-col v-if="Istats.length !== 0" cols="12" md="4">
             <v-row>
-              <v-col
-                v-for="(item, index) of Istats"
-                :key="item.title"
-                :cols="index === Istats.length - 1 ? 12 : 6"
-                :md="index === Istats.length - 1 ? 12 : 6"
-                class="d-flex flex-grow-1"
-              >
+              <v-col v-for="item of Istats" :key="item.title" :cols="6" :md="6" class="d-flex flex-grow-1">
                 <StatisticsCard :item="item" />
               </v-col>
             </v-row>
@@ -50,7 +44,7 @@
 import { NodeStatus, type Stats as GridProxyStats } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 
-import formatResourceSize from "@/utils/format_resource_size";
+import formatResourceSize, { formatNumberWithCommas } from "@/utils/format_resource_size";
 
 import { gridProxyClient } from "../clients";
 import StatisticsCard from "../components/statistics_card.vue";
@@ -140,8 +134,7 @@ const fetchData = async () => {
         { data: stats!.farms, title: "Farms", icon: "mdi-tractor" },
         { data: stats!.countries, title: "Countries", icon: "mdi-earth" },
         { data: stats!.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
-        { data: formatResourceSize(stats!.totalSru), title: "SSD Storage", icon: "mdi-nas" },
-        { data: formatResourceSize(stats!.totalHru), title: "HDD Storage", icon: "mdi-harddisk" },
+        { data: formatNumberWithCommas(stats!.totalSru), title: "SSD Storage", icon: "mdi-nas" },
         { data: formatResourceSize(stats!.totalMru), title: "RAM", icon: "mdi-memory" },
         { data: stats!.gpus, title: "GPUs", icon: "mdi-memory" },
         { data: stats!.accessNodes, title: "Access Nodes", icon: "mdi-gate" },

@@ -36,7 +36,15 @@
             ></v-text-field>
           </v-card>
 
-          <v-card class="my-3 pa-5" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
+          <v-card
+            class="my-3 pa-5"
+            :class="{
+              'dark-bg': route.query.hash == proposal.hash && theme.name.value == 'dark',
+              'light-bg': route.query.hash == proposal.hash && theme.name.value == 'light',
+            }"
+            v-for="(proposal, i) in filteredProposals(tab.content.value)"
+            :key="i"
+          >
             <div
               class="d-flex align-center"
               :style="{
@@ -46,13 +54,19 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'"> Go to Proposal </v-btn>
+              <div class="d-flex justify-between">
+                <v-btn color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'" class="mx-3">
+                  Go to Proposal
+                </v-btn>
+                <v-btn @click="shareProposal(proposal.hash, proposal.end)">Share</v-btn>
+              </div>
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
             <v-card-text class="pb-0">
               <v-row class="my-1 mb-3">
                 <p class="font-weight-bold mr-3">Description:</p>
+
                 <span> {{ proposal.description }}</span>
               </v-row>
               <v-row v-if="expired(proposal.end)" class="my-1">
@@ -295,7 +309,10 @@ import { type DaoProposalDetails, type DaoProposals, TFChainError } from "@three
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useTheme } from "vuetify";
 
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { manual } from "@/utils/manual";
 
 import { useGrid, useProfileManager } from "../stores";
@@ -317,7 +334,6 @@ const isValidFarm = ref(false);
 const selectedProposal = ref("");
 const selectedFarm = ref();
 const userFarms = ref<FarmInterface[]>();
-
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
@@ -328,6 +344,8 @@ const tabs = [
 const gridStore = useGrid();
 const grid = gridStore.client as GridClient;
 
+const route = useRoute();
+const theme = useTheme();
 onMounted(async () => {
   updateGrid(grid, { projectName: "" });
 
@@ -338,7 +356,21 @@ onMounted(async () => {
     userFarms.value = await getFarms(grid, { ownedBy: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
+  if (route.query.tab == "1") {
+    activeTab.value = 1;
+  }
 });
+
+function shareProposal(hash: string, end: moment.Moment) {
+  if (end.isBefore(Date.now())) {
+    navigator.clipboard.writeText(`${window.location.href.split("?")[0]}?hash=${hash}&tab=1`);
+  } else {
+    navigator.clipboard.writeText(`${window.location.href.split("?")[0]}?hash=${hash}&tab=0`);
+  }
+
+  createCustomToast("Copied!", ToastType.success);
+}
+
 function expired(proposalEnd: moment.Moment) {
   return proposalEnd.isAfter(Date.now());
 }
@@ -403,6 +435,17 @@ async function castVote() {
 }
 </script>
 <style>
+@import "highlight.js/styles/atom-one-dark.css";
+@import "highlight.js/styles/atom-one-light.css";
+
+.light-bg {
+  color: #333333 !important;
+  background-color: #f6f6f6 !important;
+}
+.dark-bg {
+  background-color: var(--v-theme-background-overlay-multiplier);
+}
+
 .custom-container {
   width: 80%;
 }
@@ -415,5 +458,8 @@ async function castVote() {
 .v-tooltip > .v-overlay__content {
   padding: 0px 0px !important;
   border: 1px solid #5a5959 !important;
+}
+.highlight-card {
+  background-color: var(--v-theme-background-overlay-multiplier);
 }
 </style>

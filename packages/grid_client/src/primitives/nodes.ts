@@ -8,10 +8,11 @@ import urlJoin from "url-join";
 
 import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
-import { formatErrorMessage } from "../helpers";
+import { Features, formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
 import { convertObjectToQueryString } from "../helpers/utils";
-import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
+import { FarmFilterOptions, FilterOptions, MachineModel, NodeStatus } from "../modules/models";
+import { WorkloadTypes } from "../zos";
 
 interface FarmInfo {
   name: string;
@@ -62,6 +63,7 @@ interface NodeInfo {
   rentable: boolean;
   rented: boolean;
   price_usd: number;
+  features: Features[];
 }
 interface PublicConfig {
   domain: string;
@@ -161,9 +163,9 @@ class Nodes {
     return tfclient.contracts
       .get({ id: contractId })
       .then(contract => {
-        if (!contract.contractType.nodeContract)
-          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's not a node contract.`);
-        return contract.contractType.nodeContract.nodeId;
+        if (contract.contractType.nameContract)
+          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's a name contract.`);
+        return contract.contractType?.nodeContract?.nodeId || contract.contractType?.rentContract?.nodeId;
       })
       .catch(err => {
         //TODO add error handling in QueryClient/contracts
@@ -333,9 +335,44 @@ class Nodes {
       });
   }
 
+  /**
+   * Sets the features of the node according to filter options.
+   *
+   * @param options - An object containing filter options to set the node's features.
+   * @returns A string array representing the node's features.
+   */
+  getFeaturesFromFilters(options: FilterOptions = {}): Features[] {
+    const featuresSet: Set<Features> = new Set(options.features || []);
+
+    if (options.publicIPs) {
+      featuresSet.add(Features.ipv4);
+      featuresSet.add(Features.ip);
+    }
+    if (options.hasIPv6) {
+      featuresSet.add(Features.ip);
+    }
+    if (options.wireguard) {
+      featuresSet.add(Features.wireguard);
+    }
+    if (options.mycelium) {
+      featuresSet.add(Features.mycelium);
+    }
+    if (options.planetary) {
+      featuresSet.add(Features.yggdrasil);
+    }
+
+    if (options.gateway) {
+      featuresSet.add(Features.gatewayfqdnproxy);
+      featuresSet.add(Features.gatewaynameproxy);
+    }
+
+    return Array.from(featuresSet);
+  }
+
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {
     let nodes: NodeInfo[] = [];
     url = url || this.proxyURL;
+    options.features = this.getFeaturesFromFilters(options);
     const query = this.getNodeUrlQuery(options);
     nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
     if (nodes.length) {
@@ -423,6 +460,7 @@ class Nodes {
       healthy: options.healthy,
       sort_by: SortBy.FreeCRU,
       sort_order: SortOrder.Desc,
+      features: options.features,
     };
 
     if (options.gateway) {

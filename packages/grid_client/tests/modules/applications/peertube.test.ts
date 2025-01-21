@@ -1,7 +1,15 @@
 import axios from "axios";
 import { setTimeout } from "timers/promises";
 
-import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../../src";
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../../src";
 import { config, getClient } from "../../client_loader";
 import { GBToBytes, generateInt, getOnlineNode, log, splitIP } from "../../utils";
 
@@ -78,6 +86,7 @@ test("TC2684 - Applications: Deploy Peertube", async () => {
     sru: rootfsSize + diskSize,
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
+    features: [Features.wireguard],
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) throw new Error("no nodes available to complete this test");
