@@ -6,11 +6,10 @@
       :rules="[
         validators.required('Password is required.'),
         validators.minLength('Password must be at least 6 characters.', 6),
-        props.mode === 'Login' ? validatePassword : null,
+        validatePassword,
       ]"
       #="{ props: validationProps }"
       ref="passwordInput"
-      @update:status="setStatus($event)"
     >
       <v-tooltip
         id="wallet-password__tooltip"
@@ -59,6 +58,7 @@ const props = defineProps({
 });
 const passwordInput = ref(null);
 function validatePassword(value: string) {
+  if (props.mode === "Create") return;
   if (!localStorage.getItem(window.env.WALLET_KEY)) {
     return {
       message: "We couldn't find a matching wallet for this password. Please connect your wallet first.",
@@ -68,13 +68,6 @@ function validatePassword(value: string) {
     return {
       message: "We couldn't find a matching wallet for this password. Please connect your wallet first.",
     };
-  }
-}
-function setStatus(status: ValidatorStatus) {
-  if (status === ValidatorStatus.Valid) {
-    emit("update:isValid", true);
-  } else {
-    emit("update:isValid", false);
   }
 }
 </script>
