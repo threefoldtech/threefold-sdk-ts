@@ -25,6 +25,7 @@
               @update:modelValue="$emit('update:modelValue', $event)"
               v-bind="{ ...passwordInputProps, ...validationProps }"
               autocomplete="off"
+              :disabled="props.disabled"
             />
           </div>
         </template>
@@ -39,7 +40,7 @@ import { ref } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 import { getCredentials } from "@/utils/credentials";
-const emit = defineEmits(["update:modelValue", "update:isValid"]);
+
 const props = defineProps({
   modelValue: {
     required: true,
@@ -50,10 +51,9 @@ const props = defineProps({
     type: String as () => "Login" | "Create",
     default: "Create",
   },
-  isValid: {
+  disabled: {
     required: false,
     type: Boolean,
-    default: false,
   },
 });
 const passwordInput = ref(null);
