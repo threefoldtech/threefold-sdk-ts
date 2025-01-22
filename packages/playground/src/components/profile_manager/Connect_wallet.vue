@@ -110,7 +110,13 @@
           v-model="email"
           v-bind="props"
           :loading="loadEmail"
-          :disabled="creatingAccount || activatingAccount || activating || loadEmail"
+          :disabled="
+            creatingAccount ||
+            activatingAccount ||
+            activating ||
+            loadEmail ||
+            mnemonicInput.status !== ValidatorStatus.Valid
+          "
           ref="emailRef"
         />
       </input-validator>
