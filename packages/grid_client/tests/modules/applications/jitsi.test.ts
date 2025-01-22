@@ -20,50 +20,49 @@ let deploymentName: string;
 
 beforeAll(async () => {
   gridClient = await getClient();
-  deploymentName = "gt" + generateString(10);
-  gridClient.clientOptions.projectName = `gitea/${deploymentName}`;
+  deploymentName = "jitsi" + generateString(10);
+  gridClient.clientOptions.projectName = `jitsi/${deploymentName}`;
   gridClient._connect();
   return gridClient;
 });
 
-test("TC2954 - Applications: Deploy Gitea", async () => {
+test("TCXXXX - Applications: Deploy Jitsi", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
-     Test Cases: TC2954 - Applications: Deploy Gitea
+     Test Cases: TCXXXX - Applications: Deploy Jitsi
      Scenario:
-        - Generate Test Data/Gitea Config/Gateway Config.
-        - Select a Node To Deploy the Gitea on.
+        - Generate Test Data/Jitsi Config/Gateway Config.
+        - Select a Node To Deploy the Jitsi on.
         - Select a Gateway Node To Deploy the gateway on.
-        - Deploy the Gitea solution.
+        - Deploy the Jitsi solution.
         - Assert that the generated data matches
           the deployment details.
-        - Pass the IP of the Created Gitea to the Gateway
-          Config.
+        - Pass the IP of the Created Jitsi instance
+          to the Gateway Config.
         - Deploy the Gateway.
         - Assert that the generated data matches
           the deployment details.
         - Assert that the Gateway points at the IP
-          of the created Gitea.
+          of the created Jitsi.
         - Assert that the returned domain is working
           and returns correct data.
     **********************************************/
+
+  // Test Data
   const name = "gw" + generateString(10).toLowerCase();
   const tlsPassthrough = false;
-  const cpu = 1;
-  const memory = 2;
-  const rootfsSize = 2;
-  const diskSize = 15;
+  const cpu = 2;
+  const memory = 4;
+  const rootfsSize = 0;
+  const diskSize = 50;
   const networkName = generateString(15);
   const vmName = generateString(15);
   const diskName = generateString(15);
-  const mountPoint = "/var/lib/docker";
+  const mountPoint = "/mnt/data";
   const publicIp = false;
-  const ipRangeClassA = "10." + generateInt(1, 255) + ".0.0/16";
-  const ipRangeClassB = "172." + generateInt(16, 31) + ".0.0/16";
-  const ipRangeClassC = "192.168.0.0/16";
-  const ipRange = randomChoice([ipRangeClassA, ipRangeClassB, ipRangeClassC]);
-  const metadata = "{'deploymentType': 'gitea'}";
-  const description = "test deploying Gitea via ts grid3 client";
+  const ipRange = "10.251.0.0/16";
+  const metadata = "{'deploymentType': 'jitsi'}";
+  const description = "Test deploying Jitsi via ts grid3 client";
 
   // Gateway Node Selection
   const gatewayNodes = await gridClient.capacity.filterNodes({
@@ -72,7 +71,7 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
-  if (gatewayNodes.length === 0) throw new Error("No nodes available to complete this test");
+  if (gatewayNodes.length == 0) throw new Error("No nodes available to complete this test");
   const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
   // Node Selection
@@ -85,7 +84,7 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId === -1) throw new Error("No nodes available to complete this test");
+  if (nodeId == -1) throw new Error("No nodes available to complete this test");
   const domain = name + "." + GatewayNode.publicConfig.domain;
 
   // VM Model
@@ -109,16 +108,14 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
             mountpoint: mountPoint,
           },
         ],
-        flist: "https://hub.grid.tf/petep.3bot/threefolddev-gitea-latest.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/jitsi-latest.flist",
         entrypoint: "/sbin/zinit init",
         public_ip: publicIp,
         planetary: true,
         mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
-          GITEA__HOSTNAME: domain,
-          GITEA__ROOT_EMAIL: "admin@gitea.com",
-          GITEA__ROOT_PASSWORD: "adminpassword",
+          JITSI_HOSTNAME: domain,
         },
       },
     ],
@@ -138,7 +135,7 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
   log(result);
 
   // Gateway Backend Configuration
-  const backends = ["http://[" + result[0].planetary + "]:3000"];
+  const backends = ["http://[" + result[0].planetary + "]:80"];
   log(backends);
 
   // Gateway Model
@@ -162,7 +159,9 @@ test("TC2954 - Applications: Deploy Gitea", async () => {
   expect(gatewayResult[0].name).toBe(name);
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
-  const site = "https://" + gatewayResult[0].domain;
+  // Gateway reachability check
+  const site = "http://" + gatewayResult[0].domain + "/";
+  log(`Testing Gateway URL: ${site}`);
   let reachable = false;
 
   for (let i = 0; i <= 250; i++) {

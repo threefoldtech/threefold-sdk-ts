@@ -1,6 +1,17 @@
-import { FilterOptions, GatewayNameModel, GridClient, MachinesModel } from "../../src";
-import { config, getClient } from "../client_loader";
-import { log, pingNodes } from "../utils";
+import axios from "axios";
+import { setTimeout } from "timers/promises";
+
+import {
+  Features,
+  FilterOptions,
+  GatewayNameModel,
+  generateString,
+  GridClient,
+  MachinesModel,
+  randomChoice,
+} from "../../../src";
+import { config, getClient } from "../../client_loader";
+import { generateInt, getOnlineNode, log } from "../../utils";
 
 jest.setTimeout(1250000);
 
@@ -64,113 +75,163 @@ async function cancel(client: GridClient, name: string, subdomain: string) {
   log(resultGateway);
   log("================= Canceling Gateway Deployment =================");
 }
-
-test("TC2955 - Applications: Deploy Nostr", async () => {
+test("TCXXXX - Applications: Deploy Nostr with WireGuard", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
-     Test Cases: TC2955 - Applications: Deploy Nostr
+     Test Cases: TCXXXX - Applications: Deploy Nostr with WireGuard
      Scenario:
         - Generate Test Data/Nostr Config/Gateway Config.
-        - Select a Node To Deploy the Nostr instance on.
-        - Select a Gateway Node To Deploy the Gateway on.
+        - Select a Node To Deploy the Nostr on.
+        - Select a Gateway Node To Deploy the gateway on.
         - Deploy the Nostr solution.
         - Assert that the generated data matches
           the deployment details.
-        - Pass the IP of the Created Nostr instance to the Gateway
-          Config.
+        - Pass the WireGuard IP of the Created Nostr instance
+          to the Gateway Config.
         - Deploy the Gateway.
         - Assert that the generated data matches
           the deployment details.
-        - Assert that the Gateway points at the IP
-          of the created Nostr instance.
+        - Assert that the Gateway points at the WireGuard IP
+          of the created Nostr.
         - Assert that the returned domain is working
           and returns correct data.
-**********************************************/
-  const name = "nostrDeployment";
-  const subdomain = `ntt${gridClient.twinId}${name}`;
-  const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
+    **********************************************/
 
-  // VM Query Options
-  const vmQueryOptions: FilterOptions = {
-    cru: instanceCapacity.cru,
-    mru: instanceCapacity.mru,
-    sru: instanceCapacity.sru,
-    availableFor: gridClient.twinId,
-    farmId: 1,
-    features: ["wireguard", "mycelium"], // Ensure nodes have required features
-  };
+  // Test Data
+  const name = "gw" + generateString(10).toLowerCase();
+  const tlsPassthrough = false;
+  const cpu = 2;
+  const memory = 4;
+  const rootfsSize = 0;
+  const diskSize = 50;
+  const networkName = generateString(15);
+  const vmName = generateString(15);
+  const diskName = generateString(15);
+  const mountPoint = "/mnt/data";
+  const publicIp = false;
+  const ipRange = "10.252.0.0/16";
+  const metadata = "{'deploymentType': 'nostr'}";
+  const description = "Test deploying Nostr via ts grid3 client with WireGuard";
 
-  // Gateway Query Options
-  const gatewayQueryOptions: FilterOptions = {
+  // Gateway Node Selection
+  const gatewayNodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
     gateway: true,
-    availableFor: gridClient.twinId,
-  };
+    farmId: 1,
+    availableFor: await gridClient.twins.get_my_twin_id(),
+  } as FilterOptions);
+  if (gatewayNodes.length === 0) throw new Error("No nodes available to complete this test");
+  const GatewayNode = gatewayNodes[generateInt(0, gatewayNodes.length - 1)];
 
-  const gatewayNode = (await gridClient.capacity.filterNodes(gatewayQueryOptions))[0];
-  const nodes = await gridClient.capacity.filterNodes(vmQueryOptions);
-  const vmNode = await pingNodes(gridClient, nodes);
-  const domain = `${subdomain}.${gatewayNode.publicConfig.domain}`;
+  // Node Selection
+  const nodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
+    cru: cpu,
+    mru: memory,
+    sru: rootfsSize + diskSize,
+    farmId: 1,
+    availableFor: await gridClient.twins.get_my_twin_id(),
+  } as FilterOptions);
+  const nodeId = await getOnlineNode(nodes);
+  if (nodeId === -1) throw new Error("No nodes available to complete this test");
 
+  // VM Model
   const vms: MachinesModel = {
-    name,
+    name: name,
     network: {
-      name: "nostrnet",
-      ip_range: "10.252.0.0/16",
-      addAccess: true,
-      accessNodeId: gatewayNode.nodeId,
+      name: networkName,
+      ip_range: ipRange,
     },
     machines: [
       {
-        name: "nostr",
-        node_id: vmNode,
+        name: vmName,
+        node_id: nodeId,
+        cpu: cpu,
+        memory: 1024 * memory,
+        rootfs_size: rootfsSize,
         disks: [
           {
-            name: "nsDisk",
-            size: instanceCapacity.sru,
-            mountpoint: "/mnt/data",
+            name: diskName,
+            size: diskSize,
+            mountpoint: mountPoint,
           },
         ],
-        planetary: true,
-        public_ip: false,
-        public_ip6: false,
-        mycelium: true,
-        cpu: instanceCapacity.cru,
-        memory: 1024 * instanceCapacity.mru,
-        rootfs_size: 0,
         flist: "https://hub.grid.tf/tf-official-apps/nostr_relay-mycelium.flist",
         entrypoint: "/sbin/zinit init",
+        public_ip: publicIp,
+        planetary: false, // Planetary disabled
+        mycelium: true,
         env: {
           SSH_KEY: config.ssh_key,
-          NOSTR_HOSTNAME: domain,
         },
       },
     ],
-    metadata: "",
-    description: "Deploying Nostr instance via TS Grid3 client",
+    metadata: metadata,
+    description: description,
   };
 
-  // Deploy VM and Gateway
-  await deploy(gridClient, vms, subdomain, gatewayNode);
+  const res = await gridClient.machines.deploy(vms);
+  log(res);
 
-  // Get the deployment details
-  await getDeployment(gridClient, name, subdomain);
+  // Contracts Assertions
+  expect(res.contracts.created).toHaveLength(1);
+  expect(res.contracts.updated).toHaveLength(0);
+  expect(res.contracts.deleted).toHaveLength(0);
 
-  // Uncomment the line below to cancel the deployment
-  // await cancel(gridClient, name, subdomain);
+  const result = await gridClient.machines.getObj(vms.name);
+  log(result);
+
+  // Retrieve the WireGuard network details of the VM
+  const wgnet = result[0].interfaces[0];
+
+  // Gateway Backend Configuration
+  const backends = [`http://${wgnet.ip}:8080`];
+  log(backends);
+
+  // Gateway Model
+  const gw: GatewayNameModel = {
+    name: name,
+    network: wgnet.network,
+    node_id: GatewayNode.nodeId,
+    tls_passthrough: tlsPassthrough,
+    backends: backends,
+  };
+
+  const gatewayRes = await gridClient.gateway.deploy_name(gw);
+  log(gatewayRes);
+
+  // Gateway Assertions
+  expect(gatewayRes.contracts.created).toHaveLength(1);
+
+  const gatewayResult = await gridClient.gateway.getObj(gw.name);
+  log(gatewayResult);
+
+  // Gateway Assertions
+  expect(gatewayResult[0].name).toBe(name);
+  expect(gatewayResult[0].backends).toStrictEqual(backends);
+
+  // Gateway reachability check
+  const site = `http://${wgnet.ip}:8080/`;
+  log(`Testing Gateway URL: ${site}`);
+  let reachable = false;
+
+  for (let i = 0; i <= 250; i++) {
+    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
+    log(wait);
+
+    await axios
+      .get(site)
+      .then(res => {
+        log("Gateway is reachable");
+        log(res.status);
+        log(res.statusText);
+        expect(res.status).toBe(200);
+        reachable = true;
+      })
+      .catch(() => {
+        log("Gateway is not reachable");
+      });
+    if (reachable) break;
+    if (i === 250) throw new Error("Gateway is unreachable after retries");
+  }
 });
-
-afterAll(async () => {
-  const vmNames = await gridClient.machines.list();
-  for (const name of vmNames) {
-    const res = await gridClient.machines.delete({ name });
-    log(res);
-  }
-
-  const gwNames = await gridClient.gateway.list();
-  for (const name of gwNames) {
-    const res = await gridClient.gateway.delete_name({ name });
-    log(res);
-  }
-
-  return await gridClient.disconnect();
-}, 130000);

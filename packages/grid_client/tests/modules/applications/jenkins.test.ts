@@ -78,6 +78,7 @@ test("TC2953 - Applications: Deploy Jenkins", async () => {
 
   // Node Selection
   const nodes = await gridClient.capacity.filterNodes({
+    features: [Features.wireguard, Features.mycelium],
     cru: cpu,
     mru: memory,
     sru: rootfsSize + diskSize,
