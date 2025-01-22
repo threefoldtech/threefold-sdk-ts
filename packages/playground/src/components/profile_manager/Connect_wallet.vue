@@ -27,17 +27,15 @@
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="mnemonic"
-                  :rules="[
-                validators.required('Mnemonic or Hex Seed is required.'),
-                (input:string)=>validateMnemonicInput(input),
-              ]"
+                  :rules="[validators.required('Mnemonic or Hex Seed is required.')]"
+                  :asyncRules="[validateMnemonicInput]"
                   valid-message="Mnemonic or Hex Seed is valid."
                   #="{ props: validationProps }"
                   ref="mnemonicInput"
                 >
                   <div v-bind="tooltipProps">
                     <VTextField
-                      :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
+                      :append-icon="enableReload && mnemonic !== '' ? 'mdi-reload' : ''"
                       label="Mnemonic or Hex Seed"
                       placeholder="Please insert your Mnemonic or Hex Seed"
                       v-model="mnemonic"
@@ -164,13 +162,14 @@
 </template>
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
-import { KeypairType } from "@threefold/grid_client";
+import { GridClient, KeypairType } from "@threefold/grid_client";
 import { TwinNotExistError } from "@threefold/types";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
 import { ref } from "vue";
 
+import { ValidatorStatus } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
 import { setCredentials } from "@/utils/credentials";
 import { getGrid, readEmail, storeEmail } from "@/utils/grid";
@@ -205,37 +204,40 @@ const openAcceptTerms = ref(false);
 const termsLoading = ref(false);
 
 const emit = defineEmits(["closeDialog"]);
-async function getEmail() {
+async function getEmail(grid: GridClient) {
   loadEmail.value = true;
   try {
-    const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-    if (grid) {
-      email.value = await readEmail(grid);
-    }
+    email.value = await readEmail(grid);
   } catch (e) {
-    if (e instanceof TwinNotExistError) {
-      isNonActiveMnemonic.value = true;
-    } else {
-      return {
-        message: normalizeError(e, "Something went wrong. please try again."),
-      };
-    }
+    console.error("error", e);
   } finally {
     loadEmail.value = false;
   }
 }
 
 function reloadValidation() {
-  enableReload.value = true;
+  enableReload.value = false;
   mnemonicInput.value.validate();
 }
-const validateMnemonicInput = (input: string) => {
+const validateMnemonicInput = async (input: string) => {
+  enableReload.value = false;
   isNonActiveMnemonic.value = false;
   if (
     validateMnemonic(input) ||
     ((input.length === 64 || input.length === 66) && isAddress(input.length === 66 ? input : `0x${input}`))
   ) {
-    getEmail();
+    try {
+      const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+      getEmail(grid!);
+    } catch (e) {
+      if (e instanceof TwinNotExistError) {
+        isNonActiveMnemonic.value = true;
+      } else {
+        console.log("error", e);
+        enableReload.value = true;
+        return { message: normalizeError(e, "Something went wrong. please try again.") };
+      }
+    }
     return;
   }
   email.value = "";
