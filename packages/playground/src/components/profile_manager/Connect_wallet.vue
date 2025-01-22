@@ -240,7 +240,6 @@ const validateMnemonicInput = async (input: string) => {
     }
     return;
   }
-  email.value = "";
   return {
     message: "Mnemonic or Hex Seed doesn't seem to be valid.",
   };
