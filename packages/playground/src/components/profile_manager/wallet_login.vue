@@ -7,7 +7,7 @@
             You will need to provide the password used while connecting your wallet.
           </p>
         </v-alert>
-        <WalletPassword id="wallet-login-tab__password-input" mode="Login" v-model="password" />
+        <WalletPassword id="wallet-login-tab__password-input" mode="Login" v-model="password" :disabled="loading" />
         <v-alert id="wallet-login-tab__error-alert" type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
           {{ loginError }}
         </v-alert>
@@ -44,14 +44,13 @@ import { normalizeError } from "@/utils/helpers";
 import { handlePostLogin } from "@/utils/profile_manager";
 const profileManager = useProfileManager();
 const password = ref("");
-const emit = defineEmits(["closeDialog"]);
+const emit = defineEmits(["closeDialog", "update:loading"]);
 const isValidForm = ref(false);
-const loading = ref(false);
+const loading = ref<boolean>(false);
 const loginError = ref<string>("");
 
 onMounted(async () => {
   if (getCredentials()) {
-    console.log("Stored credentials found");
     const credentials: Credentials = getCredentials();
     const sessionPassword = sessionStorage.getItem("password");
 
@@ -67,6 +66,8 @@ onMounted(async () => {
 
 async function login() {
   loading.value = true;
+  emit("update:loading", true);
+  await new Promise(resolve => setTimeout(resolve, 1000));
   loginError.value = "";
   try {
     const credentials: Credentials = getCredentials();
@@ -79,10 +80,8 @@ async function login() {
           : KeypairType.sr25519;
 
         const grid = await getGrid({ mnemonic: mnemonic, keypairType: keypairType as KeypairType });
-        await handlePostLogin(grid!);
-
-        profileManager.set(await loadProfile(grid!));
-        sessionStorage.setItem("password", password.value);
+        await handlePostLogin(grid!, password.value);
+        profileManager.set({ ...(await loadProfile(grid!)), mnemonic });
         emit("closeDialog");
       }
     } else {
@@ -94,6 +93,7 @@ async function login() {
     loginError.value = normalizeError(error, message);
   } finally {
     loading.value = false;
+    emit("update:loading", false);
   }
 }
 </script>
