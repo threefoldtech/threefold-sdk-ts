@@ -1,4 +1,4 @@
-import { GatewayNameModel, GridClient, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, GridClient, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -63,7 +63,8 @@ async function main() {
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 };
 
   // VM Query Options
-  const vmQueryOptions = {
+  const vmQueryOptions: FilterOptions = {
+    features: [Features.wireguard, Features.mycelium],
     cru: instanceCapacity.cru,
     mru: instanceCapacity.mru,
     sru: instanceCapacity.sru,
@@ -72,7 +73,8 @@ async function main() {
   };
 
   // Gateway Query Options
-  const gatewayQueryOptions = {
+  const gatewayQueryOptions: FilterOptions = {
+    features: [Features.wireguard, Features.mycelium],
     gateway: true,
     availableFor: grid3.twinId,
   };
