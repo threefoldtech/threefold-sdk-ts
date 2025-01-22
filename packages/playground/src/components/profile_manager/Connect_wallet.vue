@@ -1,6 +1,5 @@
 <template>
   <form @submit.prevent="storeAndLogin()">
-    {{ isNonActiveMnemonic }}
     <FormValidator v-model="isValidForm">
       <v-alert type="warning" variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
@@ -44,7 +43,7 @@
                         ...validationProps,
                       }"
                       autocomplete="off"
-                      :disabled="creatingAccount || activatingAccount || activating"
+                      :disabled="creatingAccount || connecting"
                       @click:append="reloadValidation"
                       ref="mnemonicRef"
                     >
@@ -69,6 +68,7 @@
                 :items="[...keyType]"
                 item-title="name"
                 v-model="keypairType"
+                @onchange="mnemonicInput.validate()"
               />
             </template>
           </v-tooltip>
@@ -76,21 +76,21 @@
       </v-row>
 
       <!-- create Account -->
-      <div class="d-flex flex-column flex-md-row justify-end mb-10">
+      <div class="d-flex flex-column flex-md-row justify-end mb-5">
         <VBtn
           class="mt-2 ml-sm-0 ml-md-3"
           color="secondary"
           variant="outlined"
-          :disabled="isValidForm || !!mnemonic || keypairType === KeypairType.ed25519"
+          :disabled="isValidForm || !!mnemonic || keypairType === KeypairType.ed25519 || isNonActiveMnemonic"
           :loading="creatingAccount"
+          @click="openAcceptTerms = true"
         >
-          <!-- shouldActivateAccount -->
           create account
         </VBtn>
       </div>
 
-      <v-alert type="error" variant="tonal" class="mb-4" v-if="createAccountError || activatingAccountError">
-        {{ createAccountError || activatingAccountError }}
+      <v-alert type="error" variant="tonal" class="mb-4" v-if="createOrActivateError">
+        {{ createOrActivateError }}
       </v-alert>
 
       <!-- Email -->
@@ -108,19 +108,13 @@
           v-model="email"
           v-bind="props"
           :loading="loadEmail"
-          :disabled="
-            creatingAccount ||
-            activatingAccount ||
-            activating ||
-            loadEmail ||
-            mnemonicInput.status !== ValidatorStatus.Valid
-          "
+          :disabled="creatingAccount || connecting || loadEmail || mnemonicInput?.status !== ValidatorStatus.Valid"
           ref="emailRef"
         />
       </input-validator>
 
       <!-- Passwords -->
-      <Wallet_password v-model="password" mode="Create" />
+      <WalletPassword v-model="password" mode="Create" :disabled="creatingAccount || connecting" />
       <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
         <InputValidator
           :value="confirmPassword"
@@ -135,7 +129,7 @@
               ...confirmPasswordInputProps,
               ...validationProps,
             }"
-            :disabled="creatingAccount || activatingAccount || activating"
+            :disabled="creatingAccount || connecting"
             autocomplete="off"
           />
         </InputValidator>
@@ -151,14 +145,15 @@
           class="ml-2"
           type="submit"
           color="secondary"
-          :loading="activating"
-          :disabled="!isValidForm || creatingAccount || activatingAccount"
+          :loading="connecting"
+          :disabled="!isValidForm || creatingAccount"
         >
           Connect
         </VBtn>
       </div>
     </FormValidator>
   </form>
+  <AcceptTermsDialog v-model="openAcceptTerms" @onError="handleTCErrors" @onAccept="handleAcceptTerms" />
 </template>
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
@@ -167,15 +162,15 @@ import { TwinNotExistError } from "@threefold/types";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
+import { useProfileManager } from "@/stores";
 import { setCredentials } from "@/utils/credentials";
-import { getGrid, readEmail, storeEmail } from "@/utils/grid";
+import { activateAccountAndCreateTwin, createAccount, getGrid, loadProfile, readEmail, storeEmail } from "@/utils/grid";
 import { normalizeError } from "@/utils/helpers";
-
-import Wallet_password from "./Wallet_password.vue";
+const profileManager = useProfileManager();
 const mnemonic = ref("");
 const email = ref("");
 const password = ref("");
@@ -188,22 +183,34 @@ const mnemonicInput = useInputRef();
 // loading
 const loadEmail = ref(false);
 const creatingAccount = ref(false);
-const activatingAccount = ref(false);
-const activating = ref(false);
+const connecting = ref(false);
 
 // flags
 const enableReload = ref(false);
 const isNonActiveMnemonic = ref(false);
 
 // errors
-const CreateOrActivateError = ref("");
+const createOrActivateError = ref("");
 const storeAndLoginError = ref("");
 
 // terms and conditions
 const openAcceptTerms = ref(false);
-const termsLoading = ref(false);
+const handleTCErrors = (error: string) => {
+  openAcceptTerms.value = false;
+  createOrActivateError.value = error;
+};
 
-const emit = defineEmits(["closeDialog"]);
+const handleAcceptTerms = () => {
+  openAcceptTerms.value = false;
+  isNonActiveMnemonic.value ? activateAccount() : createNewAccount();
+};
+
+const emit = defineEmits(["closeDialog", "update:loading"]);
+
+watch([connecting, creatingAccount], () => {
+  console.log(connecting.value || creatingAccount.value);
+  emit("update:loading", connecting.value || creatingAccount.value);
+});
 async function getEmail(grid: GridClient) {
   loadEmail.value = true;
   try {
@@ -251,7 +258,40 @@ function validateConfirmPassword(value: string) {
   }
 }
 
+async function createNewAccount() {
+  mnemonicInput.value.reset();
+  creatingAccount.value = true;
+  try {
+    const account = await createAccount();
+    mnemonic.value = account.mnemonic;
+  } catch (e) {
+    createOrActivateError.value = normalizeError(e, "Something went wrong while creating new account.");
+  } finally {
+    creatingAccount.value = false;
+  }
+}
+
+async function activateAccount() {
+  creatingAccount.value = true;
+  connecting.value = true;
+  try {
+    const mnemonicOrSeedValue = validateMnemonic(mnemonic.value)
+      ? mnemonic.value
+      : mnemonic.value.length === 66
+      ? mnemonic.value
+      : `0x${mnemonic.value}`;
+    await activateAccountAndCreateTwin(mnemonicOrSeedValue);
+    await storeAndLogin();
+  } catch (e) {
+    connecting.value = false;
+    createOrActivateError.value = normalizeError(e, "Something went wrong while activating your account.");
+  } finally {
+    creatingAccount.value = false;
+  }
+}
+
 async function storeAndLogin() {
+  connecting.value = true;
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
   const keypairTypeHash = cryptr.encrypt(keypairType.value);
@@ -259,21 +299,36 @@ async function storeAndLogin() {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     storeEmail(grid!, email.value);
     setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
-    // await activate(mnemonic.value, keypairType.value);
+    await handlePostLogin(grid!, password.value);
+    const profile = await loadProfile(grid!);
+    if (email.value && profile.email !== email.value) {
+      profile.email = email.value;
+    }
+    profileManager.set({ ...profile, mnemonic: mnemonic.value });
   } catch (e) {
     if (e instanceof TwinNotExistError) {
       openAcceptTerms.value = true;
-      termsLoading.value = true;
       isNonActiveMnemonic.value = true;
     }
-    console.log("error", e);
+    console.error("error", e);
     enableReload.value = false;
     storeAndLoginError.value = normalizeError(e, "Something went wrong. please try again.");
+  } finally {
+    connecting.value = false;
   }
 }
 </script>
 <script lang="ts">
+import { handlePostLogin } from "@/utils/profile_manager";
+
+import AcceptTermsDialog from "./AcceptTermsDialog.vue";
+import WalletPassword from "./Wallet_password.vue";
+
 export default {
   name: "ConnectWallet",
+  components: {
+    WalletPassword,
+    AcceptTermsDialog,
+  },
 };
 </script>
