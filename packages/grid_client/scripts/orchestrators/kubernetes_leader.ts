@@ -1,4 +1,4 @@
-import { FilterOptions, K8SModel } from "../../src";
+import { Features, FilterOptions, K8SModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -33,6 +33,7 @@ async function main() {
     sru: 6,
     availableFor: grid3.twinId,
     farmId: 1,
+    features: [Features.wireguard],
   };
 
   const workerQueryOptions: FilterOptions = {
