@@ -83,7 +83,7 @@ async function main() {
     },
     machines: [
       {
-        name: "staticwebsite",
+        name: "sw" + generateString(8),
         node_id: vmNode,
         disks: [
           {

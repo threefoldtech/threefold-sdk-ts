@@ -25,7 +25,7 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "uls" + generateString(8);
+  const name = "ul" + generateString(8);
   const grid3 = await getClient(`umbrel/${name}`);
   const instanceCapacity = { cru: 1, mru: 2, sru: 20 }; // Update the instance capacity values according to your requirements.
 
@@ -48,7 +48,7 @@ async function main() {
     },
     machines: [
       {
-        name: "umbrel",
+        name: "ul" + generateString(8),
         node_id: vmNode,
         disks: [
           {

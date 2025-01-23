@@ -8,6 +8,7 @@ import {
   BlockchainDeleteModel,
   BlockchainGetModel,
   BlockchainSignModel,
+  generateString,
   GridClient,
 } from "../src";
 import { getClient } from "./client_loader";
@@ -23,7 +24,7 @@ const hexMessage = message
   .split("")
   .map((letter, i) => message.charCodeAt(i).toString(16))
   .join("");
-const name = "testAcc";
+const name = generateString(10);
 
 async function main() {
   const account: AlgorandAccountCreateModel = {

@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "casperlabs",
+        name: "cl" + generateString(8),
         node_id: vmNode,
         disks: [
           {

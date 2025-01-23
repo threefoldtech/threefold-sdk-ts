@@ -77,7 +77,7 @@ async function main() {
     },
     machines: [
       {
-        name: "mattermost",
+        name: "mm" + generateString(8),
         node_id: vmNode,
         disks: [
           {

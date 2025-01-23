@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "subsquid",
+        name: "ss" + generateString(8),
         node_id: vmNode,
         disks: [
           {

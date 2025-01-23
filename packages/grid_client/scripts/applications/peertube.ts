@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "peertube",
+        name: "pt" + generateString(8),
         node_id: vmNode,
         disks: [
           {

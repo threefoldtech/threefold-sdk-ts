@@ -83,7 +83,7 @@ async function main() {
     },
     machines: [
       {
-        name: "discourse",
+        name: "dc" + generateString(8),
         node_id: vmNode,
         disks: [
           {

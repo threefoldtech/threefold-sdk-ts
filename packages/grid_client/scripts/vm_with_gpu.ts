@@ -56,7 +56,7 @@ async function main() {
     },
     machines: [
       {
-        name: "vmgpu",
+        name: "vm" + generateString(8),
         node_id: nodeId,
         disks: [
           {

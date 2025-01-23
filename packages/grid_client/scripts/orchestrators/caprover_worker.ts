@@ -43,7 +43,7 @@ async function main() {
     },
     machines: [
       {
-        name: "capworker1",
+        name: "cr" + generateString(8),
         node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[1].nodeId,
         disks: [
           {

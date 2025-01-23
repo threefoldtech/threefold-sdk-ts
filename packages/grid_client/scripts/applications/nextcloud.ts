@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "nextcloud",
+        name: "nc" + generateString(8),
         node_id: vmNode,
         disks: [
           {

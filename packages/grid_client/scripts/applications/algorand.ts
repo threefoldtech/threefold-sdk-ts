@@ -47,7 +47,7 @@ async function main() {
     },
     machines: [
       {
-        name: "algorand",
+        name: "algo" + generateString(8),
         node_id: vmNode,
         disks: [
           {

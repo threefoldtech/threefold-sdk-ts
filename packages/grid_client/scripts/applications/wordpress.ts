@@ -76,7 +76,7 @@ async function main() {
     },
     machines: [
       {
-        name: "wordpress",
+        name: "wp" + generateString(8),
         node_id: vmNode,
         disks: [
           {
