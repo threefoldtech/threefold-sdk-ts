@@ -230,6 +230,7 @@ export default {
       );
 
       if (node) {
+        if (node?.dedicated && node.rentContractId === 0) return false;
         await props.loadFarm(node.farmId);
         bindModelValue(node);
         nodeInputValidateTask.value.run(node);
