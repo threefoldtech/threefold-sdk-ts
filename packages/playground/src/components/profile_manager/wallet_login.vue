@@ -38,7 +38,8 @@ import { onMounted, ref } from "vue";
 
 import WalletPassword from "@/components/profile_manager/Wallet_password.vue";
 import { useProfileManager } from "@/stores/profile_manager";
-import { Credentials, getCredentials } from "@/utils/credentials";
+import { type Credentials, isStoredCredentials } from "@/utils/credentials";
+import { getCredentials } from "@/utils/credentials";
 import { getGrid, loadProfile } from "@/utils/grid";
 import { normalizeError } from "@/utils/helpers";
 import { handlePostLogin } from "@/utils/profile_manager";
@@ -50,24 +51,17 @@ const loading = ref<boolean>(false);
 const loginError = ref<string>("");
 
 onMounted(async () => {
-  if (getCredentials()) {
-    const credentials: Credentials = getCredentials();
+  if (isStoredCredentials()) {
     const sessionPassword = sessionStorage.getItem("password");
-
     if (!sessionPassword) return;
-
     password.value = sessionPassword;
-
-    if (credentials.passwordHash) {
-      return await login();
-    }
+    login();
   }
 });
 
 async function login() {
   loading.value = true;
   emit("update:loading", true);
-  await new Promise(resolve => setTimeout(resolve, 1000));
   loginError.value = "";
   try {
     const credentials: Credentials = getCredentials();

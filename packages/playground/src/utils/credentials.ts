@@ -12,6 +12,11 @@ export interface Credentials {
 }
 
 const WALLET_KEY = window.env.WALLET_KEY;
+
+export function isStoredCredentials() {
+  const credentials = getCredentials();
+  return credentials?.passwordHash && credentials?.mnemonicHash && credentials?.keypairTypeHash;
+}
 export function getCredentials() {
   const getCredentials = localStorage.getItem(WALLET_KEY);
   let credentials: Credentials = {};
