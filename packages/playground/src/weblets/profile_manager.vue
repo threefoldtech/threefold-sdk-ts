@@ -11,7 +11,7 @@
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center bg-transparent elevation-0">
         <div>
           <v-btn v-if="!profileManager.profile" variant="elevated"
-            ><VProgressCircular v-if="activating" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
+            ><VProgressCircular v-if="loading" class="mr-2" indeterminate color="white" size="20" width="2" /><v-icon
               size="20"
               class="pr-2"
               >mdi-wallet-outline</v-icon
@@ -71,90 +71,100 @@
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-card-title class="pa-0">TFChain Wallet</v-card-title>
     </v-card>
-    <WebletLayout disable-alerts>
-      <v-alert variant="tonal" class="mb-6">
-        <p :style="{ maxWidth: '880px' }">
-          Please visit
-          <a class="app-link" :href="manual.tf_connect_wallet" target="_blank"> the manual </a>
-          get started.
-        </p>
-      </v-alert>
+    <Suspense>
+      <WebletLayout disable-alerts>
+        <v-alert variant="tonal" class="mb-6">
+          <p :style="{ maxWidth: '880px' }">
+            Please visit
+            <a class="app-link" :href="manual.tf_connect_wallet" target="_blank"> the manual </a>
+            get started.
+          </p>
+        </v-alert>
 
-      <DTabs
-        v-if="!profileManager.profile"
-        :tabs="getTabs()"
-        v-model="activeTab"
-        :disabled="loading"
-        ref="tabsRef"
-        destroy
-      >
-        <template #login> <Wallet_login @close-dialog="emit(`update:modelValue`, false)" /> </template>
-        <template #register>
-          <ConnectWallet @close-dialog="emit(`update:modelValue`, false)" @update:loading="loading = $event" />
-        </template>
-      </DTabs>
-
-      <template v-if="profileManager.profile">
-        <v-row>
-          <v-col cols="12" md="6" lg="6" xl="6">
-            <PasswordInputWrapper
-              #="{ props }"
-              v-if="profileManager.profile.mnemonic !== profileManager.profile.hexSeed"
-            >
-              <VTextField :label="'Your Mnemonic'" readonly v-model="profileManager.profile.mnemonic" v-bind="props" />
-            </PasswordInputWrapper>
-            <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
-              <input-tooltip tooltip=" Please use this hex seed to import your wallet in Threefold Connect">
-                <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
-              </input-tooltip>
-            </CopyInputWrapper>
-
-            <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
-              <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
-            </CopyInputWrapper>
-
-            <CopyInputWrapper v-if="profileManager.profile.email" :data="profileManager.profile.email" #="{ props }">
-              <VTextField label="Email" readonly v-model="profileManager.profile.email" v-bind="props" />
-            </CopyInputWrapper>
-            <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
-              <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
-            </CopyInputWrapper>
-
-            <CopyInputWrapper :data="freeBalance.toString()" #="{ props }">
-              <VTextField label="Balance" readonly v-model="freeBalance" v-bind="props" />
-            </CopyInputWrapper>
-          </v-col>
-
-          <v-col cols="12" md="6" lg="6" xl="6" class="d-flex justify-center align-center">
-            <section class="qr d-flex flex-column align-center">
-              <QRPlayStore
-                :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
-              >
-                <p>
-                  Scan the QR code using
-                  <a class="app-link" :href="manual.tf_connect_app" target="_blank">Threefold Connect</a> to fund your
-                  account.
-                </p>
-              </QRPlayStore>
-            </section>
-          </v-col>
-        </v-row>
-      </template>
-      <!-- <v-divider horizontal></v-divider> -->
-      <div class="d-flex justify-end mt-4 mb-2">
-        <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
-        <VBtn
-          class="ml-2"
-          color="error"
-          @click="logout"
-          variant="outlined"
-          v-if="profileManager.profile"
-          :disabled="loadingBalance"
+        <DTabs
+          v-if="!profileManager.profile"
+          :tabs="getTabs()"
+          v-model="activeTab"
+          :disabled="loading"
+          ref="tabsRef"
+          destroy
         >
-          Logout
-        </VBtn>
-      </div>
-    </WebletLayout>
+          <template #login> <Wallet_login @close-dialog="emit(`update:modelValue`, false)" /> </template>
+          <template #register>
+            <ConnectWallet @close-dialog="emit(`update:modelValue`, false)" @update:loading="loading = $event" />
+          </template>
+        </DTabs>
+
+        <template v-if="profileManager.profile">
+          <v-row>
+            <v-col cols="12" md="6" lg="6" xl="6">
+              <PasswordInputWrapper
+                #="{ props }"
+                v-if="profileManager.profile.mnemonic !== profileManager.profile.hexSeed"
+              >
+                <VTextField
+                  :label="'Your Mnemonic'"
+                  readonly
+                  v-model="profileManager.profile.mnemonic"
+                  v-bind="props"
+                />
+              </PasswordInputWrapper>
+              <CopyInputWrapper :data="profileManager.profile.hexSeed" #="{ props }">
+                <input-tooltip tooltip=" Please use this hex seed to import your wallet in Threefold Connect">
+                  <VTextField label="Your Hex Seed" readonly v-model="profileManager.profile.hexSeed" v-bind="props" />
+                </input-tooltip>
+              </CopyInputWrapper>
+
+              <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
+                <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
+              </CopyInputWrapper>
+
+              <CopyInputWrapper v-if="profileManager.profile.email" :data="profileManager.profile.email" #="{ props }">
+                <VTextField label="Email" readonly v-model="profileManager.profile.email" v-bind="props" />
+              </CopyInputWrapper>
+              <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
+                <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
+              </CopyInputWrapper>
+
+              <CopyInputWrapper :data="freeBalance.toString()" #="{ props }">
+                <VTextField label="Balance" readonly v-model="freeBalance" v-bind="props" />
+              </CopyInputWrapper>
+            </v-col>
+
+            <v-col cols="12" md="6" lg="6" xl="6" class="d-flex justify-center align-center">
+              <section class="qr d-flex flex-column align-center">
+                <QRPlayStore
+                  :qr="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
+                >
+                  <p>
+                    Scan the QR code using
+                    <a class="app-link" :href="manual.tf_connect_app" target="_blank">Threefold Connect</a> to fund your
+                    account.
+                  </p>
+                </QRPlayStore>
+              </section>
+            </v-col>
+          </v-row>
+        </template>
+        <!-- <v-divider horizontal></v-divider> -->
+        <div class="d-flex justify-end mt-4 mb-2">
+          <VBtn v-if="profileManager.profile" color="anchor" @click="$emit('update:modelValue', false)"> Close </VBtn>
+          <VBtn
+            class="ml-2"
+            color="error"
+            @click="logout"
+            variant="outlined"
+            v-if="profileManager.profile"
+            :disabled="loadingBalance"
+          >
+            Logout
+          </VBtn>
+        </div>
+      </WebletLayout>
+      <template #fallback>
+        <SkeletonLoader />
+      </template>
+    </Suspense>
   </VDialog>
 </template>
 <script lang="ts" setup>
@@ -309,6 +319,7 @@ profileManagerController.set({ loadBalance: __loadBalance });
 </script>
 
 <script lang="ts">
+import SkeletonLoader from "@/components/profile_manager/SkeletonLoader.vue";
 import Wallet_login from "@/components/profile_manager/wallet_login.vue";
 import QRPlayStore from "@/components/qr_play_store.vue";
 import { useKYC } from "@/stores/kyc";
