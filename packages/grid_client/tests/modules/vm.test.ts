@@ -89,6 +89,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -235,6 +236,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -254,6 +256,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -404,6 +407,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -424,6 +428,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
