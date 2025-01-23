@@ -4,7 +4,7 @@ import { Addr } from "netaddr";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
-import { ZmachineData } from "../helpers/types";
+import { Features, ZmachineData } from "../helpers/types";
 import { validateInput } from "../helpers/validator";
 import { VMHL } from "../high_level/machine";
 import { DeploymentResultContracts, TwinDeployment } from "../high_level/models";
@@ -59,7 +59,7 @@ class MachinesModule extends BaseModule {
       // Sets the network and contractMetadata based on the node's zos version
       const nodeTwinId = await this.capacity.getNodeTwinId(machine.node_id);
       const features = await this.rmb.request([nodeTwinId], "zos.system.node_features_get", "", 20, 3);
-      if (features.some(item => item.includes("zmachine-light") || item.includes("network-light"))) {
+      if (features.some(item => item.includes(Features.zmachinelight) || item.includes(Features.networklight))) {
         network = new ZNetworkLight(options.network.name, options.network.ip_range, this.config);
         await network.load();
         contractMetadata = JSON.stringify({
