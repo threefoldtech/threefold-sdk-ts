@@ -50,7 +50,7 @@ const isValidForm = ref(false);
 const loading = ref<boolean>(false);
 const loginError = ref<string>("");
 
-onMounted(async () => {
+onMounted(() => {
   if (isStoredCredentials()) {
     const sessionPassword = sessionStorage.getItem("password");
     if (!sessionPassword) return;
