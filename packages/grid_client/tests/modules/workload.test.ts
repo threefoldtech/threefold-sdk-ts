@@ -232,7 +232,6 @@ describe.each(Object.values(WorkloadTypes))("Workload Tests for %s", type => {
       workload.metadata +
       workload.description +
       workload.data.challenge();
-    console.log("data", workload.data);
 
     expect(workload.challenge()).toBe(expectedChallenge);
   });
