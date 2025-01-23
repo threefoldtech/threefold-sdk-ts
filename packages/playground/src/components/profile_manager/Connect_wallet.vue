@@ -110,6 +110,7 @@
           :loading="loadEmail"
           :disabled="creatingAccount || connecting || loadEmail || mnemonicInput?.status !== ValidatorStatus.Valid"
           ref="emailRef"
+          autocomplete="off"
         />
       </input-validator>
 

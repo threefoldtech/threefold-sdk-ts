@@ -6,7 +6,8 @@ import { createCustomToast, ToastType } from "./custom_toast";
 import { readEmail } from "./grid";
 import SSHKeysManagement from "./ssh";
 //TODO add docstring
-export async function handlePostLogin(grid: GridClient) {
+export async function handlePostLogin(grid: GridClient, password: string) {
+  sessionStorage.setItem("password", password);
   const storedEmail = await readEmail(grid!);
   if (!storedEmail) {
     createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
