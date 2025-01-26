@@ -390,6 +390,10 @@ class ContractConsumption {
   @Expose() @IsInt() @Min(1) id: number;
 }
 
+class ContractDiscountPackage {
+  @Expose() @IsInt() @Min(1) id: number;
+}
+
 class ContractLockModel extends ContractConsumption {}
 
 class TwinCreateModel {
@@ -974,6 +978,7 @@ export {
   ContractsByTwinId,
   ContractsByAddress,
   ContractConsumption,
+  ContractDiscountPackage,
   ContractLockModel,
   TwinCreateModel,
   TwinGetModel,

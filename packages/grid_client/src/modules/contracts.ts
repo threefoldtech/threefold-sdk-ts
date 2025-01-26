@@ -11,6 +11,7 @@ import * as PATH from "path";
 
 import {
   ContractsOverdue,
+  type DiscountLevel,
   GqlContracts,
   GqlNameContract,
   GqlNodeContract,
@@ -31,6 +32,7 @@ import {
   BatchCancelContractsModel,
   ContractCancelModel,
   ContractConsumption,
+  ContractDiscountPackage,
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
   ContractLockModel,
@@ -523,7 +525,19 @@ class Contracts {
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
     return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
-
+  /**
+   * Get contract discount package
+   * @param {ContractDiscountPackage} options
+   * @returns {Promie<DiscountLevel>}
+   * @decorators
+   * - `@expose`: Exposes the method for external use.
+   * - `@validateInput`: Validates the input options.
+   */
+  @expose
+  @validateInput
+  async getDiscountPackage(options: ContractDiscountPackage): Promise<DiscountLevel> {
+    return this.client.contracts.getDiscountPackage({ id: options.id, graphqlURL: this.config.graphqlURL });
+  }
   /**
    * Get contract consumption per hour in TFT.
    *
