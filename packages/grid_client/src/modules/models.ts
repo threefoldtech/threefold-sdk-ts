@@ -82,7 +82,7 @@ class QSFSDiskModel {
 }
 
 class NetworkModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
@@ -824,7 +824,7 @@ class pingFarmModel {
 }
 
 class NetworkAddNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
   @Expose() @IsBoolean() mycelium: boolean;
@@ -834,13 +834,13 @@ class NetworkAddNodeModel {
 }
 
 class NetworkHasNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
 class NetworkGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
 }
 

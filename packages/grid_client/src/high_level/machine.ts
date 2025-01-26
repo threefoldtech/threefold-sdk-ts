@@ -157,7 +157,7 @@ class VMHL extends HighLevelBase {
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
-      if (nodeFeatures.includes(Features.ip)) {
+      if (!nodeFeatures.includes(Features.ip)) {
         throw new GridClientErrors.Farms.InvalidResourcesError(`Node ${nodeId} doesn't support public ips.`);
       }
       const ip = new PublicIPPrimitive();
