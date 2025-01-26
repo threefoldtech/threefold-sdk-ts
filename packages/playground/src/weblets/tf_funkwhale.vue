@@ -166,7 +166,7 @@ const rootFilesystemSize = computed(() =>
   calculateRootFileSystem({ CPUCores: solution.value?.cpu ?? 0, RAMInMegaBytes: solution.value?.memory ?? 0 }),
 );
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
+  value: "https://hub.grid.tf/tf-official-apps/funkwhale-1.4.0.flist",
   entryPoint: "/init.sh",
 };
 const dedicated = ref(false);
@@ -229,10 +229,10 @@ async function deploy() {
           planetary: planetary.value,
           envs: [
             { key: "SSH_KEY", value: selectedSSHKeys.value },
-            { key: "FUNKWHALE_HOSTNAME", value: domain },
-            { key: "DJANGO_SUPERUSER_EMAIL", value: email.value },
-            { key: "DJANGO_SUPERUSER_USERNAME", value: username.value },
-            { key: "DJANGO_SUPERUSER_PASSWORD", value: password.value },
+            { key: "Domain", value: domain },
+            { key: "FUNKWHALE_SUPERUSER_EMAIL", value: email.value },
+            { key: "FUNKWHALE_SUPERUSER_NAME", value: username.value },
+            { key: "FUNKWHALE_SUPERUSER_PASSWORD", value: password.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,

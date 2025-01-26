@@ -99,12 +99,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn
-            tooltip="Visit"
-            icon="mdi-web"
-            color="anchor"
-            :href="'https://' + item.env.FUNKWHALE_HOSTNAME"
-          />
+          <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.env.Domain" />
         </template>
 
         <template #Jenkins-actions="{ item }">
