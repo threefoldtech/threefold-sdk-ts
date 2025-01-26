@@ -503,6 +503,7 @@ class BaseModule {
     const resultData = workload.result.data as ZmachineResult;
     return {
       version: workload.version,
+      type: workload.type,
       contractId: workload["contractId"],
       nodeId: workload["nodeId"],
       name: workload.name,

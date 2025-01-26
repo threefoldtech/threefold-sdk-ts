@@ -21,7 +21,7 @@ import {
   ValidateNested,
 } from "class-validator";
 
-import { IsAlphanumericExpectUnderscore } from "../helpers";
+import { Features, IsAlphanumericExpectUnderscore } from "../helpers";
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
@@ -82,7 +82,7 @@ class QSFSDiskModel {
 }
 
 class NetworkModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
@@ -635,6 +635,10 @@ class FilterOptions {
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
   @Expose() @IsOptional() @IsString() region?: string;
   @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
+  @Expose() @IsOptional() @IsBoolean() planetary?: boolean;
+  @Expose() @IsOptional() @IsBoolean() mycelium?: boolean;
+  @Expose() @IsOptional() @IsBoolean() wireguard?: boolean;
+  @Expose() @IsOptional() features?: Features[];
 }
 
 enum CertificationType {
@@ -816,7 +820,7 @@ class pingFarmModel {
 }
 
 class NetworkAddNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
   @Expose() @IsBoolean() mycelium: boolean;
@@ -826,13 +830,13 @@ class NetworkAddNodeModel {
 }
 
 class NetworkHasNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
 class NetworkGetModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumericExpectUnderscore() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
 }
 

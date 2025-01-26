@@ -1,6 +1,7 @@
 import {
   AddWorkerModel,
   DeleteWorkerModel,
+  Features,
   FilterOptions,
   generateString,
   GridClient,
@@ -75,6 +76,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -94,6 +96,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
 
@@ -106,6 +109,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
       sru: workerRootfsSize + workerDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -125,6 +129,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
       sru: workerRootfsSize + workerDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);
@@ -343,6 +348,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -362,6 +368,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
 
@@ -374,6 +381,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
       sru: (workerRootfsSize + workerDiskSize) * 2,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -393,6 +401,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
       sru: (workerRootfsSize + workerDiskSize) * 2,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);
@@ -599,6 +608,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -618,6 +628,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
       sru: masterRootfsSize + masterDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
 
@@ -630,6 +641,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
       sru: workerRootfsSize + workerDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -649,6 +661,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
       sru: workerRootfsSize + workerDiskSize,
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
+      features: [Features.wireguard],
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);

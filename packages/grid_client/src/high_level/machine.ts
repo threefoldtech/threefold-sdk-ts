@@ -1,6 +1,7 @@
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
+import { Features } from "../helpers";
 import { events } from "../helpers/events";
 import { calculateRootFileSystem } from "../helpers/root_fs";
 import { randomChoice, zeroPadding } from "../helpers/utils";
@@ -13,9 +14,11 @@ import {
   Network,
   Nodes,
   PublicIPPrimitive,
+  VMLightPrimitive,
   VMPrimitive,
   ZlogsPrimitive,
 } from "../primitives/index";
+import { ZNetworkLight } from "../primitives/networklight";
 import { QSFSPrimitive } from "../primitives/qsfs";
 import { Mount, ZdbGroup } from "../zos";
 import { Deployment } from "../zos/deployment";
@@ -37,7 +40,7 @@ class VMHL extends HighLevelBase {
     planetary: boolean,
     mycelium: boolean,
     myceliumSeed: string,
-    network: Network,
+    network: Network | ZNetworkLight,
     myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     entrypoint: string,
     env: Record<string, unknown>,
@@ -60,6 +63,8 @@ class VMHL extends HighLevelBase {
         RAMInMegaBytes: memory,
       });
     }
+    const nodeInfo = await this.nodes.getNode(nodeId);
+    const nodeFeatures = (await this.nodes.getNode(nodeId)).features;
     const deployments: TwinDeployment[] = [];
     const workloads: Workload[] = [];
     let totalDisksSize = rootfs_size;
@@ -86,7 +91,6 @@ class VMHL extends HighLevelBase {
       );
     } else {
       // If Available for twinId (dedicated), check it's not in grace period
-      const nodeInfo = await this.nodes.getNode(nodeId);
       if (nodeInfo.rentContractId !== 0) {
         const contract = await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
         if (contract && contract.state.gracePeriod) {
@@ -149,9 +153,13 @@ class VMHL extends HighLevelBase {
     }
 
     // ipv4
+    // Reject the deployment if the node is a zos4 node, as it doesn't support ipv4.
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
+      if (!nodeFeatures.includes(Features.ip)) {
+        throw new GridClientErrors.Farms.InvalidResourcesError(`Node ${nodeId} doesn't support public ips.`);
+      }
       const ip = new PublicIPPrimitive();
       ipName = `${name}_pubip`;
       workloads.push(ip.create(ipName, "", description, 0, publicIp, publicIp6));
@@ -168,7 +176,6 @@ class VMHL extends HighLevelBase {
         publicIps++;
       }
     }
-
     if (gpus && gpus.length > 0) {
       const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
       const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
@@ -200,58 +207,76 @@ class VMHL extends HighLevelBase {
     let accessNodeSubnet;
     if (ip) {
       userIPsubnet = network.ValidateFreeSubnet(Addr(ip).mask(24).toString());
-      accessNodeSubnet = network.getFreeSubnet();
+
+      // If the node supports wireguard feature get accessNodeSubnet
+      if (nodeFeatures.includes(Features.wireguard)) {
+        accessNodeSubnet = network.getFreeSubnet();
+      }
     }
-    // network
-    const networkContractMetadata = JSON.stringify({
-      version: 3,
-      type: "network",
-      name: network.name,
-      projectName: this.config.projectName,
-    });
+    // Set networkContractMetadata based on node's zos version
+    let networkContractMetadata;
+    if (nodeFeatures.includes(Features.network)) {
+      networkContractMetadata = JSON.stringify({
+        version: 3,
+        type: "network",
+        name: network.name,
+        projectName: this.config.projectName,
+      });
+    } else {
+      networkContractMetadata = JSON.stringify({
+        version: 4,
+        type: "network-light",
+        name: network.name,
+        projectName: this.config.projectName,
+      });
+    }
+
     const deploymentFactory = new DeploymentFactory(this.config);
+
     let access_net_workload;
     let wgConfig = "";
     let hasAccessNode = false;
     let accessNodes: Record<string, unknown> = {};
-    if (addAccess) {
-      accessNodes = await this.nodes.getAccessNodes(this.config.twinId);
-      for (const accessNode of Object.keys(accessNodes)) {
-        if (network.nodeExists(Number(accessNode))) {
-          hasAccessNode = true;
-          break;
+    if (nodeFeatures.includes(Features.wireguard) && network instanceof Network) {
+      if (addAccess) {
+        accessNodes = await this.nodes.getAccessNodes(this.config.twinId);
+        for (const accessNode of Object.keys(accessNodes)) {
+          if (network.nodeExists(Number(accessNode))) {
+            hasAccessNode = true;
+            break;
+          }
         }
       }
-    }
-    if (
-      (!Object.keys(accessNodes).includes(nodeId.toString()) || nodeId !== accessNodeId) &&
-      !hasAccessNode &&
-      addAccess
-    ) {
-      // add node to any access node and deploy it
-      const filteredAccessNodes: number[] = [];
-      for (const accessNodeId of Object.keys(accessNodes)) {
-        if (accessNodes[accessNodeId]["ipv4"]) {
-          filteredAccessNodes.push(+accessNodeId);
+      if (
+        (!Object.keys(accessNodes).includes(nodeId.toString()) || nodeId !== accessNodeId) &&
+        !hasAccessNode &&
+        addAccess &&
+        nodeFeatures.includes(Features.wireguard)
+      ) {
+        const filteredAccessNodes: number[] = [];
+        for (const accessNodeId of Object.keys(accessNodes)) {
+          if (accessNodes[accessNodeId]["ipv4"]) {
+            filteredAccessNodes.push(+accessNodeId);
+          }
         }
-      }
-      let access_node_id = randomChoice(filteredAccessNodes);
-      if (accessNodeId) {
-        if (!filteredAccessNodes.includes(accessNodeId))
-          throw new GridClientErrors.Nodes.AccessNodeError(
-            `Node ${accessNodeId} is not an access node or maybe it's down.`,
-          );
+        let access_node_id = randomChoice(filteredAccessNodes);
+        if (accessNodeId) {
+          if (!filteredAccessNodes.includes(accessNodeId))
+            throw new GridClientErrors.Nodes.AccessNodeError(
+              `Node ${accessNodeId} is not an access node or maybe it's down.`,
+            );
 
-        access_node_id = accessNodeId;
+          access_node_id = accessNodeId;
+        }
+        access_net_workload = await network.addNode(
+          access_node_id,
+          mycelium,
+          description,
+          accessNodeSubnet,
+          myceliumNetworkSeeds,
+        );
+        wgConfig = await network.addAccess(access_node_id, true);
       }
-      access_net_workload = await network.addNode(
-        access_node_id,
-        mycelium,
-        description,
-        accessNodeSubnet,
-        myceliumNetworkSeeds,
-      );
-      wgConfig = await network.addAccess(access_node_id, true);
     }
     // If node exits on network check if mycelium needs to be added or not
     if (network.nodeExists(nodeId)) {
@@ -262,7 +287,7 @@ class VMHL extends HighLevelBase {
     }
 
     const znet_workload = await network.addNode(nodeId, mycelium, description, userIPsubnet, myceliumNetworkSeeds);
-    if ((await network.exists()) && (znet_workload || access_net_workload)) {
+    if (network instanceof Network && (await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {
         const d = await deploymentFactory.fromObj(deployment);
@@ -273,6 +298,7 @@ class VMHL extends HighLevelBase {
           ) {
             continue;
           }
+
           workload.data = network.getUpdatedNetwork(workload["data"]);
           workload.version += 1;
           break;
@@ -295,7 +321,8 @@ class VMHL extends HighLevelBase {
       }
     } else if (znet_workload) {
       // node not exist on the network
-      if (!access_net_workload && !hasAccessNode && addAccess) {
+
+      if (!access_net_workload && !hasAccessNode && addAccess && network instanceof Network) {
         // this node is access node, so add access point on it
         wgConfig = await network.addAccess(nodeId, true);
         znet_workload["data"] = network.getUpdatedNetwork(znet_workload.data);
@@ -313,7 +340,7 @@ class VMHL extends HighLevelBase {
         ),
       );
     }
-    if (access_net_workload) {
+    if (access_net_workload && nodeFeatures.includes(Features.wireguard)) {
       // network is not exist, and the node provide is not an access node
       const accessNodeId = access_net_workload.data["node_id"];
       access_net_workload["data"] = network.getUpdatedNetwork(access_net_workload.data);
@@ -332,7 +359,13 @@ class VMHL extends HighLevelBase {
     }
 
     // vm
-    const vm = new VMPrimitive();
+    // Initalize vm based on node's zos version
+    let vm;
+    if (nodeFeatures.includes(Features.zmachine)) {
+      vm = new VMPrimitive();
+    } else {
+      vm = new VMLightPrimitive();
+    }
     let machine_ip;
     if (ip !== "") {
       machine_ip = network.validateUserIP(nodeId, ip);
@@ -412,6 +445,7 @@ class VMHL extends HighLevelBase {
       WorkloadTypes.zmachine,
       WorkloadTypes.qsfs,
       WorkloadTypes.zlogs,
+      WorkloadTypes.zmachinelight,
     ]);
   }
 }
