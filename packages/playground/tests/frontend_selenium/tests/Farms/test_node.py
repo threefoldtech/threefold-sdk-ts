@@ -11,10 +11,6 @@ import time
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
 def before_test_setup(browser):
-    """
-    Sets up the browser with necessary configurations, loads the dashboard, 
-    and navigates to the Node page.
-    """
     node_page = NodePage(browser)
     grid_proxy = GridProxy(browser)
     dashboard_page = DashboardPage(browser)
@@ -39,6 +35,62 @@ def test_node_page(browser):
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
     for node in nodes:
         assert str(node['nodeId']) in browser.page_source
+
+
+# def test_search_node(browser):
+#     """
+#       Test Case: TC1217 - Search node
+#       Steps:
+#           - Navigate to the dashboard.
+#           - Select an account (with node).
+#           - Click on Farm from side menu.
+#           - Enter keywords on search nodes input.
+#           - Search by node ID, serial number, certification, farming policy ID
+#       Result: Nodes searched for should be listed.
+#     """
+#     node_page, _, grid_proxy, _ = before_test_setup(browser)
+#     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
+#     for node in nodes:
+#         node_page.search_nodes(str(node['nodeId']))
+#         assert node_page.get_node_count() == 1
+#         node_page.search_nodes(str(node['serialNumber']))
+#         assert node_page.get_node_count() == 1
+#         node_page.search_nodes(str(node['certificationType']))
+#         assert node_page.get_node_count() >= 1
+#         node_page.search_nodes(str(node['farmingPolicyId']))
+#         assert node_page.get_node_count() >= 1
+#     node_page.search_nodes(generate_string())
+#     assert 'No data available' in browser.page_source
+
+
+# def test_sort_node(browser):
+#     """
+#       Test Case: TC1218 - Sort nodes
+#       Steps:
+#           - Navigate to the dashboard.
+#           - Select an account (with node).
+#           - Click on Farm from side menu.
+#           - Click on column header to sort it (once ascend then descend then remove the sorting).
+#           - Sort nodes in any order using Node ID, Farm ID, Country, Serial Number, Status
+#       Result: Nodes should be sorted using specified column.
+#     """
+#     node_page, _, grid_proxy, _ = before_test_setup(browser)
+#     node_list = grid_proxy.get_twin_node(str(node_page.twin_id))
+#     # Sort by Node ID
+#     assert node_page.sort_node_id() == sorted(node_page.get_node_id(node_list), reverse=False)
+#     assert node_page.sort_node_id() == sorted(node_page.get_node_id(node_list), reverse=True)
+#     # Sort by Farm ID
+#     assert node_page.sort_farm_id() == sorted(node_page.get_farm_id(node_list), reverse=False)
+#     assert node_page.sort_farm_id() == sorted(node_page.get_farm_id(node_list), reverse=True)
+#     # Sort by Country
+#     assert node_page.sort_country() == sorted(node_page.get_country(node_list), reverse=False)
+#     assert node_page.sort_country() == sorted(node_page.get_country(node_list), reverse=True)
+#     # Sort by Serial Number
+#     assert node_page.sort_serial_number() == sorted(node_page.get_serial_number(node_list), reverse=False)
+#     assert node_page.sort_serial_number() == sorted(node_page.get_serial_number(node_list), reverse=True)
+#     # Sort by Status
+#     assert node_page.sort_status() == sorted(node_page.get_status(node_list), reverse=False)
+#     assert node_page.sort_status() == sorted(node_page.get_status(node_list), reverse=True)
 
 
 def test_node_details(browser):
@@ -92,18 +144,44 @@ def test_config_validation(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    node_id = nodes[random.randint(0, len(nodes) - 1)]['nodeId']
+    node_id = nodes[random.randint(0,len(nodes)-1)]['nodeId']
     node_page.setup_config(node_id)
     cases = [generate_string(), '1.0.0.0/66', '239.255.255/17', '239.15.35.78.5/25', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
     for case in cases:
         node_page.add_config_input(case, 0, 0, 0, 0)
         assert node_page.wait_for('IPv4 is not valid.')
-        assert not node_page.get_save_button().is_enabled()
-
-    node_page.add_config_input('255.0.0.1/32', 0, 0, 0, 0)
+        assert node_page.get_save_button().is_enabled()==False
+    node_page.add_config_input( '255.0.0.1/32', 0, 0, 0, 0)
     assert node_page.wait_for('Private IP addresses are not allowed.')
-    assert not node_page.get_save_button().is_enabled()
-
+    assert node_page.get_save_button().is_enabled()==False
+    assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
+    cases = [generate_inavalid_gateway(), '1.0.0.',  '1:1:1:1', '522.255.255.255', '.239.35.78', '1.1.1.1/16', '239.15.35.78.5', ' ', '*.#.@.!|+-']
+    for case in cases:
+        node_page.add_config_input( 0, case, 0, 0, 0)
+        assert node_page.wait_for('Gateway is not valid.')
+        assert node_page.get_save_button().is_enabled()==False
+    assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
+    cases = [' ', '::g', '::+', ':: /6  5', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
+    for case in cases:
+        node_page.add_config_input( 0, 0, case, 0, 0)
+        assert node_page.wait_for('IP is not valid.')
+        assert node_page.get_save_button().is_enabled()==False
+    node_page.add_config_input( 0, 0, 'fd12:3456:789a:1::/64', 0, 0)
+    assert node_page.wait_for('Private IP addresses are not allowed.')
+    assert node_page.get_save_button().is_enabled()==False
+    assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
+    cases = [' ', '::g', '1:2:3', ':a', '1:2:3:4:5:6:7:8:9', generate_string(), generate_leters()]
+    for case in cases:
+        node_page.add_config_input( 0, 0, 0, case, 0)
+        assert node_page.wait_for('Gateway is not valid.')
+        assert node_page.get_save_button().is_enabled()==False
+    assert node_page.add_config_input( "1.1.1.1/16", '1.1.1.2', '::2/16', '::1', 'tf.grid').is_enabled() == True
+    cases = [generate_inavalid_ip(), generate_inavalid_gateway(), generate_string(), generate_leters(), '     ', '.', '/', 'q', '1', 'ww', 'ww/ww', '22.22']
+    for case in cases:
+        node_page.add_config_input( 0, 0, 0, 0, case)
+        assert node_page.wait_for('Please provide a valid domain.')
+        assert node_page.get_save_button().is_enabled()==False
 
 def test_add_config(browser):
     """
@@ -118,21 +196,20 @@ def test_add_config(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    rand_node = random.randint(0, len(nodes) - 1)
+    rand_node = random.randint(0,len(nodes)-1)
     node_id = nodes[rand_node]['nodeId']
     old_ipv4 = nodes[rand_node]['publicConfig']['ipv4']
-    new_ipv4 = '125.25.25.25/25'
     node_page.setup_config(node_id)
-    node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', 'tf.grid').click()
+    new_ipv4 = '125.25.25.25/25'
+    node_page.wait_for_button(node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', 'tf.grid')).click()
     node_page.wait_for('Public config saved successfully.')
     counter = 0
-    while old_ipv4 != new_ipv4:
+    while(old_ipv4 != new_ipv4):
         old_ipv4 = grid_proxy.get_node_ipv4(node_id)
         counter += 1
-        if counter == 30:
+        if(counter==30):
             time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == new_ipv4
-
 
 def test_remove_config(browser):
     """
@@ -147,20 +224,19 @@ def test_remove_config(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    rand_node = random.randint(0, len(nodes) - 1)
+    rand_node = random.randint(0,len(nodes)-1)
     node_id = nodes[rand_node]['nodeId']
     node_page.setup_config(node_id)
     node_page.remove_config()
     node_page.wait_for('Public config removed successfully.')
     counter = 0
     ipv4 = grid_proxy.get_node_ipv4(node_id)
-    while ipv4:
+    while(ipv4 != ''):
         ipv4 = grid_proxy.get_node_ipv4(node_id)
         counter += 1
-        if counter == 30:
+        if(counter==30):
             time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == ''
-
 
 def test_additional_fee(browser):
     """
@@ -175,9 +251,27 @@ def test_additional_fee(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    rand_node = random.randint(0, len(nodes) - 1)
+    rand_node = random.randint(0,len(nodes)-1)
     node_id = nodes[rand_node]['nodeId']
     node_page.setup_fee(node_id)
-    valid_fee = valid_amount()
-    node_page.set_fee(valid_fee).click()
+    cases = ['-10', '0', '-5', '-0', '-8.84']
+    for case in cases:
+        node_page.set_fee(case)
+        assert node_page.wait_for('Fee must be a 0 or more.')
+        assert node_page.get_fee_button().is_enabled()==False
+    cases = [generate_inavalid_gateway(), generate_inavalid_ip(), generate_string(), '*d', '_3']
+    for case in cases:
+        node_page.set_fee(case)
+        assert node_page.wait_for('Fee must be a valid number.')
+        assert node_page.get_fee_button().is_enabled()==False
+    fee = grid_proxy.get_node_fee(node_id)
+    new_fee = valid_amount()
+    node_page.set_fee(new_fee).click()
     node_page.wait_for('Additional fee is set successfully.')
+    counter = 0
+    while(fee != new_fee):
+        fee = grid_proxy.get_node_fee(node_id)
+        counter += 1
+        if(counter==30):
+            time.sleep(2)
+    assert grid_proxy.get_node_fee(node_id) == new_fee
