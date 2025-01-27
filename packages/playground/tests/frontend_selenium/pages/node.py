@@ -167,12 +167,16 @@ class NodePage:
             nodes.append(details)
         return nodes
     
-    def setup_config(self, node_id):
-        for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
-            if (self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]").text==str(node_id)):
-                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/span[1]/i").click()
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
-
+def setup_config(self, node_id):
+    """
+    Prepares the setup configuration for a given node ID.
+    """
+    for i in range(1, len(self.browser.find_elements(*self.node_table)) + 1):
+        if self.browser.find_element(By.XPATH, f"{self.table_xpath}[{i}]/td[1]").text == str(node_id):
+            elem = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{i}]/td[6]/span[1]/i")
+            self.browser.execute_script("arguments[0].scrollIntoView(true);", elem)
+            WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(elem)).click()
+            WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
     def add_config_input(self, ipv4, gw4, ipv6, gw6, domain):
         if(ipv4):
             self.browser.find_element(*self.ipv4).send_keys(Keys.CONTROL + "a")
@@ -221,10 +225,27 @@ class NodePage:
     def get_fee_button(self):
         return self.browser.find_element(*self.set_btn)
 
-    def wait_for_button(self, button):
-        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(button))
-        return button
+def wait_for(self, keyword):
+    """
+    Waits for an element with specific text to be visible on the page.
+    """
+    try:
+        WebDriverWait(self.browser, 60).until(
+            EC.visibility_of_element_located((By.XPATH, f"//*[contains(text(), '{keyword}')]"))
+        )
+    except TimeoutException:
+        print(f"Timeout waiting for keyword: {keyword}")
+        raise
+    return True
 
-    def wait_for(self, keyword):
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
-        return True
+
+def wait_for_button(self, button):
+    """
+    Waits for a button to be clickable.
+    """
+    try:
+        WebDriverWait(self.browser, 60).until(EC.element_to_be_clickable(button))
+    except TimeoutException:
+        print("Timeout waiting for button to be clickable.")
+        raise
+    return button
