@@ -11,6 +11,9 @@ import time
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
 def before_test_setup(browser):
+    """
+    Prepares the test environment by initializing required pages and importing the test account.
+    """
     node_page = NodePage(browser)
     grid_proxy = GridProxy(browser)
     dashboard_page = DashboardPage(browser)
@@ -29,12 +32,14 @@ def test_node_page(browser):
           - Navigate to the dashboard.
           - Login into an account (with node).
           - Click on Farm from side menu.
-      Result: User should be navigated to Farm Nodes page and see all his node.
+      Result: User should be navigated to Farm Nodes page and see all his nodes.
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
     for node in nodes:
         assert str(node['nodeId']) in browser.page_source
+
+
 
 
 # def test_search_node(browser):
@@ -196,20 +201,22 @@ def test_add_config(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    rand_node = random.randint(0,len(nodes)-1)
+    rand_node = random.randint(0, len(nodes) - 1)
     node_id = nodes[rand_node]['nodeId']
     old_ipv4 = nodes[rand_node]['publicConfig']['ipv4']
     node_page.setup_config(node_id)
     new_ipv4 = '125.25.25.25/25'
-    node_page.wait_for_button(node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', 'tf.grid')).click()
+    node_page.wait_for_button(
+        node_page.add_config_input(new_ipv4, '125.25.25.24', '2600:1f13:0d15:95:00::/64', '2600:1f13:0d15:95:00::1', 'tf.grid')
+    ).click()
     node_page.wait_for('Public config saved successfully.')
     counter = 0
-    while(old_ipv4 != new_ipv4):
+    while old_ipv4 != new_ipv4 and counter < 30:
         old_ipv4 = grid_proxy.get_node_ipv4(node_id)
         counter += 1
-        if(counter==30):
-            time.sleep(2)
+        time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == new_ipv4
+
 
 def test_remove_config(browser):
     """
@@ -224,19 +231,19 @@ def test_remove_config(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    rand_node = random.randint(0,len(nodes)-1)
+    rand_node = random.randint(0, len(nodes) - 1)
     node_id = nodes[rand_node]['nodeId']
     node_page.setup_config(node_id)
     node_page.remove_config()
     node_page.wait_for('Public config removed successfully.')
     counter = 0
     ipv4 = grid_proxy.get_node_ipv4(node_id)
-    while(ipv4 != ''):
+    while ipv4 != '' and counter < 30:
         ipv4 = grid_proxy.get_node_ipv4(node_id)
         counter += 1
-        if(counter==30):
-            time.sleep(2)
+        time.sleep(2)
     assert grid_proxy.get_node_ipv4(node_id) == ''
+
 
 def test_additional_fee(browser):
     """
@@ -251,27 +258,26 @@ def test_additional_fee(browser):
     """
     node_page, grid_proxy = before_test_setup(browser)
     nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
-    rand_node = random.randint(0,len(nodes)-1)
+    rand_node = random.randint(0, len(nodes) - 1)
     node_id = nodes[rand_node]['nodeId']
     node_page.setup_fee(node_id)
     cases = ['-10', '0', '-5', '-0', '-8.84']
     for case in cases:
         node_page.set_fee(case)
         assert node_page.wait_for('Fee must be a 0 or more.')
-        assert node_page.get_fee_button().is_enabled()==False
+        assert not node_page.get_fee_button().is_enabled()
     cases = [generate_inavalid_gateway(), generate_inavalid_ip(), generate_string(), '*d', '_3']
     for case in cases:
         node_page.set_fee(case)
         assert node_page.wait_for('Fee must be a valid number.')
-        assert node_page.get_fee_button().is_enabled()==False
+        assert not node_page.get_fee_button().is_enabled()
     fee = grid_proxy.get_node_fee(node_id)
     new_fee = valid_amount()
     node_page.set_fee(new_fee).click()
     node_page.wait_for('Additional fee is set successfully.')
     counter = 0
-    while(fee != new_fee):
+    while fee != new_fee and counter < 30:
         fee = grid_proxy.get_node_fee(node_id)
         counter += 1
-        if(counter==30):
-            time.sleep(2)
+        time.sleep(2)
     assert grid_proxy.get_node_fee(node_id) == new_fee
