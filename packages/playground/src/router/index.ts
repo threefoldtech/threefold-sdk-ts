@@ -747,6 +747,22 @@ function createDeployRoutes(): RouteRecordRaw[] {
             title: "Your Contracts List",
           },
         },
+        {
+          path: DashboardRoutes.Deploy.YourContracts,
+          component: () => import("../dashboard/contracts_list.vue"),
+          meta: {
+            title: "Your Contracts List",
+            info: { page: "info/deployment_list.md" },
+          },
+        },
+        {
+          path: DashboardRoutes.Deploy.YourDeployments,
+          component: () => import("../dashboard/deployment_list.vue"),
+          meta: {
+            title: "Your Contracts List",
+            info: { page: "info/deployment_list.md" },
+          },
+        },
 
         {
           path: DashboardRoutes.Deploy.SSHKey,
