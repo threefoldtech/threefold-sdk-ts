@@ -136,8 +136,8 @@ async function main() {
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 10;
-  const totalVMs = 50;
+  const batchSize = 100;
+  const totalVMs = 1500;
   const batches = totalVMs / batchSize;
   const allSuccessfulNodes = new Set<number>();
   const allFailedNodes = new Set<number>();
