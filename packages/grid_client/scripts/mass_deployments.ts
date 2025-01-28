@@ -1,21 +1,117 @@
+import { Contract } from "@threefold/tfchain_client";
+import { ValidationError } from "@threefold/types";
+
 import {
+  Deployment,
+  DeploymentResultContracts,
+  events,
   FarmFilterOptions,
   FilterOptions,
   generateString,
   GridClient,
+  KycStatus,
   MachineModel,
   MachinesModel,
   NetworkModel,
   NodeInfo,
+  Operations,
   TwinDeployment,
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function pingNodes(
-  grid3: GridClient,
-  nodes: NodeInfo[],
-): Promise<Promise<{ node: NodeInfo; error?: Error; res?: unknown }[]>> {
+async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
+  const kycStatus = await grid3.machines.twinDeploymentHandler.kyc.status();
+  if (kycStatus !== KycStatus.verified) {
+    throw new ValidationError(
+      "Your account is not verified. Please sign into Threefold Dashboard or Connect mobile app to complete your KYC verification.",
+    );
+  }
+
+  events.emit("logs", "Validating workloads");
+  await grid3.machines.twinDeploymentHandler.validate(twinDeployments);
+  await grid3.machines.twinDeploymentHandler.checkNodesCapacity(twinDeployments);
+  await grid3.machines.twinDeploymentHandler.checkFarmIps(twinDeployments);
+
+  const contracts: DeploymentResultContracts = {
+    created: [],
+    updated: [],
+    deleted: [],
+  };
+
+  const resultContracts: DeploymentResultContracts = {
+    created: [],
+    updated: [],
+    deleted: [],
+  };
+
+  const successfulNodesSet: number[] = [];
+  const failedNodesSet: number[] = [];
+  const original_deployments: Deployment[] = [];
+
+  const deploymentPromises: Promise<void>[] = [];
+
+  for (const twinDeployment of twinDeployments) {
+    deploymentPromises.push(
+      (async () => {
+        try {
+          const extrinsics = await grid3.machines.twinDeploymentHandler.PrepareExtrinsic(twinDeployment, contracts);
+          const extrinsicResults: Contract[] =
+            await grid3.machines.twinDeploymentHandler.tfclient.applyAllExtrinsics<Contract>([
+              ...extrinsics.nodeExtrinsics,
+              ...extrinsics.nameExtrinsics,
+            ]);
+
+          for (const contract of extrinsicResults) {
+            const updatedContract = contracts.updated.filter(c => c["contractId"] === contract.contractId);
+            if (updatedContract.length === 0) contracts.created.push(contract);
+          }
+
+          if (twinDeployment.operation === Operations.deploy) {
+            events.emit("logs", `Sending deployment to node_id: ${twinDeployment.nodeId}`);
+            for (const contract of extrinsicResults) {
+              if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
+                twinDeployment.deployment.contract_id = contract.contractId;
+                resultContracts.created.push(contract);
+                break;
+              }
+            }
+            await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
+            successfulNodesSet.push(twinDeployment.nodeId);
+          } else if (twinDeployment.operation === Operations.update) {
+            const old_contract_id = twinDeployment.deployment.contract_id;
+            if (old_contract_id) {
+              original_deployments.push(
+                await grid3.machines.twinDeploymentHandler.getDeploymentFromFactory(old_contract_id),
+              );
+            }
+            events.emit("logs", `Updating deployment with contract_id: ${twinDeployment.deployment.contract_id}`);
+            for (const contract of extrinsicResults) {
+              if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
+                twinDeployment.nodeId = contract.contractType.nodeContract.nodeId;
+                resultContracts.updated.push(contract);
+                break;
+              }
+            }
+            await grid3.machines.twinDeploymentHandler.sendToNode(twinDeployment);
+            successfulNodesSet.push(twinDeployment.nodeId);
+          }
+        } catch (error) {
+          events.emit("logs", `Failed deployment on node_id: ${twinDeployment.nodeId} due to error: ${error}`);
+          successfulNodesSet.push(twinDeployment.nodeId);
+        }
+      })(),
+    );
+  }
+
+  const res = await Promise.allSettled(deploymentPromises);
+  console.log("Deployment Results in handle:", res);
+  log("Successful Nodes: " + successfulNodesSet);
+  log("Failed Nodes: " + failedNodesSet);
+  return { resultContracts, successfulNodesSet, failedNodesSet };
+}
+
+async function pingNodes(grid3: GridClient, nodes: NodeInfo[]) {
   const pingPromises = nodes.map(async node => {
     try {
       const res = await grid3.zos.pingNode({ nodeId: node.nodeId });
@@ -31,11 +127,9 @@ async function pingNodes(
 
   return result;
 }
-
 async function main() {
   const grid3 = await getClient();
 
-  // Timeout for deploying vm is 2 min
   grid3.clientOptions.deploymentTimeoutMinutes = 2;
   await grid3._connect();
 
@@ -43,9 +137,11 @@ async function main() {
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 50;
-  const totalVMs = 250;
+  const batchSize = 10;
+  const totalVMs = 50;
   const batches = totalVMs / batchSize;
+  const allSuccessfulNodes = new Set<number>();
+  const allFailedNodes = new Set<number>();
 
   // resources
   const cru = 1;
@@ -86,30 +182,20 @@ async function main() {
     const results = await pingNodes(grid3, nodes);
     console.timeEnd("Ping Nodes");
 
-    // Check nodes results
     results.forEach(({ node, res, error }) => {
       if (res) {
         console.log(`Node ${node.nodeId} is online`);
       } else {
         offlineNodes.push(node.nodeId);
         console.log(`Node ${node.nodeId} is offline`);
-        if (error) {
-          console.error("Error:", error);
-        }
+        if (error) console.error("Error:", error);
       }
     });
 
     const onlineNodes = nodes.filter(node => !offlineNodes.includes(node.nodeId));
-
-    // Batch Deployment
     const batchVMs: MachinesModel[] = [];
-    for (let i = 0; i < batchSize; i++) {
+    for (let i = 0; i < batchSize && onlineNodes.length > 0; i++) {
       const vmName = "vm" + generateString(8);
-
-      if (onlineNodes.length <= 0) {
-        errors.push("No online nodes available for deployment");
-        continue;
-      }
       const selectedNode = onlineNodes.pop();
 
       // create vm node Object
@@ -141,66 +227,60 @@ async function main() {
       vms.network = n;
       vms.machines = [vm];
       vms.metadata = "";
-      vms.description = "Test deploying vm with name " + vm.name + " via ts grid3 client - Batch " + (batch + 1);
+      vms.description = `Test deploying vm with name ${vm.name} - Batch ${batch + 1}`;
 
       batchVMs.push(vms);
     }
 
     const allTwinDeployments: TwinDeployment[] = [];
 
-    const deploymentPromises = batchVMs.map(async (vms, index) => {
+    const deploymentPromises = batchVMs.map(async vms => {
       try {
-        const [twinDeployments, _, __] = await grid3.machines._createDeployment(vms);
-        return { twinDeployments, batchIndex: index };
+        const [twinDeployments] = await grid3.machines._createDeployment(vms);
+        return twinDeployments;
       } catch (error) {
         log(`Error creating deployment for batch ${batch + 1}: ${error}`);
-        return { twinDeployments: null, batchIndex: index };
+        return [];
       }
     });
     console.time("Preparing Batch " + (batch + 1));
     const deploymentResults = await Promise.allSettled(deploymentPromises).then(results =>
       results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
     );
-    console.timeEnd("Preparing Batch " + (batch + 1));
 
-    for (const { twinDeployments } of deploymentResults) {
-      if (twinDeployments) {
-        allTwinDeployments.push(...twinDeployments);
+    allTwinDeployments.push(...deploymentResults);
+
+    if (allTwinDeployments.length > 0) {
+      try {
+        const { resultContracts, successfulNodesSet, failedNodesSet } = await handle(grid3, allTwinDeployments);
+
+        successfulNodesSet.forEach(node => allSuccessfulNodes.add(node));
+        failedNodesSet.forEach(node => allFailedNodes.add(node));
+
+        log(`Successfully handled deployments for Batch ${batch + 1}`);
+        successCount = allSuccessfulNodes.size;
+      } catch (error) {
+        errors.push(`Error handling deployments for Batch ${batch + 1}: ${error}`);
+        failedCount = allFailedNodes.size;
       }
+    } else {
+      log(`No deployments created for Batch ${batch + 1}`);
     }
 
-    try {
-      await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
-      log(`Successfully handled and saved contracts for some twin deployments`);
-    } catch (error) {
-      errors.push(error);
-      failedCount += batchSize;
-      log(`Error handling contracts for twin deployments: ${error}`);
-    }
-
-    successCount = totalVMs - failedCount;
-
-    console.timeEnd("Batch " + (batch + 1));
+    log(`Batch ${batch + 1} Summary:`);
+    log(`- Successful Deployments: ${successCount}`);
+    log(`- Failed Deployments: ${failedCount}`);
+    log("---------------------------------------------");
   }
 
   console.timeEnd("Total Deployment Time");
 
-  log("Successful Deployments: " + successCount);
-  log("Failed Deployments: " + failedCount);
-
-  // List of failed deployments' errors
-  log("Failed deployments errors: ");
-  for (let i = 0; i < errors.length; i++) {
-    log(errors[i]);
-    log("---------------------------------------------");
-  }
-
-  // List of offline nodes
-  log("Failed Nodes: ");
-  for (let i = 0; i < offlineNodes.length; i++) {
-    log(offlineNodes[i]);
-    log("---------------------------------------------");
-  }
+  log("Final Summary:");
+  log(`- Total Successful Deployments: ${successCount}`);
+  log(`- Total Failed Deployments: ${failedCount}`);
+  log(`- Offline Nodes: ${offlineNodes.join(", ")}`);
+  log(`- All Successful Deployments on Nodes: ${Array.from(allSuccessfulNodes).join(", ")}`);
+  log(`- All Failed Deployments on Nodes: ${Array.from(allFailedNodes).join(", ")}`);
 
   await grid3.disconnect();
 }
