@@ -1,11 +1,13 @@
 <template>
-  <view-layout>
-    <TfDomains />
+  <div class="mt-4">
+    <view-layout>
+      <TfDomains />
 
-    <template #list>
-      <TfDeploymentList title="Domains" :project-name="name" :hideSSH="true" />
-    </template>
-  </view-layout>
+      <template #list>
+        <TfDeploymentList title="Domains" :project-name="name" :hideSSH="true" />
+      </template>
+    </view-layout>
+  </div>
 </template>
 
 <script lang="ts">
