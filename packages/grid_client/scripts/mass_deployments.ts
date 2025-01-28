@@ -105,7 +105,6 @@ async function handle(grid3: GridClient, twinDeployments: TwinDeployment[]) {
   }
 
   const res = await Promise.allSettled(deploymentPromises);
-  console.log("Deployment Results in handle:", res);
   log("Successful Nodes: " + successfulNodesSet);
   log("Failed Nodes: " + failedNodesSet);
   return { resultContracts, successfulNodesSet, failedNodesSet };
