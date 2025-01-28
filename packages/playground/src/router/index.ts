@@ -610,7 +610,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
         {
           path: DashboardRoutes.Deploy.Domains,
           component: () => import("@/views/domains_view.vue"),
-          meta: { title: "Domains", requireKYC: true },
+          meta: { title: "Domains", info: { page: "info/domains.md" }, requireKYC: true },
         },
         {
           path: DashboardRoutes.Deploy.NodeFinder,
