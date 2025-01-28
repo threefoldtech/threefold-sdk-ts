@@ -177,7 +177,11 @@ export default {
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
           case missingFeatures.length > 0:
-            throw `Node ${nodeId} doesn't support [ ${missingFeatures} ] features`;
+            throw `Node ${nodeId} does not support Feature${missingFeatures.length > 1 ? "s" : ""} ${missingFeatures
+              .slice(0, -1)
+              .join(", ")}${missingFeatures.length > 1 ? " or " : ""}${
+              missingFeatures[missingFeatures.length - 1]
+            }. Please check compatibility or upgrade the node.`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;
