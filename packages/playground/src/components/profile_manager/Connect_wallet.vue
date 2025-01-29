@@ -76,7 +76,7 @@
                 :items="[...keyType]"
                 item-title="name"
                 v-model="keypairType"
-                @onchange="mnemonicInput.validate()"
+                @update:modelValue="mnemonic !== '' ? reloadValidation() : null"
               />
             </template>
           </v-tooltip>
@@ -241,11 +241,17 @@ async function getEmail(grid: GridClient) {
   }
 }
 
+const clearErrors = () => {
+  createOrActivateError.value = "";
+  storeAndLoginError.value = "";
+};
+
 function reloadValidation() {
   enableReload.value = false;
   mnemonicInput.value.validate();
 }
 const validateMnemonicInput = async (input: string) => {
+  clearErrors();
   enableReload.value = false;
   isNonActiveMnemonic.value = false;
   if (
@@ -278,6 +284,7 @@ function validateConfirmPassword(value: string) {
 }
 
 async function createNewAccount() {
+  clearErrors();
   mnemonicInput.value.reset();
   creatingAccount.value = true;
   try {
@@ -291,6 +298,7 @@ async function createNewAccount() {
 }
 
 async function activateAccount() {
+  clearErrors();
   creatingAccount.value = true;
   connecting.value = true;
   try {
@@ -310,6 +318,7 @@ async function activateAccount() {
 }
 
 async function storeAndLogin() {
+  clearErrors();
   connecting.value = true;
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
@@ -326,8 +335,13 @@ async function storeAndLogin() {
     profileManager.set({ ...profile, mnemonic: mnemonic.value });
   } catch (e) {
     if (e instanceof TwinNotExistError) {
-      openAcceptTerms.value = true;
       isNonActiveMnemonic.value = true;
+      if (keypairType.value === KeypairType.ed25519) {
+        createOrActivateError.value = "Activation ed25519 Keys isn't supported, you can only import pre-existing ones.";
+        return;
+      }
+
+      openAcceptTerms.value = true;
       return;
     }
     console.error("error", e);
