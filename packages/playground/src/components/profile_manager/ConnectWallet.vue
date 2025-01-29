@@ -252,7 +252,6 @@ function reloadValidation() {
 }
 const validateMnemonicInput = async (input: string) => {
   clearErrors();
-  enableReload.value = false;
   isNonActiveMnemonic.value = false;
   if (
     validateMnemonic(input) ||
@@ -345,7 +344,6 @@ async function storeAndLogin() {
       return;
     }
     console.error("error", e);
-    enableReload.value = false;
     storeAndLoginError.value = normalizeError(e, "Something went wrong. please try again.");
   } finally {
     connecting.value = false;
