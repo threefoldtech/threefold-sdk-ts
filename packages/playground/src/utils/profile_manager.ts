@@ -17,11 +17,13 @@ import SSHKeysManagement from "./ssh";
  *
  * @throws {Error} If any operation (like reading the email or updating SSH keys) fails.
  */
-export async function handlePostLogin(grid: GridClient) {
-  const storedEmail = await readEmail(grid!);
-  if (!storedEmail) {
-    createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
-    router.push({ path: "/tf-chain/your-profile" });
+export async function handlePostLogin(grid: GridClient, email?: string) {
+  if (!email) {
+    const storedEmail = await readEmail(grid!);
+    if (!storedEmail) {
+      createCustomToast("Email is Missing! Please enter your Email.", ToastType.warning);
+      router.push({ path: "/tf-chain/your-profile" });
+    }
   }
 
   // Migrate the ssh-key

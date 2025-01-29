@@ -228,7 +228,6 @@ const handleAcceptTerms = () => {
 const emit = defineEmits(["closeDialog", "update:loading"]);
 
 watch([connecting, creatingAccount], () => {
-  console.log(connecting.value || creatingAccount.value);
   emit("update:loading", connecting.value || creatingAccount.value);
 });
 async function getEmail(grid: GridClient) {
@@ -260,7 +259,7 @@ const validateMnemonicInput = async (input: string) => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
       } else {
-        console.log("error", e);
+        console.error("ValidateMnemonicInput error", e);
         enableReload.value = true;
         return { message: normalizeError(e, "Something went wrong. please try again.") };
       }
@@ -319,7 +318,7 @@ async function storeAndLogin() {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     storeEmail(grid!, email.value);
     setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
-    await handlePostLogin(grid!);
+    await handlePostLogin(grid!, email.value);
     const profile = await loadProfile(grid!);
     if (email.value && profile.email !== email.value) {
       profile.email = email.value;
@@ -329,6 +328,7 @@ async function storeAndLogin() {
     if (e instanceof TwinNotExistError) {
       openAcceptTerms.value = true;
       isNonActiveMnemonic.value = true;
+      return;
     }
     console.error("error", e);
     enableReload.value = false;
