@@ -319,7 +319,7 @@ async function storeAndLogin() {
     const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
     storeEmail(grid!, email.value);
     setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
-    await handlePostLogin(grid!, password.value);
+    await handlePostLogin(grid!);
     const profile = await loadProfile(grid!);
     if (email.value && profile.email !== email.value) {
       profile.email = email.value;
