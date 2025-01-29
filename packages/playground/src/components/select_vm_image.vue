@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type PropType, ref, watch } from "vue";
+import { computed, type PropType, ref, watch } from "vue";
 
 import type { Flist } from "../types";
 
@@ -58,22 +58,23 @@ const props = defineProps({
   },
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: Flist): void }>();
-const flist = ref<string>();
-const entryPoint = ref<string>("");
 
 const image = ref<VmImage>(props.images[0]);
-const name = ref<string>();
-watch(
-  image,
-  vm => {
-    name.value = vm.name;
-    if (vm.name !== "Other") {
-      flist.value = vm.flist;
-      entryPoint.value = vm.entryPoint;
-    }
-  },
-  { immediate: true },
-);
+const name = computed(() => image.value.name);
+
+const flist = computed(() => {
+  if (name.value != "Other") {
+    return image.value.flist;
+  }
+  return "";
+});
+
+const entryPoint = computed(() => {
+  if (name.value != "Other") {
+    return image.value.entryPoint;
+  }
+  return "";
+});
 
 watch(
   [flist, entryPoint, name],
