@@ -177,10 +177,10 @@ export default {
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
           case missingFeatures.length > 0:
-            throw `Node ${nodeId} does not support Feature${missingFeatures.length > 1 ? "s" : ""} ${missingFeatures
-              .slice(0, -1)
-              .join(", ")}${missingFeatures.length > 1 ? " or " : ""}${
-              missingFeatures[missingFeatures.length - 1]
+            throw `Node ${nodeId} does not support ${missingFeatures.slice(0, -1).join(", ")}${
+              missingFeatures.length > 1 ? " or " : ""
+            }${missingFeatures[missingFeatures.length - 1]}  Feature${
+              missingFeatures.length > 1 ? "s" : ""
             }. Please check compatibility or upgrade the node.`;
         }
 
