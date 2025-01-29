@@ -3,7 +3,10 @@ import { plainToClass } from "class-transformer";
 import {
   DeploymentResult,
   Encryption,
+  MachineInterface,
   Mycelium,
+  MyceliumIP,
+  NetworkLight,
   Peer,
   QuantumCompression,
   QuantumSafeConfig,
@@ -15,6 +18,8 @@ import {
   ZdbBackend,
   ZdbGroup,
   ZdbModes,
+  ZmachineLight,
+  ZmachineLightNetwork,
 } from "../../src";
 import {
   ComputeCapacity,
@@ -38,8 +43,16 @@ let workload: Workload;
 const createDataInstance = (type: WorkloadTypes) => {
   let instance;
   const network = new ZmachineNetwork();
+  const networklight = new ZmachineLightNetwork();
+  const interfaces = new MachineInterface();
+  const myceliumip = new MyceliumIP();
+
   const computeCapacity = new ComputeCapacity();
+  computeCapacity.cpu = 1;
+  computeCapacity.memory = 256 * 1024 ** 2;
   const disks = new Mount();
+  disks.name = "zdisk";
+  disks.mountpoint = "/mnt/data";
   const peer = new Peer();
   peer.subnet = "10.0.1.0/24";
   peer.wireguard_public_key = "9I8H7G6F5E4D3C2B1A0J";
@@ -62,8 +75,6 @@ const createDataInstance = (type: WorkloadTypes) => {
   switch (type) {
     case WorkloadTypes.zmachine:
       instance = new Zmachine();
-      computeCapacity.cpu = 1;
-      computeCapacity.memory = 256 * 1024 ** 2;
       network.planetary = true;
       network.public_ip = "10.249.0.0/16";
       network.interfaces = [
@@ -77,9 +88,6 @@ const createDataInstance = (type: WorkloadTypes) => {
         hex_seed: "abc123",
       };
 
-      disks.name = "zdisk";
-      disks.mountpoint = "/mnt/data";
-
       instance.flist = "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist";
       instance.network = network;
       instance.size = rootfs_size * 1024 ** 3;
@@ -90,7 +98,24 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance.corex = false;
       instance.gpu = ["AMD", "NIVIDIA"];
       break;
-
+    case WorkloadTypes.zmachinelight:
+      instance = new ZmachineLight();
+      instance.flist = "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist";
+      interfaces.network = "znetwork";
+      interfaces.ip = "10.20.2.2";
+      networklight.interfaces = [interfaces];
+      myceliumip.network = "mycelium_net";
+      myceliumip.hex_seed = "abc123";
+      networklight.mycelium = myceliumip;
+      instance.network = networklight;
+      instance.size = rootfs_size * 1024 ** 3;
+      instance.compute_capacity = computeCapacity;
+      instance.mounts = [disks];
+      instance.env = { key: "value" };
+      instance.entrypoint = "/sbin/zinit init";
+      instance.corex = false;
+      instance.gpu = ["AMD", "NIVIDIA"];
+      break;
     case WorkloadTypes.zmount:
       instance = new Zmount();
       instance.size = size;
@@ -110,7 +135,11 @@ const createDataInstance = (type: WorkloadTypes) => {
       instance.peers = [peer];
       instance.mycelium = mycelium;
       break;
-
+    case WorkloadTypes.networklight:
+      instance = new NetworkLight();
+      instance.subnet = "10.0.0.1/32";
+      instance.mycelium = mycelium;
+      break;
     case WorkloadTypes.zdb:
       instance = new Zdb();
       instance.size = size;
