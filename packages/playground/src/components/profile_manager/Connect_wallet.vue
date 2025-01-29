@@ -1,15 +1,15 @@
 <template>
-  <form @submit.prevent="storeAndLogin()">
-    <FormValidator v-model="isValidForm">
-      <v-alert type="warning" variant="tonal" class="mb-6">
+  <form id="wallet-form" @submit.prevent="storeAndLogin()">
+    <FormValidator id="form-validator" v-model="isValidForm">
+      <v-alert id="mnemonic-warning" type="warning" variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           To connect your wallet, you will need to enter your Mnemonic or Hex Seed which will be encrypted using the
           password. Mnemonic or Hex Seed will never be shared outside of this device.
         </p>
       </v-alert>
-      <v-alert variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
+      <v-alert id="ed25519-warning" variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
         <p>
-          Please note that generation or activation of ed25519 Keys isn't supported, you can only import pre existing
+          Please note that generation or activation of ed25519 Keys isn't supported, you can only import pre-existing
           ones.
         </p>
       </v-alert>
@@ -18,13 +18,15 @@
       <v-row>
         <v-col cols="12" md="9">
           <VTooltip
+            id="mnemonic-tooltip"
             text="Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing (Mnemonic or Hex Seed) or click the 'Create Account' button to create an account and generate mnemonic."
             location="bottom"
             max-width="700px"
           >
             <template #activator="{ props: tooltipProps }">
-              <PasswordInputWrapper #="{ props: passwordInputProps }">
+              <PasswordInputWrapper id="password-input-wrapper" #="{ props: passwordInputProps }">
                 <InputValidator
+                  id="mnemonic-input-validator"
                   :value="mnemonic"
                   :rules="[validators.required('Mnemonic or Hex Seed is required.')]"
                   :asyncRules="[validateMnemonicInput]"
@@ -34,6 +36,7 @@
                 >
                   <div v-bind="tooltipProps">
                     <VTextField
+                      id="mnemonic-text-field"
                       :append-icon="enableReload && mnemonic !== '' ? 'mdi-reload' : ''"
                       label="Mnemonic or Hex Seed"
                       placeholder="Please insert your Mnemonic or Hex Seed"
@@ -48,11 +51,11 @@
                       ref="mnemonicRef"
                     >
                       <template v-slot:prepend-inner v-if="validationProps.hint || validationProps.error">
-                        <v-icon :color="validationProps.error ? 'red' : 'green'">
+                        <v-icon id="mnemonic-validation-icon" :color="validationProps.error ? 'red' : 'green'">
                           {{ validationProps.error ? "mdi-close" : "mdi-check" }}
                         </v-icon>
-                      </template></VTextField
-                    >
+                      </template>
+                    </VTextField>
                   </div>
                 </InputValidator>
               </PasswordInputWrapper>
@@ -60,9 +63,14 @@
           </VTooltip>
         </v-col>
         <v-col cols="12" md="3">
-          <v-tooltip location="top" text="Using different keypair types will lead to a completely different account.">
+          <v-tooltip
+            id="keypair-tooltip"
+            location="top"
+            text="Using different keypair types will lead to a completely different account."
+          >
             <template #activator="{ props }">
               <v-autocomplete
+                id="keypair-select"
                 label="Keypair Type"
                 v-bind="props"
                 :items="[...keyType]"
@@ -76,8 +84,9 @@
       </v-row>
 
       <!-- create Account -->
-      <div class="d-flex flex-column flex-md-row justify-end mb-5">
+      <div id="create-account-container" class="d-flex flex-column flex-md-row justify-end mb-5">
         <VBtn
+          id="create-account-btn"
           class="mt-2 ml-sm-0 ml-md-3"
           color="secondary"
           variant="outlined"
@@ -89,12 +98,13 @@
         </VBtn>
       </div>
 
-      <v-alert type="error" variant="tonal" class="mb-4" v-if="createOrActivateError">
+      <v-alert id="activation-error" type="error" variant="tonal" class="mb-4" v-if="createOrActivateError">
         {{ createOrActivateError }}
       </v-alert>
 
       <!-- Email -->
       <input-validator
+        id="email-validator"
         :value="email"
         :rules="[
           validators.required('Email is required.'),
@@ -103,6 +113,7 @@
         #="{ props }"
       >
         <v-text-field
+          id="email-text-field"
           label="Email"
           placeholder="email@example.com"
           v-model="email"
@@ -115,15 +126,17 @@
       </input-validator>
 
       <!-- Passwords -->
-      <WalletPassword v-model="password" mode="Create" :disabled="creatingAccount || connecting" />
-      <PasswordInputWrapper #="{ props: confirmPasswordInputProps }">
+      <WalletPassword id="password-input" v-model="password" mode="Create" :disabled="creatingAccount || connecting" />
+      <PasswordInputWrapper id="confirm-password-wrapper" #="{ props: confirmPasswordInputProps }">
         <InputValidator
+          id="confirm-password-validator"
           :value="confirmPassword"
           :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
           #="{ props: validationProps }"
           ref="confirmPasswordInput"
         >
           <VTextField
+            id="confirm-password-text-field"
             label="Confirm Password"
             v-model="confirmPassword"
             v-bind="{
@@ -136,13 +149,14 @@
         </InputValidator>
       </PasswordInputWrapper>
 
-      <v-alert type="error" variant="tonal" class="mb-4" v-if="storeAndLoginError">
+      <v-alert id="login-error" type="error" variant="tonal" class="mb-4" v-if="storeAndLoginError">
         {{ storeAndLoginError }}
       </v-alert>
       <!-- Action Buttons -->
-      <div class="d-flex justify-center mt-2">
-        <VBtn color="anchor" variant="outlined" @click="emit('closeDialog')"> Close </VBtn>
+      <div id="action-buttons-container" class="d-flex justify-center mt-2">
+        <VBtn id="close-btn" color="anchor" variant="outlined" @click="emit('closeDialog')"> Close </VBtn>
         <VBtn
+          id="connect-btn"
           class="ml-2"
           type="submit"
           color="secondary"
@@ -154,7 +168,12 @@
       </div>
     </FormValidator>
   </form>
-  <AcceptTermsDialog v-model="openAcceptTerms" @onError="handleTCErrors" @onAccept="handleAcceptTerms" />
+  <AcceptTermsDialog
+    id="terms-dialog"
+    v-model="openAcceptTerms"
+    @onError="handleTCErrors"
+    @onAccept="handleAcceptTerms"
+  />
 </template>
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
