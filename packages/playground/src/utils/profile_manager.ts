@@ -7,17 +7,22 @@ import { readEmail } from "./grid";
 import SSHKeysManagement from "./ssh";
 
 /**
- * Handles the actions to be performed after a successful login "including create account and activate account".
+ * Handles the actions to be performed after a successful login.
  *
- * - Retrieves the stored email address and checks its presence.
- *   If the email is missing, triggers a warning toast and navigates to the profile creation page.
+ * - Saves the password in session storage for future use.
+ * - Retrieves and checks the provided or stored email address.
+ *   If neither is available, triggers a warning toast and navigates to the profile creation page.
  * - Ensures that SSH keys are migrated if not already done. If not migrated, it performs the migration and updates the SSH keys.
  *
  * @param grid - The instance of the GridClient used to interact with the grid.
+ * @param password - The user's password to be stored in session storage.
+ * @param email - Optional email address provided during login. If not provided, it will attempt to retrieve the stored email.
  *
  * @throws {Error} If any operation (like reading the email or updating SSH keys) fails.
  */
-export async function handlePostLogin(grid: GridClient, email?: string) {
+export async function handlePostLogin(grid: GridClient, password: string, email?: string) {
+  sessionStorage.setItem("password", password);
+
   if (!email) {
     const storedEmail = await readEmail(grid!);
     if (!storedEmail) {
