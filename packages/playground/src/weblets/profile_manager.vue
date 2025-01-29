@@ -319,12 +319,12 @@ profileManagerController.set({ loadBalance: __loadBalance });
 </script>
 
 <script lang="ts">
+import Wallet_login from "@/components/profile_manager/LoginWallet.vue";
 import SkeletonLoader from "@/components/profile_manager/SkeletonLoader.vue";
-import Wallet_login from "@/components/profile_manager/wallet_login.vue";
 import QRPlayStore from "@/components/qr_play_store.vue";
 import { useKYC } from "@/stores/kyc";
 
-import ConnectWallet from "../components/profile_manager/Connect_wallet.vue";
+import ConnectWallet from "../components/profile_manager/ConnectWallet.vue";
 import type { Profile } from "../stores/profile_manager";
 export default {
   name: "ProfileManager",

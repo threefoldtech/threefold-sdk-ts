@@ -356,7 +356,7 @@ async function storeAndLogin() {
 import { handlePostLogin } from "@/utils/profile_manager";
 
 import AcceptTermsDialog from "./AcceptTermsDialog.vue";
-import WalletPassword from "./Wallet_password.vue";
+import WalletPassword from "./WalletPassword.vue";
 
 export default {
   name: "ConnectWallet",

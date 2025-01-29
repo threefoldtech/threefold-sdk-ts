@@ -36,7 +36,7 @@ import Cryptr from "cryptr";
 import md5 from "md5";
 import { onMounted, ref } from "vue";
 
-import WalletPassword from "@/components/profile_manager/Wallet_password.vue";
+import WalletPassword from "@/components/profile_manager/WalletPassword.vue";
 import { useProfileManager } from "@/stores/profile_manager";
 import { type Credentials, isStoredCredentials } from "@/utils/credentials";
 import { getCredentials } from "@/utils/credentials";
