@@ -1,6 +1,6 @@
-import { FilterOptions, MachinesModel } from "../src";
+import { Features, FilterOptions, generateRandomHexSeed, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
-import { log } from "./utils";
+import { log, pingNodes } from "./utils";
 
 async function deploy(client, vms) {
   const res = await client.machines.deploy(vms);
@@ -33,13 +33,28 @@ async function main() {
     sru: 7,
     availableFor: grid3.twinId,
     country: "Belgium",
+    features: [Features.mycelium, Features.yggdrasil],
   };
 
+  const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
+  const vmNode = await pingNodes(grid3, nodes);
   const vms: MachinesModel = {
     name,
     network: {
       name: "dynamictest",
       ip_range: "10.249.0.0/16",
+      myceliumSeeds: [
+        {
+          nodeId: vmNode,
+          /**
+           * ### Mycelium Network Seed:
+           * - The `seed` is an optional field used to provide a specific seed for the Mycelium network.
+           * - If not provided, the `GridClient` will generate a seed automatically when the `mycelium` flag is enabled.
+           * - **Use Case:** If you need the new machine to have the same IP address as a previously deleted machine, set the `seed` field to the old seed value.
+           */
+          seed: generateRandomHexSeed(32),
+        },
+      ],
     },
     machines: [
       {
