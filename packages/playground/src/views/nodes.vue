@@ -597,6 +597,7 @@ export default {
             totalCru: +filters.value.minCRU || undefined,
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
+            ipv4: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
             sortBy: SortBy.Status,
