@@ -207,6 +207,8 @@ export function normalizeNodeFilters(
     country: options?.location.country,
     gateway: options?.gateway,
     healthy: true,
+    rentable: filters.dedicated ? filters.dedicated : undefined,
+    rentedBy: filters.rentedBy ? options?.twinId : undefined,
     rentableOrRentedBy: filters.dedicated ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,

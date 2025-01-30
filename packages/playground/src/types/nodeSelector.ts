@@ -22,6 +22,8 @@ export interface SelectionDetailsFilters {
   solutionDisk?: number;
   certified?: boolean;
   dedicated?: boolean;
+  rentedBy?: number;
+  rentable?: boolean;
   exclusiveFor?: string;
   rentable_or_rented_by?: number;
   planetary?: boolean;
