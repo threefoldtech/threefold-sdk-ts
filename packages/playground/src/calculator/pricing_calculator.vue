@@ -104,8 +104,10 @@
                   />
                 </InputTooltip>
               </VCol>
+            </VRow>
 
-              <VCol lg="4" md="4" sm="12">
+            <VRow class="x_small">
+              <VCol lg="4" md="6" sm="12" xs="12">
                 <InputTooltip
                   inline
                   tooltip=" A certified node will receive 25% more reward compared to a non-certified node."
@@ -114,7 +116,7 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol lg="4" md="4" sm="12">
+              <VCol lg="4" md="6" sm="12" xs="12">
                 <InputTooltip
                   inline
                   tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet"
@@ -125,8 +127,9 @@
 
               <VCol
                 lg="4"
-                md="4"
+                md="6"
                 sm="12"
+                xs="12"
                 v-if="userBalance"
                 @vue:unmounted="
                   resources.useCurrentBalance = true;
@@ -360,15 +363,22 @@ export default {
   padding: 10px 0;
 }
 
+.x_small {
+  display: flex !important;
+}
 .card {
   background: white;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-@media (max-width: 425px) {
+@media (max-width: 600px) {
   .v-col {
     flex-basis: auto !important;
+  }
+
+  .x_small {
+    display: block !important;
   }
 }
 </style>
