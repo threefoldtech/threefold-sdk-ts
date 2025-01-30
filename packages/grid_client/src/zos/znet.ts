@@ -55,4 +55,4 @@ class Znet extends WorkloadData {
   }
 }
 
-export { Znet, Peer };
+export { Znet, Peer, Mycelium };
