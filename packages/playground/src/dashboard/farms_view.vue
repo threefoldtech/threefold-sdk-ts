@@ -4,58 +4,15 @@
       <v-icon size="30" class="pr-3">mdi-silo</v-icon>
       <v-card-title class="pa-0">Farms</v-card-title>
     </v-card>
-    <template v-if="showKYCError">
-      <VAlert variant="tonal" type="error" class="mt-4">
-        <template #prepend>
-          <v-icon icon="mdi-shield-remove"></v-icon>
-        </template>
-        <div class="d-flex justify-space-between align-baseline">
-          <div>
-            To start farming, KYC verification is required. Please complete the verification process to proceed.
-          </div>
-        </div>
-      </VAlert>
-      <div class="d-flex justify-content-center align-items-center mt-10" style="height: 100%; width: 100%">
-        <v-img class="d-inline-block mx-auto" :src="baseURL + 'images/kyc.png'" style="max-width: 40%"></v-img>
-      </div>
-      <template>
-        <div class="d-flex justify-center align-center" style="height: 100vh">
-          <VBtn color="primary">Click Me</VBtn>
-        </div>
-      </template>
 
-      <div class="d-flex justify-content-center align-items-center mb-10">
-        <v-btn
-          class="d-inline-block mx-auto"
-          text="Verify now"
-          size="small"
-          color="error"
-          @click="kycDialog = true"
-          :loading="kycDialogLoading"
-        />
-      </div>
-    </template>
-    <template v-else>
-      <CreateFarm class="mt-4" @farm-created="handleFarmCreated" />
-      <UserFarms :ref="el => (userFarms = el)" :reloadFarms="farmsReload" />
-      <UserNodes />
-    </template>
+    <CreateFarm class="mt-4" @farm-created="handleFarmCreated" />
+    <UserFarms :ref="el => (userFarms = el)" :reloadFarms="farmsReload" />
+    <UserNodes />
   </div>
-  <KycVerifier
-    v-if="kycDialog"
-    :loading="kycDialogLoading"
-    @update:loading="kycDialogLoading = $event"
-    :moduleValue="kycDialog"
-    @update:moduleValue="kycDialog = $event"
-  />
 </template>
 
 <script lang="ts">
-import { KycStatus } from "@threefold/grid_client";
-import { computed, ref, watch } from "vue";
-
-import KycVerifier from "@/components/KycVerifier.vue";
-import { useKYC } from "@/stores/kyc";
+import { ref, watch } from "vue";
 
 import CreateFarm from "./components/create_farm.vue";
 import UserFarms from "./components/user_farms.vue";
@@ -63,21 +20,13 @@ import UserNodes from "./components/user_nodes.vue";
 export default {
   name: "DashboardFarms",
   components: {
-    KycVerifier,
     UserNodes,
     UserFarms,
     CreateFarm,
   },
   setup() {
-    const baseURL = import.meta.env.BASE_URL;
-
     const farmsReload = ref<boolean>(false);
     const userFarms = ref();
-    const kyc = useKYC();
-    const kycDialog = ref(false);
-    const kycDialogLoading = ref(false);
-
-    const showKYCError = computed(() => kyc.status !== KycStatus.verified);
     function handleFarmCreated() {
       farmsReload.value = !farmsReload.value;
     }
@@ -88,13 +37,9 @@ export default {
       },
     );
     return {
-      baseURL,
       farmsReload,
       handleFarmCreated,
       userFarms,
-      showKYCError,
-      kycDialog,
-      kycDialogLoading,
     };
   },
 };
