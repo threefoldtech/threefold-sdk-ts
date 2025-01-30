@@ -14,15 +14,11 @@
           and add more as needed.
         </v-alert>
         <v-alert type="info" class="mt-3">
-          <!--
-            TODO: Return the message back when return the multiple keys feature.
-            The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
-            wish to select/deselect.
-          -->
-          To change the key that you want to use over the deployment, simply click on it.
+          The keys selected here will be forwarded to your deployment. To change keys, simply toggle on the keys you
+          wish to select/deselect.
         </v-alert>
       </v-card-text>
-      <v-chip-group class="ml-3" v-model="selectedKey" mandatory>
+      <v-chip-group class="keys ml-3" v-model="selectedKey" multiple>
         <v-tooltip
           v-for="_key of sshKeysManagement.list()"
           :key="_key.id"
@@ -33,9 +29,7 @@
             <v-chip
               class="pa-5 mb-3"
               :variant="isKeySelected(_key) ? 'flat' : 'outlined'"
-              :color="
-                isKeySelected(_key) ? 'primary' : theme.name.value === AppThemeSelection.light ? 'primary' : 'white'
-              "
+              :class="chipClass(_key)"
               v-bind="props"
               @click="selectKey(_key)"
             >
@@ -57,8 +51,7 @@
 
 <script lang="ts">
 import { noop } from "lodash";
-import { capitalize, defineComponent, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
-import { onUnmounted } from "vue";
+import { capitalize, defineComponent, getCurrentInstance, onMounted, onUnmounted, ref, watch } from "vue";
 import { useTheme } from "vuetify";
 
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
@@ -87,11 +80,6 @@ export default defineComponent({
     onMounted(() => {
       selectedKeys.value = sshKeysManagement.list().filter(_key => _key.isActive === true);
       selectedKey.value = selectedKeys.value.findIndex(k => k.id === selectedKeys.value[0].id);
-      // TODO: Remove the below `selectedKeys.value = [selectedKeys.value[0]];` to make the user select more than one key
-      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
-      if (selectedKeys.value.length) {
-        selectedKeys.value = [selectedKeys.value[0]];
-      }
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
     });
@@ -100,18 +88,26 @@ export default defineComponent({
       return selectedKeys.value.some(selectedKey => selectedKey.id === key.id);
     };
 
+    function chipClass(key: SSHKeyData) {
+      if (!isKeySelected(key)) {
+        const keys = document.querySelectorAll(".keys .v-chip");
+        keys.forEach(key => key.classList.remove("v-chip--selected"));
+      }
+      if (isKeySelected(key)) {
+        return ["bg-primary", "v-chip--selected"];
+      }
+      return theme.name.value === "light" ? "bg-primary" : "anchor";
+    }
+
     function selectKey(key: SSHKeyData) {
-      // TODO: Update the below `selectedKeys.value = [key];` to make the user select more than one key
-      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
-      selectedKeys.value = [key];
-      // if (isKeySelected(key)) {
-      //   const index = selectedKeys.value.findIndex(selectedKey => selectedKey.id === key.id);
-      //   if (index !== -1) {
-      //     selectedKeys.value.splice(index, 1);
-      //   }
-      // } else {
-      //   selectedKeys.value.push(key);
-      // }
+      if (isKeySelected(key)) {
+        const index = selectedKeys.value.findIndex(selectedKey => selectedKey.id === key.id);
+        if (index !== -1) {
+          selectedKeys.value.splice(index, 1);
+        }
+      } else {
+        selectedKeys.value.push(key);
+      }
 
       handleKeys();
       emit("selectedKeys", selectedKeysString.value);
@@ -164,6 +160,7 @@ export default defineComponent({
       capitalize,
       selectKey,
       isKeySelected,
+      chipClass,
     };
   },
 });
@@ -179,10 +176,8 @@ export default defineComponent({
   padding: 10px;
 }
 
-.v-theme--light .v-card--variant-outlined {
-  border-color: #b9b9b9;
-}
+.v-theme--light .v-card--variant-outlined,
 .v-theme--dark .v-card--variant-outlined {
-  border-color: #5d5d5d;
+  border-color: transparent;
 }
 </style>

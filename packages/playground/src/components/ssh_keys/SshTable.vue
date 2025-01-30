@@ -184,14 +184,11 @@ export default defineComponent({
         title: "Key Fingerprint",
         key: "fingerPrint",
       },
-
-      // TODO: Update the below `Column` to make the user activate/deactivate more than one key.
-      // after fixing this issue: https://github.com/threefoldtech/tf-images/issues/231
-      // {
-      //   title: "Active",
-      //   key: "activation",
-      //   sortable: false,
-      // },
+      {
+        title: "Active",
+        key: "activation",
+        sortable: false,
+      },
     ];
 
     const deleteSelected = () => {

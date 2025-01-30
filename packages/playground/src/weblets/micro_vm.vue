@@ -207,8 +207,8 @@ const images = [
     entryPoint: "/sbin/zinit init",
   },
   {
-    name: "Ubuntu-23.10",
-    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-23.10-mycelium.flist",
+    name: "Ubuntu-23.04",
+    flist: "https://hub.grid.tf/petep.3bot/threefolddev-ubuntu_23.04-latest.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
@@ -218,7 +218,7 @@ const images = [
   },
   {
     name: "Arch",
-    flist: "https://hub.grid.tf/tf-official-vms/arch-mycelium.flist",
+    flist: "https://hub.grid.tf/petep.3bot/archlinux_20240101.0.204074.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
