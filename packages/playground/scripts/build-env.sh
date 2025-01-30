@@ -12,6 +12,7 @@ STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
     TFT_ASSET_ISSUER
 )
+WALLET_KEY="${WALLET_KEY:=wallet.v1}"
 
 case $MODE in
     "dev")
@@ -102,6 +103,7 @@ parss_array(){
 
 configs="
 window.env = {
+  WALLET_KEY: '$WALLET_KEY',
   NETWORK: '$MODE',
   GRAPHQL_STACKS: "[$(parss_array "$GRAPHQL_URL")]",
   GRIDPROXY_STACKS: "[$(parss_array "$GRIDPROXY_URL")]",

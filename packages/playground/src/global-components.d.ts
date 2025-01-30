@@ -66,6 +66,7 @@ declare global {
       MANUAL_URL: string;
       SENTRY_DSN: string;
       ENABLE_TELEMETRY: boolean;
+      WALLET_KEY: string;
     };
   }
 }
