@@ -47,7 +47,14 @@
               <v-icon class="scale_beat" color="warning" v-bind="props">mdi-brightness-percent</v-icon>
             </template>
 
-            <span>
+            <a
+              v-if="item.discountPackage === 'None'"
+              class="app-link"
+              target="_blank"
+              :href="manual.discount_levels"
+              v-text="item.discountPackage"
+            />
+            <span v-else>
               {{ item.discountPackage }}
             </span>
           </v-tooltip>
@@ -315,6 +322,7 @@ import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import toHumanDate from "@/utils/date";
 import { downloadAsJson, normalizeError } from "@/utils/helpers";
+import { manual } from "@/utils/manual";
 
 import { gridProxyClient } from "../../clients";
 
