@@ -466,7 +466,6 @@ class Nodes {
 
     if (options.gateway) {
       params["ipv4"] = true;
-      params["ipv6"] = true;
       params["domain"] = true;
     }
     return convertObjectToQueryString(params);
