@@ -54,8 +54,13 @@
           v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
         />
+
+        <!-- <input-tooltip inline tooltip="" :href="manual"> -->
+        <v-switch color="primary" inset label="Rented by me" v-model="rentedBy" hide-details />
+        <!-- </input-tooltip> -->
+
         <input-tooltip inline tooltip="Click to know more about dedicated machines." :href="manual.dedicated_machines">
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Include rentable nodes" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -68,6 +73,7 @@
             ipv6,
             certified,
             dedicated,
+            rentedBy,
             cpu: solution?.cpu,
             ssdDisks: disks.map(disk => disk.size),
             memory: solution?.memory,
@@ -249,6 +255,7 @@ const { ipv4, ipv6, planetary, mycelium, wireguard } = useNetworks();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
+const rentedBy = ref(false);
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const selectedSSHKeys = ref("");
