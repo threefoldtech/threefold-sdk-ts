@@ -19,7 +19,6 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
-import { createCustomToast, ToastType } from "./custom_toast";
 import { normalizeError } from "./helpers";
 
 export interface GetLocationsConfig {
@@ -235,10 +234,13 @@ export async function validateRentContract(
         id: node.rentContractId,
       });
       if (contractInfo.state.gracePeriod) {
-        createCustomToast(
-          `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`,
-          ToastType.danger,
-        );
+        const err = `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
+        await new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(Error(err));
+          }, 2000);
+        });
+        console.error(err);
       }
     }
 
