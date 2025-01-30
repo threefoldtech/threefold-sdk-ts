@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel, QSFSZDBSModel } from "../src";
+import { FilterOptions, generateString, MachinesModel, QSFSZDBSModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -38,7 +38,7 @@ async function deleteQsfs(client, qsfs) {
 }
 
 async function main() {
-  const name = "wed2710t1";
+  const name = "vm" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
 
   const qsfs_name = "wed2710q1";
@@ -86,7 +86,7 @@ async function main() {
     },
     machines: [
       {
-        name: "wed2710v1",
+        name: "vm" + generateString(8),
         node_id: vmNode,
         disks: [
           {

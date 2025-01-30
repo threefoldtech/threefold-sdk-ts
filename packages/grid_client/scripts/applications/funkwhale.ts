@@ -1,4 +1,4 @@
-import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -43,7 +43,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newfunkwhale";
+  const name = "fw" + generateString(8);
   const grid3 = await getClient(`funkwhale/${name}`);
   const subdomain = "fw" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 50 }; // Update the instance capacity values according to your requirements.
@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "funkwhale",
+        name: "fw" + generateString(8),
         node_id: vmNode,
         disks: [
           {

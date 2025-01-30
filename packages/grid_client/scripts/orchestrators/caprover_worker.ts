@@ -1,4 +1,4 @@
-import { Features, FilterOptions, MachinesModel } from "../../src";
+import { Features, FilterOptions, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -24,7 +24,7 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "newVMS5";
+  const name = "cr" + generateString(8);
   const grid3 = await getClient(`caprover/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -43,7 +43,7 @@ async function main() {
     },
     machines: [
       {
-        name: "capworker1",
+        name: "cr" + generateString(8),
         node_id: +(await grid3.capacity.filterNodes(vmQueryOptions))[1].nodeId,
         disks: [
           {

@@ -1,4 +1,4 @@
-import { GridClient, MachinesModel } from "../src";
+import { generateString, GridClient, MachinesModel } from "../src";
 import { type ZmachineData } from "../src/helpers/types";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -26,7 +26,7 @@ async function cancel(client: GridClient, name: string) {
 }
 
 async function main() {
-  const name = "newVMS";
+  const name = "vm" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
 
   const vms: MachinesModel = {
@@ -37,7 +37,7 @@ async function main() {
     },
     machines: [
       {
-        name: "testvm",
+        name: "vm" + generateString(8),
         node_id: 11,
         disks: [
           {

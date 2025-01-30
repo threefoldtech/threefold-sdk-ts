@@ -1,4 +1,4 @@
-import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -43,7 +43,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newsubsquid";
+  const name = "ss" + generateString(8);
   const grid3 = await getClient(`subsquid/${name}`);
   const subdomain = "ss" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 50 }; // Update the instance capacity values according to your requirements.
@@ -75,7 +75,7 @@ async function main() {
     },
     machines: [
       {
-        name: "subsquid",
+        name: "ss" + generateString(8),
         node_id: vmNode,
         disks: [
           {

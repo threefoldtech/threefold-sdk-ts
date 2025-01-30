@@ -1,4 +1,4 @@
-import { FilterOptions, K8SModel } from "../../src";
+import { FilterOptions, generateString, K8SModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log } from "../utils";
 
@@ -24,7 +24,7 @@ async function cancel(client, k8s) {
 }
 
 async function main() {
-  const name = "testk8sMy";
+  const name = "k8s" + generateString(8);
   const grid3 = await getClient(`kubernetes/${name}`);
 
   const k: K8SModel = {

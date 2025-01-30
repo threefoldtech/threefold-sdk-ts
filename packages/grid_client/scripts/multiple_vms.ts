@@ -1,4 +1,4 @@
-import { FilterOptions, GridClient, MachinesModel } from "../src";
+import { FilterOptions, generateString, GridClient, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log, pingNodes } from "./utils";
 
@@ -30,7 +30,7 @@ async function getNodeId(client: GridClient, options: FilterOptions) {
 }
 
 async function main() {
-  const name = "monVMS2";
+  const name = "vm" + generateString(8);
   const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
@@ -46,7 +46,7 @@ async function main() {
   const vms: MachinesModel = {
     name,
     network: {
-      name: "monNetwork",
+      name: "vm" + generateString(8),
       ip_range: "10.238.0.0/16",
     },
     machines: [

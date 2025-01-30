@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -43,7 +43,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newjenkins";
+  const name = "jk" + generateString(8);
   const grid3 = await getClient(`jenkins/${name}`);
   const subdomain = "jk" + grid3.twinId + name;
   const instanceCapacity = { cru: 2, mru: 4, sru: 50 }; // Medium flavor as an example
@@ -74,7 +74,7 @@ async function main() {
     },
     machines: [
       {
-        name: "jenkins",
+        name: "jk" + generateString(8),
         node_id: vmNode,
         disks: [
           {

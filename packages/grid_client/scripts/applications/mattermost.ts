@@ -1,4 +1,4 @@
-import { Features, FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { Features, FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -43,7 +43,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "newmattermost";
+  const name = "mm" + generateString(8);
   const grid3 = await getClient(`mattermost/${name}`);
   const subdomain = "mm" + grid3.twinId + name;
   const instanceCapacity = { cru: 1, mru: 2, sru: 15 }; // Update the instance capacity values according to your requirements.
@@ -77,7 +77,7 @@ async function main() {
     },
     machines: [
       {
-        name: "mattermost",
+        name: "mm" + generateString(8),
         node_id: vmNode,
         disks: [
           {

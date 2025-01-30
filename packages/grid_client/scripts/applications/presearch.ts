@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel } from "../../src";
+import { FilterOptions, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -24,7 +24,7 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const name = "newpresearch";
+  const name = "ps" + generateString(8);
   const grid3 = await getClient(`presearch/${name}`);
   const instanceCapacity = { cru: 1, mru: 1, sru: 10 }; // Update the instance capacity values according to your requirements.
 
@@ -47,7 +47,7 @@ async function main() {
     },
     machines: [
       {
-        name: "presearch",
+        name: "ps" + generateString(8),
         node_id: vmNode,
         disks: [
           {

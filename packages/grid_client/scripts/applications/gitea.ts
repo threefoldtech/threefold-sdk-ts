@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel, MachinesModel } from "../../src";
+import { FilterOptions, GatewayNameModel, generateString, MachinesModel } from "../../src";
 import { config, getClient } from "../client_loader";
 import { log, pingNodes } from "../utils";
 
@@ -44,7 +44,7 @@ async function cancel(client, vms, gw) {
 }
 
 async function main() {
-  const name = "giteainstance";
+  const name = "gt" + generateString(8);
   const networkName = "giteanetwork";
   const grid3 = await getClient(`gitea/${name}`);
   const subdomain = "gt" + grid3.twinId + name;
@@ -77,7 +77,7 @@ async function main() {
     },
     machines: [
       {
-        name: "giteavm",
+        name: "gt" + generateString(8),
         node_id: vmNode,
         disks: [
           {
