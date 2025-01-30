@@ -201,13 +201,13 @@ export function normalizeNodeFilters(
     publicIPs: filters.ipv4 || undefined,
     hasIPv6: filters.ipv6 || undefined,
     hasGPU: filters.hasGPU || undefined,
-    rentedBy: filters.dedicated ? options?.twinId : undefined,
     certified: filters.certified || undefined,
-    availableFor: options?.twinId,
+    availableFor: filters.dedicated ? undefined : options?.twinId,
     region: options?.location.region ? options?.location.region : options?.location.subregion,
     country: options?.location.country,
     gateway: options?.gateway,
     healthy: true,
+    rentableOrRentedBy: filters.dedicated ? options?.twinId : undefined,
     planetary: filters.planetary,
     mycelium: filters.mycelium,
     wireguard: filters.wireguard,
@@ -227,6 +227,9 @@ export async function validateRentContract(
   }
 
   try {
+    if (node.dedicated && node.rentedByTwinId === 0) {
+      throw `Node ${node.nodeId} is not rented`;
+    }
     if (node.rentContractId !== 0) {
       const contractInfo = await gridStore.grid.contracts.get({
         id: node.rentContractId,
