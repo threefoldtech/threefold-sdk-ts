@@ -69,6 +69,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -88,6 +89,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -234,6 +236,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -253,6 +256,7 @@ test("TC2847 - VM: Deploy a VM With Mycelium", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -403,6 +407,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   } catch (error) {
     //Log the resources that were not found.
@@ -423,6 +428,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       farmId: 1,
       availableFor: await gridClient.twins.get_my_twin_id(),
       features: [Features.wireguard],
+      nodeExclude: [11],
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
@@ -499,9 +505,9 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
     //Verify that the disk was added successfully.
     await ssh.execCommand("df -h").then(async function (result) {
       const splittedRes = result.stdout.split("\n");
-      log(splittedRes[4]);
-      expect(splittedRes[4]).toContain(mountPoint);
-      expect(splittedRes[4]).toContain(diskSize.toString());
+      log(splittedRes[5]);
+      expect(splittedRes[5]).toContain(mountPoint);
+      expect(splittedRes[5]).toContain(diskSize.toString());
     });
   } finally {
     //Disconnect from the machine
@@ -727,7 +733,11 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
         log(result.stdout);
         expect(result.stdout).toContain(vmEnvVarValue[maxIterations]);
       });
-
+      await ssh.execCommand("apk add util-linux").then(function (result) {
+        if (result.stderr) {
+          throw new Error("Failed to install util-linux");
+        }
+      });
       //Verify VM Resources(CPU)
       await ssh.execCommand("lscpu").then(async function (result) {
         const splittedRes = result.stdout.split("\n");
